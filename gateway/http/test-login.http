@@ -1,0 +1,23 @@
+### 登录
+POST http://127.0.0.1:10010/auth/login/doLogin
+Content-Type: application/json
+
+{
+  "username": "yubin",
+  "pwd": "yubin"
+}
+
+### 添加用户
+POST http://127.0.0.1:10010/auth/admin/add-user
+Content-Type: application/json
+
+{
+  "username": "yubin-normal",
+  "password": "yubin",
+  "role": 2,
+  "screenName": "俞斌-普通"
+}
+
+
+### GET request with parameter
+GET http://10.245.142.233:10010/antv/

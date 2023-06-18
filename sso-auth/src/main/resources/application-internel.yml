@@ -1,0 +1,14 @@
+# 实验室内网环境下的版本
+server:
+  servlet:
+    context-path: /auth
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn

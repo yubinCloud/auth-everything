@@ -1,0 +1,54 @@
+server:
+  port: ${APP_PORT:9590}
+  servlet:
+    context-path: /auth
+
+spring:
+  application:
+    name: antv-sso-auth
+  profiles:
+    active: dev
+  data:
+    redis:
+      database: ${REDIS_DB:1}
+      host: ${REDIS_HOST:127.0.0.1}
+      port: ${REDIS_PORT:6379}
+      timeout: 10s
+      lettuce:
+        pool:
+          max-active: 200
+          max-wait: -1ms
+          max-idle: 10
+          min-idle: 0
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${MYSQL_HOST:127.0.0.1}:${MYSQL_PORT:3306}/${MYSQL_DB:sso_auth}?serverTimezone=UTC&useSSL=false&useUnicode=true&characterEncoding=utf-8
+    username: ${MYSQL_USERNAME:root}
+    password: ${MYSQL_PWD:root}
+
+
+sa-token:
+  token-name: authorization
+  timeout: 2592000
+  activity-timeout: -1
+  is-concurrent: true
+  is-share: true
+  token-style: uuid
+  is-log: false
+  # jwt 密钥
+  jwt-secret-key: ${JWT_SECRET:sfaisokhnfsdsadaitfasf}
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+
+springdoc:
+  swagger-ui:
+    path: /docs
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
+
+pagehelper:
+  reasonable: false
+  defaultCount: true # 分页插件默认参数支持 default-count 形式，自定义扩展的参数，必须大小写一致

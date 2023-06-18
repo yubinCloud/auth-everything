@@ -1,0 +1,72 @@
+version: '3'
+services:
+  mysql8:
+    build:
+      context: ./mysql8
+    container_name: ${PROJECT_PREFIX}-${MYSQL_HOST}
+    hostname: ${MYSQL_HOST}
+    image: ${PROJECT_PREFIX}-${MYSQL_HOST}
+    expose:
+      - "3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_PWD}
+    privileged: true
+    volumes:
+      - ./mysql8/volume/conf/my.cnf:/etc/mysql/my.cnf
+      - ./mysql8/volume/data:/var/lib/mysql
+    restart: ${DOCKER_RESTART_POLICY}
+
+  redis6:
+    container_name: ${PROJECT_PREFIX}-${REDIS_HOST}
+    hostname: ${REDIS_HOST}
+    image: redis:6.2.6
+    privileged: true
+    expose:
+      - "6379"
+    restart: ${DOCKER_RESTART_POLICY}
+  
+  gateway:
+    build:
+      context: ./gateway
+    container_name: ${PROJECT_PREFIX}-${GATEWAY_HOST}
+    hostname: ${GATEWAY_HOST}
+    image: ${PROJECT_PREFIX}-${GATEWAY_HOST}
+    ports:
+      - ${GATEWAY_INGRESS_PORT}:${GATEWAY_PORT}
+    depends_on:
+      - ${REDIS_HOST}
+    environment:
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILE}  # 激活 Spring 的某个环境
+    env_file:
+      - ./.env
+    restart: ${DOCKER_RESTART_POLICY}
+  
+  sso-auth:
+    build:
+      context: ./sso-auth
+    container_name: ${PROJECT_PREFIX}-${AUTH_SERVICE_HOST}
+    hostname: ${AUTH_SERVICE_HOST}
+    image: ${PROJECT_PREFIX}-${AUTH_SERVICE_HOST}
+    expose:
+      - ${AUTH_SERVICE_PORT}
+    depends_on:
+      - ${MYSQL_HOST}
+      - ${REDIS_HOST}
+    environment:
+      - APP_PORT=${AUTH_SERVICE_PORT:-9590}
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILE}
+      - MYSQL_DB=sso_auth  # 存放认证信息的数据库名
+    env_file:
+      - ./.env
+    command: ./wait-for-it.sh -t 0 ${MYSQL_HOST}:3306 -- sh -c "java -jar app.jar"
+    restart: ${DOCKER_RESTART_POLICY}
+
+  hello-service:
+    build:
+      context: ./hello-service
+    container_name: ${PROJECT_PREFIX}-${HELLO_SERVICE_HOST}
+    hostname: ${HELLO_SERVICE_HOST}
+    image: ${PROJECT_PREFIX}-${HELLO_SERVICE_HOST}
+    expose:
+      - "80"
+    restart: ${DOCKER_RESTART_POLICY}

@@ -1,0 +1,50 @@
+POST {{url-prefix}}/admin/user/add
+Content-Type: application/json
+
+{
+  "username": "yubin-54",
+  "password": "yubin125",
+  "role": 2,
+  "screenName": "yubin54",
+  "permissionList": ["wechat", "hello"]
+}
+
+### 删除
+
+POST {{url-prefix}}/admin/user/delete
+Content-Type: application/json
+
+{
+"username": "yubin-54"
+}
+
+### 查看用户列表
+
+GET {{url-prefix}}/admin/user/list?pageNum=1&pageSize=2
+Content-Type: application/json
+
+
+### 查询用户
+
+GET {{url-prefix}}/admin/user-list?username=yubin-admin
+Content-Type: application/json
+
+### 增加权限
+
+POST {{url-prefix}}/admin/permission/add
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "permissionList": ["weibod"]
+}
+
+### 删除权限
+
+POST {{url-prefix}}/admin/permission/delete
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "permission": "weibod"
+}

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.ssoauth.mapper.UserMapper">
+
+    <resultMap id="UserDao" type="com.example.ssoauth.dao.result.UserDao">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="username" column="username" jdbcType="VARCHAR"/>
+            <result property="password" column="password" jdbcType="VARCHAR"/>
+            <result property="screenName" column="screen_name" jdbcType="VARCHAR"/>
+            <result property="role" column="role" jdbcType="INTEGER"/>
+            <result property="permissionList" column="permission_list" jdbcType="OTHER" javaType="cn.hutool.json.JSONArray" typeHandler="com.example.ssoauth.mybatis.JsonTypeHandler"/>
+    </resultMap>
+
+    <resultMap id="UserWithRoleDao" type="com.example.ssoauth.dao.result.UserWithRoleDao">
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="username" column="username" jdbcType="VARCHAR"/>
+        <result property="password" column="password" jdbcType="VARCHAR"/>
+        <result property="screenName" column="screen_name" jdbcType="VARCHAR"/>
+        <result property="role" column="role" jdbcType="VARCHAR"/>
+        <result property="permissionList" column="permission_list" jdbcType="OTHER" javaType="cn.hutool.json.JSONArray"
+                typeHandler="com.example.ssoauth.mybatis.JsonTypeHandler"/>
+    </resultMap>
+
+    <sql id="UserDao_ColumnList">
+        id,username,password,
+        screen_name,role,permission_list
+    </sql>
+
+    <sql id="UserWithRoleDao_ColumnList">
+        id, username, password, screen_name, r.name as `role`, permission_list
+    </sql>
+
+
+
+    <insert id="insert" parameterType="com.example.ssoauth.dao.param.NewUserDao">
+        insert into user
+        ( id,username,password
+        ,screen_name,role,permission_list
+        )
+        values (#{id,jdbcType=BIGINT},#{username,jdbcType=VARCHAR},#{password,jdbcType=VARCHAR}
+               ,#{screenName,jdbcType=VARCHAR},#{role,jdbcType=INTEGER},#{permissionList,jdbcType=VARCHAR}
+               )
+    </insert>
+
+    <select id="selectByCond" parameterType="com.example.ssoauth.dao.param.UserSelectCond" resultMap="UserWithRoleDao">
+        select
+            <include refid="UserWithRoleDao_ColumnList"></include>
+        from user as u
+        left join role as r on u.role = r.role_id
+        <where>
+            <if test="username != null">
+                and u.username = #{username}
+            </if>
+            <if test="screenName != null">
+                and screen_name = #{screenName}
+            </if>
+            <if test="role != null">
+                and r.name = #{role}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectByUsername" parameterType="java.lang.String" resultMap="UserWithRoleDao">
+        select
+        <include refid="UserWithRoleDao_ColumnList"></include>
+        from user as u
+        left join role as r on u.role = r.role_id
+        where u.username = #{username,jdbcType=VARCHAR}
+    </select>
+
+    <delete id="deleteByUsername" parameterType="java.lang.String">
+        delete
+        from user
+        where username = #{username,jdbcType=VARCHAR}
+    </delete>
+
+    <update id="updateUserInfo" parameterType="com.example.ssoauth.dao.param.UpdateUserParam">
+        update user
+        <set>
+            <if test="password != null">
+                password = #{password}
+            </if>
+            <if test="screenName != null">
+                screen_name = #{screenName}
+            </if>
+            <if test="role != null">
+                role = #{role,jdbcType=INTEGER}
+            </if>
+        </set>
+        where username = #{username,jdbcType=VARCHAR}
+    </update>
+
+    <update id="appendPermission" parameterType="com.example.ssoauth.dao.param.PermissionInsertParam">
+        update user
+        set permission_list = json_merge(permission_list, #{permissionList})
+        where username = #{username,jdbcType=VARCHAR}
+    </update>
+
+    <update id="deletePermission" parameterType="com.example.ssoauth.dao.param.DeleteUserPermissionParam">
+        update user
+        set permission_list = JSON_REMOVE(permission_list, JSON_UNQUOTE(JSON_SEARCH(permission_list, 'one', #{permission})))
+        where username = #{username} and JSON_SEARCH(permission_list, 'one', #{permission});
+    </update>
+</mapper>
