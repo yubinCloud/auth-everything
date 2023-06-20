@@ -17,6 +17,11 @@ public class SaTokenConfigure {
                 .addInclude("/**")    /* 拦截全部path */
                 // 开放地址
                 .addExclude("/favicon.ico")
+                .addExclude("/auth/v3/api-docs")  // API 文档相关信息
+                .addExclude("/auth/swagger-ui/index.html")
+                .addExclude("/auth/docs")
+                .addExclude("/auth/doc.html")
+                .addExclude("/nacos/**")
                 // 鉴权方法：每次访问进入
                 .setAuth(obj -> {
                     // ********** 登录校验：除登录接口外，均需要登录 ***********

@@ -24,6 +24,11 @@ spring:
           uri: http://${AUTH_SERVICE_HOST:127.0.0.1}:${AUTH_SERVICE_PORT:9590}
           predicates:
             - Path=/auth/**
+        
+        - id: nacos
+          uri: http://${NACOS_HOST:127.0.0.1}:${NACOS_PORT:8848}
+          predicates:
+            - Path=/nacos/**
 
         - id: hello-service
           uri: http://${HELLO_SERVICE_HOST:127.0.0.1}:${HELLO_SERVICE_PORT:80}

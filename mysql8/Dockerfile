@@ -1,7 +1,8 @@
 FROM mysql:8.0.32
 
-WORKDIR /docker-entrypoint-initdb.d
-
 ENV LANG=C.UTF-8
 
-ADD ./initdb/*.sql ./
+ADD ./initdb/*.sql /docker-entrypoint-initdb.d/
+
+COPY ./wait-for-it.sh /root/wait-for-it.sh
+RUN chmod +x /root/wait-for-it.sh
