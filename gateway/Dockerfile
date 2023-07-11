@@ -1,10 +1,13 @@
 FROM openjdk:17
 
-EXPOSE 10010
+ENV TZ=Asia/Sh
+ENV PARAMS=""
+
+RUN ln -sf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 WORKDIR /root
 
-ENV PARAMS=""
+EXPOSE 10010
 
 ADD target/gateway-*.jar app.jar
 

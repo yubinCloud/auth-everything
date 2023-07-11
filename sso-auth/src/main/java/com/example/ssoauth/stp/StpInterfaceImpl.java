@@ -2,6 +2,8 @@ package com.example.ssoauth.stp;
 
 import cn.dev33.satoken.stp.StpInterface;
 import cn.dev33.satoken.stp.StpUtil;
+import com.example.ssoauth.constant.SaLoginConfExtraKey;
+import com.example.ssoauth.exception.LoginException;
 import com.example.ssoauth.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -18,7 +20,11 @@ public class StpInterfaceImpl implements StpInterface {
     @Override
     public List<String> getPermissionList(Object loginId, String loginType) {
         String username = (String) loginId;
-        return userService.findByUsername(username).getPermissionList();
+        var userInDb =  userService.findByUsername(username);
+        if (userInDb == null) {
+            throw new LoginException();
+        }
+        return userInDb.getPermissionList();
     }
 
     /**
@@ -26,7 +32,7 @@ public class StpInterfaceImpl implements StpInterface {
      */
     @Override
     public List<String> getRoleList(Object loginId, String loginType) {
-        String role = (String) StpUtil.getExtra("role");
+        String role = (String) StpUtil.getExtra(SaLoginConfExtraKey.ROLE);
         List<String> roleList = new ArrayList<>();
         roleList.add(role);
         return roleList;

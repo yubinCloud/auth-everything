@@ -11,6 +11,7 @@ import java.util.List;
 public class StpInterfaceImpl implements StpInterface {
     @Override
     public List<String> getPermissionList(Object loginId, String loginType) {
+        System.out.println(StpUtil.getExtra("permission"));
         return new ArrayList<>();
     }
 

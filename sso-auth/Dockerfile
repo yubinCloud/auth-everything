@@ -1,11 +1,14 @@
 FROM openjdk:17
 
-EXPOSE 9590
+ENV TZ=Asia/Sh
+ENV PARAMS=""
+
+RUN ln -sf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 WORKDIR /root
 
-ENV PARAMS=""
+EXPOSE 9590
 
 ADD target/sso-auth-*.jar app.jar
 
-ENTRYPOINT [ "sh", "-c", "java -jar $JAVA_OPTS app.jar $PARAMS" ]
+ENTRYPOINT [ "sh", "-c", "java $JAVA_OPTS -jar app.jar $PARAMS" ]

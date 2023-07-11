@@ -39,18 +39,22 @@ services:
       start_period: 30s
     restart: ${DOCKER_RESTART_POLICY}
   
-  nacos:
-    container_name: ${PROJECT_PREFIX}-${NACOS_HOST}
-    hostname: ${NACOS_HOST}
-    image: nacos/nacos-server:v2.2.3-slim
-    env_file:
-      - ./nacos/nacos.env
+  sentinel-dashboard:
+    build:
+      context: ./sentinel-dashboard
+    container_name: ${PROJECT_PREFIX}-${SENTINEL_HOST}
+    hostname: ${SENTINEL_HOST}
+    image: ${PROJECT_PREFIX}-${SENTINEL_HOST}
     expose:
-      - "9848"
-      - "8848"
-    depends_on:
-      mysql8:
-        condition: service_healthy
+      - "8080"
+    ports:
+      - 8080:8080
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sS 'http://localhost:8080/sentinel/#/login' || exit 1"]
+      interval: 8s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
     restart: ${DOCKER_RESTART_POLICY}
 
   gateway:
@@ -62,11 +66,13 @@ services:
     ports:
       - ${GATEWAY_INGRESS_PORT}:${GATEWAY_PORT}
     environment:
-      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILE}  # 激活 Spring 的某个环境
+      - auth_enabled=false  # 关闭 Sentinel 自带的登录认证
     env_file:
       - ./.env
     depends_on:
       redis6:
+        condition: service_healthy
+      sentinel-dashboard:
         condition: service_healthy
     restart: ${DOCKER_RESTART_POLICY}
   

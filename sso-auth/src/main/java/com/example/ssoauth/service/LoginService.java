@@ -35,6 +35,7 @@ public class LoginService {
         }
         // 第二步：根据账号id，进行登录
         var loginConf = SaLoginConfig.setExtra(SaLoginConfExtraKey.ROLE, userInDb.getRole());  // 此处填入的参数应该保持用户表唯一，比如用户id，不可以直接填入整个 User 对象
+        loginConf.setExtra(SaLoginConfExtraKey.PERMISSION, userInDb.getPermissionList());
         StpUtil.login(username, loginConf);
         // 构造 resp
         LoginResp resp = userConverter.toLoginResp(userInDb);
