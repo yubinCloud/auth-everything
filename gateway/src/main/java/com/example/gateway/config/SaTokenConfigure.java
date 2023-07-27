@@ -8,6 +8,7 @@ import com.example.gateway.constant.PermissionEnum;
 import com.example.gateway.enums.RoleEum;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Role;
 
 @Configuration
 public class SaTokenConfigure {
@@ -29,20 +30,30 @@ public class SaTokenConfigure {
                     // *****************************************************
 
                     // ********** 权限认证服务 ***************
-                    SaRouter.match("/auth/admin/**", r -> StpUtil.checkRole(RoleEum.SUPER_ADMIN));
+                    SaRouter.match("/auth/**").free(r -> {
+                        SaRouter.match("/auth/admin/**", rq -> StpUtil.checkRole(RoleEum.SUPER_ADMIN));
+                        SaRouter.match("/auth/internal/**", rq -> StpUtil.checkRole(RoleEum.INTERNAL));
+                    }).stop();
                     // **************************************
 
                     // ********** sentinel 服务 ***************
-                    SaRouter.match("/sentinel/**", r -> StpUtil.checkRole(RoleEum.SUPER_ADMIN));
+                    SaRouter.match("/sentinel/**", r -> StpUtil.checkRole(RoleEum.SUPER_ADMIN)).stop();
                     // ***************************************
 
                     // ********** actuator ********************
-                    SaRouter.match("/actuator/**", r -> StpUtil.checkRole(RoleEum.SUPER_ADMIN));
-                    SaRouter.match("/actuator/**", r -> StpUtil.checkPermission(PermissionEnum.ACTUATOR));
+                    SaRouter.match("/actuator/**").free(r -> {
+                        SaRouter.match("/actuator/**", rq -> StpUtil.checkRole(RoleEum.SUPER_ADMIN));
+                        SaRouter.match("/actuator/**", rq -> StpUtil.checkRole(RoleEum.SUPER_ADMIN));
+                    }).stop();
                     // ****************************************
 
                     // ********** hello service 服务 **************
-                    SaRouter.match("/hello/admin", r -> StpUtil.checkRole(RoleEum.SUPER_ADMIN));
+                    SaRouter.match("/hello/**").free(r -> {
+                        SaRouter.match("/hello/admin", rq -> StpUtil.checkRole(RoleEum.SUPER_ADMIN));
+                        SaRouter.match("/hello/docs", rq -> StpUtil.checkRole(RoleEum.SUPER_ADMIN));
+                        SaRouter.match("/hello/redoc", rq -> StpUtil.checkRole(RoleEum.SUPER_ADMIN));
+                        SaRouter.match("/hello/openapi.json", rq -> StpUtil.checkRole(RoleEum.SUPER_ADMIN));
+                    }).stop();
                     // ********************************************
                 })
                 // 异常处理方法：每次setAuth函数出现异常时进入

@@ -19,30 +19,35 @@ spring:
           max-idle: 10
           min-idle: 0
   cloud:
-    gateway:
-      routes:
-        - id: sentinel-dashboard
-          uri: http://${SENTINEL_HOST:127.0.0.1}:${SENTINEL_PORT:8080}
-          predicates:
-            - Path=/sentinel/**
-
-        - id: sso-auth
-          uri: http://${AUTH_SERVICE_HOST:127.0.0.1}:${AUTH_SERVICE_PORT:9590}
-          predicates:
-            - Path=/auth/**
-
-        - id: hello-service
-          uri: http://${HELLO_SERVICE_HOST:127.0.0.1}:${HELLO_SERVICE_PORT:80}
-          predicates:
-            - Path=/hello/**
-          filters:
-            - StripPrefix=1
     discovery:
       client:
         simple:
           instances:
+            sentinel-dashboard:
+              - uri: http://${SENTINEL_HOST:127.0.0.1}:${SENTINEL_PORT:8080}
             auth-service:
               - uri: http://${AUTH_SERVICE_HOST:127.0.0.1}:${AUTH_SERVICE_PORT:9590}
+            hello-service:
+              - uri: http://${HELLO_SERVICE_HOST:127.0.0.1}:${HELLO_SERVICE_PORT:80}
+    gateway:
+      routes:
+        - id: sentinel-dashboard
+          uri: lb://sentinel-dashboard
+          predicates:
+            - Path=/sentinel/**
+
+        - id: sso-auth
+          uri: lb://auth-service
+          predicates:
+            - Path=/auth/login/**,/auth/admin/**
+
+        - id: hello-service
+          uri: lb://hello-service
+          predicates:
+            - Path=/hello/**
+          filters:
+            - StripPrefix=1
+
 sa-token:
   token-name: authorization
   timeout: 2592000

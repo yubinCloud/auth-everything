@@ -21,7 +21,7 @@ public class StpInterfaceImpl implements StpInterface {
 
     private final AuthFeignClient authFeignClient;
 
-    private ExecutorService executorService = Executors.newFixedThreadPool(1);
+    private final ExecutorService executorService = Executors.newFixedThreadPool(1);
 
     static private final String KEY_PREFIX_PERM = "aet:auth-perm:";
 
