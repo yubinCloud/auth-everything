@@ -1,4 +1,5 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Header
+from typing import Annotated, Union
 
 app = FastAPI()
 
@@ -11,3 +12,10 @@ def read_root(name: str = 'World'):
 @app.get('/admin')
 def only_admin():
     return "Only admin can see it."
+
+
+@app.get('/whoami')
+def whoami(
+    user: Annotated[Union[str, None], Header(...)] = None
+):
+    return f"I am {user}"

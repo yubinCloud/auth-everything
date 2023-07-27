@@ -1,10 +1,11 @@
-package com.example.ssoauth.dao.result;
+package com.example.gateway.feign.client.response;
 
-import cn.hutool.json.JSONArray;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
-public class UserWithRoleDao {
+public class UserInfo {
     /**
      * 主键
      */
@@ -30,5 +31,8 @@ public class UserWithRoleDao {
      */
     private String role;
 
-    private JSONArray permissionList;
+    /**
+     * 权限列表
+     */
+    private List<String> permissionList;
 }

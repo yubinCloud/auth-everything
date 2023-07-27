@@ -37,8 +37,21 @@ spring:
             - Path=/hello/**
           filters:
             - StripPrefix=1
+    discovery:
+      client:
+        simple:
+          instances:
+            auth-service:
+              - uri: http://${AUTH_SERVICE_HOST:127.0.0.1}:${AUTH_SERVICE_PORT:9590}
 sa-token:
   token-name: authorization
+  timeout: 2592000
+  activity-timeout: -1
+  is-concurrent: true
+  is-share: true
+  token-style: uuid
+  is-log: false
+  jwt-secret-key: ${JWT_SECRET:sfaisokhnfsdsadaitfasf}
 
 
 management:

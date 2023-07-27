@@ -3,8 +3,8 @@ POST http://127.0.0.1:10010/auth/login/doLogin
 Content-Type: application/json
 
 {
-  "username": "yubin",
-  "pwd": "yubin"
+  "username": "admin",
+  "pwd": "123456"
 }
 
 ### 添加用户
@@ -21,3 +21,7 @@ Content-Type: application/json
 
 ### GET request with parameter
 GET http://10.245.142.233:10010/antv/
+
+
+### GET request with parameter
+GET http://127.0.0.1:10010/hello/admin

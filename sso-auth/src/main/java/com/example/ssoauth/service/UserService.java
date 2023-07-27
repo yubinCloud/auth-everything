@@ -36,7 +36,6 @@ public class UserService {
 
     public UserDetailDao findByUsername(String username) {
         UserWithRoleDao userDao = userMapper.selectByUsername(username);
-        System.out.println(userDao.getPermissionList());
         return userConverter.toUserDetail(userDao);
     }
 

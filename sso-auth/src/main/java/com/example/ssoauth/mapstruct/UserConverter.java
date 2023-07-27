@@ -24,6 +24,8 @@ public interface UserConverter {
     })
     LoginResp toLoginResp(UserDetailDao userDetail);
 
+    @Mappings({})
+    UserInfoResp toUserInfoResp(UserDetailDao userDetail);
 
 
     @Mappings({
