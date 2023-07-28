@@ -19,7 +19,10 @@ public class UsernameHeaderFilter implements WebFilter {
         var request = exchange.getRequest();
         var token = request.getHeaders().getFirst("Authorization");
         if (token == null) {
-            token = request.getCookies().getFirst("authorization").getValue();
+            var tokenCookie = request.getCookies().getFirst("authorization");
+            if (tokenCookie != null) {
+                token = tokenCookie.getValue();
+            }
         }
         if (token == null || token.equals("")) {
             return chain.filter(exchange);  // 如果不存在 token，直接放行

@@ -8,7 +8,6 @@ import com.example.gateway.constant.PermissionEnum;
 import com.example.gateway.enums.RoleEum;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Role;
 
 @Configuration
 public class SaTokenConfigure {
