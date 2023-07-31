@@ -31,13 +31,6 @@ services:
     privileged: true
     expose:
       - "6379"
-    healthcheck:
-      test: ["CMD", "/root/wait-for-it.sh", "localhost:6379"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-      start_period: 30s
-    restart: ${DOCKER_RESTART_POLICY}
   
   sentinel-dashboard:
     build:
@@ -65,15 +58,8 @@ services:
     image: ${PROJECT_PREFIX}-${GATEWAY_HOST}
     ports:
       - ${GATEWAY_INGRESS_PORT}:${GATEWAY_PORT}
-    environment:
-      - auth_enabled=false  # 关闭 Sentinel 自带的登录认证
     env_file:
       - ./.env
-    depends_on:
-      redis6:
-        condition: service_healthy
-      sentinel-dashboard:
-        condition: service_healthy
     restart: ${DOCKER_RESTART_POLICY}
   
   sso-auth:
@@ -90,11 +76,6 @@ services:
       - MYSQL_DB=sso_auth  # 存放认证信息的数据库名
     env_file:
       - ./.env
-    depends_on:
-      mysql8:
-        condition: service_healthy
-      redis6:
-        condition: service_healthy
     restart: ${DOCKER_RESTART_POLICY}
 
   hello-service:

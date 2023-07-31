@@ -29,7 +29,7 @@ public class UsernameHeaderFilter implements WebFilter {
         }
         String loginId = (String) StpUtil.getLoginIdByToken(token);
         if (loginId == null) {
-            throw new RuntimeException("token 异常");
+            return chain.filter(exchange);  // 即便无法从 token 中解析出 loginId 也直接放行
         }
         var mutate = request.mutate();
         mutate.header("User", loginId);
