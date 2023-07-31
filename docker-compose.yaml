@@ -31,6 +31,13 @@ services:
     privileged: true
     expose:
       - "6379"
+    healthcheck:
+      test: ["CMD", "/root/wait-for-it.sh", "localhost:6379"]
+      interval: 8s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    restart: ${DOCKER_RESTART_POLICY}
   
   sentinel-dashboard:
     build:

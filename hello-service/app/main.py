@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Header
+from fastapi import FastAPI, Header, Request
 from typing import Annotated, Union
 
 app = FastAPI()
@@ -19,3 +19,11 @@ def whoami(
     user: Annotated[Union[str, None], Header(...)] = None
 ):
     return f"I am {user}"
+
+
+@app.get('/header')
+def header(
+    request: Request
+):
+    print(request.headers)
+    return ""

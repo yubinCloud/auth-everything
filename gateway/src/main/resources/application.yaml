@@ -39,7 +39,7 @@ spring:
         - id: sso-auth
           uri: lb://auth-service
           predicates:
-            - Path=/auth/login/**,/auth/admin/**
+            - Path=/auth/**
 
         - id: hello-service
           uri: lb://hello-service
