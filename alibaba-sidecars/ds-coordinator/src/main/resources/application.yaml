@@ -1,0 +1,24 @@
+server:
+  port: ${APP_PORT:10014}
+spring:
+  application:
+    name: @artifactId@
+  cloud:
+    nacos:
+      discovery:
+        server-addr: http://${NACOS_HOST:127.0.0.1}:${NACOS_PORT:8848}
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+
+sidecar:
+  ip: ${DS_COORDINATOR_HOST:127.0.0.1}
+  port: ${DS_COORDINATOR_PORT:15530}
+  health-check-url: http://${DS_COORDINATOR_HOST:127.0.0.1}:${DS_COORDINATOR_PORT:15530}/health
+
+management:
+  endpoint:
+    health:
+      show-details: always

@@ -1,0 +1,7 @@
+POST {{url-prefix}}/login/doLogin
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "pwd": "123456"
+}

@@ -1,0 +1,12 @@
+# 生产环境下关闭 spring-doc
+server:
+  servlet:
+    context-path: /auth
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+knife4j:
+  production: true # 生产环境下屏蔽

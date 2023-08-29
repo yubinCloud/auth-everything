@@ -1,0 +1,5 @@
+{
+    "name": "avue-data-server",
+    "script": "./app.js",
+    "autorestart": true
+}

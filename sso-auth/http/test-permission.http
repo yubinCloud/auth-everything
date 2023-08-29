@@ -1,0 +1,7 @@
+POST {{url-prefix}}/admin/permission/add
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "permissionList": ["weibod"]
+}

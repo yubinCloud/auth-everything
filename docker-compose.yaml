@@ -1,0 +1,434 @@
+version: '3'
+services:
+  
+  ##################################################################
+  #################### Basic infrastructure ########################
+  ##################################################################
+  mysql8:
+    build:
+      context: ./mysql8
+    container_name: ${PROJECT_PREFIX}-${MYSQL_HOST}
+    hostname: ${MYSQL_HOST}
+    image: ${PROJECT_PREFIX}-${MYSQL_HOST}
+    expose:
+      - "3306"
+    # ports:
+    #   - 3307:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_PWD}
+    privileged: true
+    volumes:
+      - ./mysql8/volume/conf/my.cnf:/etc/mysql/my.cnf
+      - ./mysql8/volume/data:/var/lib/mysql
+    restart: ${DOCKER_RESTART_POLICY}
+    networks:
+      - platform-net
+  
+  xxl-job-mysql:
+    build:
+      context: ./xxl-job-mysql
+    container_name: ${PROJECT_PREFIX}-${XXL_JOB_MYSQL_HOST}
+    hostname: ${XXL_JOB_MYSQL_HOST}
+    image: ${PROJECT_PREFIX}-${XXL_JOB_MYSQL_HOST}
+    expose:
+      - ${XXL_JOB_MYSQL_PORT}
+    # ports:
+    #   - 3308:${XXL_JOB_MYSQL_PORT}
+    environment:
+      - MYSQL_ROOT_PASSWORD=${XXL_JOB_MYSQL_PWD}
+    privileged: true
+    volumes:
+      - ./xxl-job-mysql/volume/conf/my.cnf:/etc/mysql/my.cnf
+      - ./xxl-job-mysql/volume/data:/var/lib/mysql
+    restart: ${DOCKER_RESTART_POLICY}
+    networks:
+      - platform-net
+
+  redis6:
+    build:
+      context: ./redis6
+    container_name: ${PROJECT_PREFIX}-${REDIS_HOST}
+    hostname: ${REDIS_HOST}
+    image: ${PROJECT_PREFIX}-${REDIS_HOST}
+    privileged: true
+    expose:
+      - "6379"
+    restart: ${DOCKER_RESTART_POLICY}
+    networks:
+      - platform-net
+  
+  elasticsearch7:
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.5.1
+    container_name: ${PROJECT_PREFIX}-${ES_HOST}
+    hostname: ${ES_HOST}
+    expose:
+      - 9200
+      - 9300
+    volumes:
+      - ./es/es_data:/usr/share/elasticsearch/data
+    environment:
+      - http.cors.enabled=true
+      - http.cors.allow-origin=*
+      - bootstrap.memory_lock=true
+      - discovery.type=single-node        # 指定单节点模式
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"  # 指定内存限制
+    privileged: true
+    healthcheck:
+      test: ["CMD-SHELL", "curl --silent --fail localhost:9200/_cluster/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 800s
+    restart: ${DOCKER_RESTART_POLICY}
+    networks:
+      - platform-net
+  
+  sentinel-dashboard:
+    build:
+      context: ./sentinel-dashboard
+    container_name: ${PROJECT_PREFIX}-${SENTINEL_HOST}
+    hostname: ${SENTINEL_HOST}
+    image: ${PROJECT_PREFIX}-${SENTINEL_HOST}
+    command: ["/wait-for-it.sh", "mysql8:3306", "-t", "0", "--", "sh", "-c", "java -Dauth.enabled=false -jar app.jar --server.servlet.context-path=/sentinel"]
+    expose:
+      - 8080
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sS 'http://localhost:8080/sentinel/#/login' || exit 1; echo healthy"]
+      interval: 5s
+      timeout: 10s
+      retries: 3
+      start_period: 360s
+    restart: ${DOCKER_RESTART_POLICY}
+    networks:
+      - platform-net
+  
+  nacos:
+    build:
+      context: ./nacos
+    container_name: ${PROJECT_PREFIX}-${NACOS_HOST}
+    hostname: ${NACOS_HOST}
+    image: ${PROJECT_PREFIX}-${NACOS_HOST}
+    env_file:
+      - ./nacos/nacos.env
+    environment:
+      - MYSQL_SERVICE_HOST=${MYSQL_HOST}
+      - MYSQL_SERVICE_PORT=3306
+      - MYSQL_SERVICE_USER=root
+      - MYSQL_SERVICE_PASSWORD=${MYSQL_PWD}
+      - MYSQL_SERVICE_DB_NAME=nacos
+    expose:
+      - "8848"
+      - "9848"
+      - "9849"
+    ports:
+      - 8848:8848
+      # - 9848:9848
+      # - 9849:9849
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sS 'http://localhost:8848/nacos' || exit 1; echo healthy"]
+      interval: 5s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    depends_on:
+      sentinel-dashboard:
+        condition: service_healthy
+    restart: ${DOCKER_RESTART_POLICY}
+    networks:
+      - platform-net
+  
+  ##################################################################
+  ######################### Biz Services ###########################
+  ##################################################################
+
+  gateway:
+    build:
+      context: ./gateway
+    container_name: ${PROJECT_PREFIX}-${GATEWAY_HOST}
+    hostname: ${GATEWAY_HOST}
+    image: ${PROJECT_PREFIX}-${GATEWAY_HOST}
+    command: ["/wait-for-it.sh", "nacos:8848", "-t", "0", "--", "sh", "-c", "java -jar app.jar"]
+    ports:
+      - 10010:${GATEWAY_PORT}
+    env_file:
+      - ./.env
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f localhost:10010/actuator/health | grep UP || exit 1; echo healthy"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 300s
+    depends_on:
+      - mysql8
+      - redis6
+      - nacos
+    restart: ${DOCKER_RESTART_POLICY}
+    networks:
+      - platform-net
+  
+  sso-auth:
+    build:
+      context: ./sso-auth
+    container_name: ${PROJECT_PREFIX}-${AUTH_SERVICE_HOST}
+    hostname: ${AUTH_SERVICE_HOST}
+    image: ${PROJECT_PREFIX}-${AUTH_SERVICE_HOST}
+    expose:
+      - ${AUTH_SERVICE_PORT}
+    environment:
+      - APP_PORT=${AUTH_SERVICE_PORT:-9590}
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILE}
+      - MYSQL_DB=sso_auth  # 存放认证信息的数据库名
+    env_file:
+      - ./.env
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f localhost:${AUTH_SERVICE_PORT}/auth/actuator/health | grep UP || exit 1; echo healthy"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 300s
+    depends_on:
+      gateway:
+        condition: service_healthy
+    restart: ${DOCKER_RESTART_POLICY}
+    networks:
+      - platform-net
+
+  jupyter-gateway:
+    build:
+      context: ./jupyter-gateway
+    container_name: ${PROJECT_PREFIX}-${JUPYTER_GATEWAY_HOST}
+    hostname: ${JUPYTER_GATEWAY_HOST}
+    image: ${PROJECT_PREFIX}-${JUPYTER_GATEWAY_HOST}
+    expose:
+      - ${JUPYTER_GATEWAY_PORT}
+    env_file:
+      - ./.env
+    depends_on:
+      gateway:
+        condition: service_healthy
+    restart: ${DOCKER_RESTART_POLICY}
+    networks:
+      - platform-net
+
+  xxljob-admin:
+    build:
+      context: ./xxl-job/xxl-job-admin
+    container_name: ${PROJECT_PREFIX}-${XXLJOB_ADMIN_HOST}
+    hostname: ${XXLJOB_ADMIN_HOST}
+    image: ${PROJECT_PREFIX}-${XXLJOB_ADMIN_HOST}
+    expose:
+      - 8090
+    environment:
+      - PARAMS=--spring.datasource.username=root --spring.datasource.password=${XXL_JOB_MYSQL_PWD} --spring.datasource.url=jdbc:mysql://${XXL_JOB_MYSQL_HOST}:${XXL_JOB_MYSQL_PORT}/xxl_job?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=GMT
+    env_file:
+      - ./.env
+    depends_on:
+      gateway:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f localhost:8090/xxl-job-admin/actuator/health | grep UP || exit 1; echo healthy"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 300s
+    restart: ${DOCKER_RESTART_POLICY}
+    networks:
+      - platform-net
+  
+  # xxljob-executor:
+  #   build:
+  #     context: ./xxl-job/xxl-job-executor-samples/xxl-job-executor-sample-springboot
+  #   container_name: ${PROJECT_PREFIX}-${XXLJOB_EXECUTOR_HOST}
+  #   hostname: ${XXLJOB_EXECUTOR_HOST}
+  #   image: ${PROJECT_PREFIX}-${XXLJOB_EXECUTOR_HOST}
+  #   expose:
+  #     - 8081
+  #     - 9999
+  #   environment:
+  #     - PARAMS=--xxl.job.admin.addresses=http://${XXLJOB_ADMIN_HOST}:8090/xxl-job-admin --xxl.job.executor.address=http://${XXLJOB_EXECUTOR_HOST}:9999
+  #   env_file:
+  #     - ./.env
+  #   volumes:
+  #     - miniconda:/opt/miniconda
+  #     - projects_deployment:/opt/app/dadp/projects_deployment
+  #   depends_on:
+  #     xxljob-admin:
+  #       condition: service_healthy
+  #   restart: ${DOCKER_RESTART_POLICY}
+  #   networks:
+  #     - platform-net
+
+  avue-nginx:
+    build:
+      context: ./avue-nginx
+    container_name: ${PROJECT_PREFIX}-${AVUE_NGINX_HOST}
+    hostname: ${AVUE_NGINX_HOST}
+    image: ${PROJECT_PREFIX}-${AVUE_NGINX_HOST}
+    expose:
+      - 8095
+    volumes:
+      - ./avue-data-server/exported-files:/opt/exported-files
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail http://localhost:8095/health | grep UP || exit 1; echo healthy"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 300s
+    depends_on:
+      gateway:
+        condition: service_healthy
+    restart: ${DOCKER_RESTART_POLICY}
+    networks:
+      - platform-net
+
+  avue-data-server:
+    build:
+      context: ./avue-data-server
+    container_name: ${PROJECT_PREFIX}-${AVUE_DATA_SERVER_HOST}
+    hostname: ${AVUE_DATA_SERVER_HOST}
+    image: ${PROJECT_PREFIX}-${AVUE_DATA_SERVER_HOST}
+    expose:
+      - 10002
+    environment:
+      - MYSQL_HOST=${MYSQL_HOST}
+      - MYSQL_USER=root
+      - MYSQL_PWD=${MYSQL_PWD}
+      - MYSQL_PORT=3306
+      - MYSQL_DB=antv_data_server
+      - SIDECAR_HOST=sidecar-avue-data-server
+    volumes:
+      - ./avue-data-server/exported-files:/src/exported-files
+      - ./avue-data-server/file:/src/file
+    healthcheck:
+      test: ["CMD-SHELL", "pm2 list | grep avue-data-server || exit 1; echo healthy"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    depends_on:
+      gateway:
+        condition: service_healthy
+    restart: ${DOCKER_RESTART_POLICY}
+    networks:
+      - platform-net
+
+  ds-worker:
+    build:
+      context: ./ds-worker
+    container_name: ${PROJECT_PREFIX}-${DS_WORKER_HOST}
+    hostname: ${DS_WORKER_HOST}
+    image: ${PROJECT_PREFIX}-${DS_WORKER_HOST}
+    expose:
+      - 9300
+    env_file:
+      - ./.env
+    depends_on:
+      avue-data-server:
+        condition: service_healthy
+    restart: ${DOCKER_RESTART_POLICY}
+    networks:
+      - platform-net
+  
+  ds-coordinator:
+    build:
+      context: ./ds-coordinator
+    container_name: ${PROJECT_PREFIX}-${DS_COORDINATOR_HOST}
+    hostname: ${DS_COORDINATOR_HOST}
+    image: ${PROJECT_PREFIX}-${DS_COORDINATOR_HOST}
+    expose:
+      - 15530
+    env_file:
+      - ./.env
+    environment:
+      - ENV_FOR_DYNACONF=internal
+      - TZ=Asia/Shanghai
+    depends_on:
+      gateway:
+        condition: service_healthy
+      elasticsearch7:
+        condition: service_healthy
+    restart: ${DOCKER_RESTART_POLICY}
+    networks:
+      - platform-net
+
+  ##################################################################
+  #################### Alibaba Sidecars ############################
+  ##################################################################
+  sidecar-jupyter-service:
+    build:
+      context: ./alibaba-sidecars/jupyter-service
+    container_name: ${PROJECT_PREFIX}-${SIDECAR_JUPYTER_SERVICE_HOST}
+    hostname: ${SIDECAR_JUPYTER_SERVICE_HOST}
+    image: ${PROJECT_PREFIX}-${SIDECAR_JUPYTER_SERVICE_HOST}
+    expose:
+      - ${SIDECAR_JUPYTER_SERVICE_PORT}
+    env_file:
+      - ./.env
+    environment:
+      - APP_PORT=${SIDECAR_JUPYTER_SERVICE_PORT}
+    depends_on:
+      gateway:
+        condition: service_healthy
+    restart: ${DOCKER_RESTART_POLICY}
+    networks:
+      - platform-net
+
+  sidecar-avue-data-server:
+    build:
+      context: ./alibaba-sidecars/avue-data-server
+    container_name: ${PROJECT_PREFIX}-${SIDECAR_AVUE_DATA_SERVER_HOST}
+    hostname: ${SIDECAR_AVUE_DATA_SERVER_HOST}
+    image: ${PROJECT_PREFIX}-${SIDECAR_AVUE_DATA_SERVER_HOST}
+    expose:
+      - ${SIDECAR_AVUE_DATA_SERVER_PORT}
+    env_file:
+      - ./.env
+    environment:
+      - APP_PORT=${SIDECAR_AVUE_DATA_SERVER_PORT}
+    depends_on:
+      - avue-data-server
+    restart: ${DOCKER_RESTART_POLICY}
+    networks:
+      - platform-net
+  
+  sidecar-avue-nginx:
+    build:
+      context: ./alibaba-sidecars/avue-nginx
+    container_name: ${PROJECT_PREFIX}-${SIDECAR_AVUE_NGINX_HOST}
+    hostname: ${SIDECAR_AVUE_NGINX_HOST}
+    image: ${PROJECT_PREFIX}-${SIDECAR_AVUE_NGINX_HOST}
+    expose:
+      - ${SIDECAR_AVUE_NGINX_PORT}
+    env_file:
+      - ./.env
+    environment:
+      - APP_PORT=${SIDECAR_AVUE_NGINX_PORT}
+    depends_on:
+      avue-nginx:
+        condition: service_healthy
+    restart: ${DOCKER_RESTART_POLICY}
+    networks:
+      - platform-net
+
+  sidecar-ds-coordinator:
+    build:
+      context: ./alibaba-sidecars/ds-coordinator
+    container_name: ${PROJECT_PREFIX}-${SIDECAR_DS_COORDINATOR_HOST}
+    hostname: ${SIDECAR_DS_COORDINATOR_HOST}
+    image: ${PROJECT_PREFIX}-${SIDECAR_DS_COORDINATOR_HOST}
+    expose:
+      - ${SIDECAR_DS_COORDINATOR_PORT}
+    env_file:
+      - ./.env
+    environment:
+      - APP_PORT=${SIDECAR_DS_COORDINATOR_PORT}
+    depends_on:
+      gateway:
+        condition: service_healthy
+    restart: ${DOCKER_RESTART_POLICY}
+    networks:
+      - platform-net
+
+networks:
+  platform-net:
+    external: true

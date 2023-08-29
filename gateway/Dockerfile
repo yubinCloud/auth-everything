@@ -1,0 +1,17 @@
+FROM openjdk:17
+
+ENV TZ=Asia/Sh
+ENV PARAMS=""
+
+RUN ln -sf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+WORKDIR /root
+
+EXPOSE 10010
+
+ADD target/gateway-*.jar app.jar
+
+COPY wait-for-it.sh /wait-for-it.sh
+RUN chmod +x /wait-for-it.sh
+
+CMD [ "sh", "-c", "java -jar $JAVA_OPTS app.jar $PARAMS" ]

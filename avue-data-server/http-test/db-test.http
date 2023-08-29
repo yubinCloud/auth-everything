@@ -1,0 +1,7 @@
+GET http://localhost:10002/db/list
+User: admin
+
+###
+
+GET http://localhost:10002/visual/list
+User: admin

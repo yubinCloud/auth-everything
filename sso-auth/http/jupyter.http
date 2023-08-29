@@ -1,0 +1,22 @@
+POST  http://10.245.143.119:8010/jupyter/hub/dadp/user/login
+Content-Type: application/json
+User: admin
+
+###
+
+POST  http://10.245.143.119:8112/jupyter/hub/dadp/user/create/lxy
+Content-Type: application/json
+
+{
+  "admin": true
+}
+
+###
+
+PATCH http://10.245.143.119:8112/jupyter/hub/dadp/user/update/lxyTest1
+Content-Type: application/json
+
+{
+  "name": "lxyTest1",
+  "admin": false
+}

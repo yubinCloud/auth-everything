@@ -1,0 +1,25 @@
+server:
+  port: ${APP_PORT:10012}
+
+spring:
+  application:
+    name: @artifactId@
+  cloud:
+    nacos:
+      discovery:
+        server-addr: http://${NACOS_HOST:127.0.0.1}:${NACOS_PORT:8848}
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+
+sidecar:
+  ip: ${AVUE_DATA_SERVER_HOST:127.0.0.1}
+  port: ${AVUE_DATA_SERVER_PORT:10002}
+  health-check-url: http://${AVUE_DATA_SERVER_HOST:127.0.0.1}:${AVUE_DATA_SERVER_PORT:10002}/health
+
+management:
+  endpoint:
+    health:
+      show-details: always

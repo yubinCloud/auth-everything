@@ -1,0 +1,13 @@
+### Simple WebSocket Request
+// It is possible to send messages to server right from the Services tool window
+WEBSOCKET ws://127.0.0.1:10010/ws/jupyter/user/admin/terminals/websocket/1
+Authz: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJsb2dpblR5cGUiOiJsb2dpbiIsImxvZ2luSWQiOiJhZG1pbiIsInJuU3RyIjoiVGlWNU9GUkZmcTdLSEV4UERXQUpPMzhoYjg3a0hDYUwiLCJyb2xlIjoic3VwZXItYWRtaW4ifQ.KCMfz2UOqFSdmUGZ2ROJAVWy0c74QL1wWEbrpuXyMnA
+
+###
+
+WEBSOCKET ws://10.245.143.119:8011/jupyter/user/admin/terminals/websocket/5
+Authorization: token 9a9450660dcc45e3b663072f86d58776
+
+###
+
+WEBSOCKET ws://10.245.143.119:10010/ws/jupyter/user/admin/terminals/websocket/5?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJsb2dpblR5cGUiOiJsb2dpbiIsImxvZ2luSWQiOiJhZG1pbiIsInJuU3RyIjoiN0FzSEV6MGdORmkwY1RsRDd0aWxxY3ppUmJLcnhkVXEiLCJyb2xlIjoic3VwZXItYWRtaW4ifQ.gt3SW_mYLq8XfsvOhFYJywObohuXHMGKtDXDNXZxv1s

@@ -1,0 +1,16 @@
+server:
+  port: ${APP_PORT:9300}
+  servlet:
+    context-path: /ds-worker
+
+spring:
+  application:
+    name: @artifactId@
+  cloud:
+    nacos:
+      server-addr: http://${NACOS_HOST:127.0.0.1}:${NACOS_PORT:8848}
+
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn

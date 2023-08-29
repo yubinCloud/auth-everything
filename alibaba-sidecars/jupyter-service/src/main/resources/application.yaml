@@ -1,0 +1,23 @@
+server:
+  port: ${APP_PORT:10011}
+spring:
+  application:
+    name: @artifactId@
+  cloud:
+    nacos:
+      discovery:
+        server-addr: http://${NACOS_HOST:127.0.0.1}:${NACOS_PORT:8848}
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+
+sidecar:
+  ip: ${JUPYTER_HOST:10.245.143.119}
+  port: ${JUPYTER_PORT:8010}
+
+management:
+  endpoint:
+    health:
+      show-details: always

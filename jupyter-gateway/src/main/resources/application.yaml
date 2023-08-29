@@ -1,0 +1,39 @@
+server:
+  port: ${APP_PORT:10015}
+
+spring:
+  application:
+    name: @artifactId@
+  profiles:
+    active: dev
+
+  data:
+    redis:
+      database: ${REDIS_DB:1}
+      host: ${REDIS_HOST:127.0.0.1}
+      port: ${REDIS_PORT:6379}
+      timeout: 10s
+      lettuce:
+        pool:
+          max-active: 200
+          max-wait: -1ms
+          max-idle: 10
+          min-idle: 0
+
+  cloud:
+    nacos:
+      server-addr: http://${NACOS_HOST:127.0.0.1}:${NACOS_PORT:8848}
+
+    gateway:
+      routes:
+        - id: jupyter-websocket
+          uri: lb:ws://jupyter-service
+          predicates:
+            - Path=/ws/**
+          filters:
+            - StripPrefix=1
+
+        - id: jupyter
+          uri: lb://jupyter-service
+          predicates:
+            - Path=/jupyter/**
