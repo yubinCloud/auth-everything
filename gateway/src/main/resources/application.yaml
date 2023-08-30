@@ -27,6 +27,8 @@ spring:
           instances:
             sentinel-dashboard:
               - uri: http://${SENTINEL_HOST:127.0.0.1}:${SENTINEL_PORT:8080}
+            nacos:
+              - uri: http://${NACOS_HOST:127.0.0.1}:${NACOS_PORT:8848}
 
     gateway:
       routes:
@@ -34,6 +36,11 @@ spring:
           uri: lb://sentinel-dashboard
           predicates:
             - Path=/sentinel/**
+
+        - id: nacos
+          uri: lb://nacos
+          predicates:
+            - Path=/nacos/**
 
         - id: sso-auth
           uri: lb://sso-auth

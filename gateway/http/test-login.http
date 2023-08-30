@@ -1,10 +1,19 @@
-### 登录
+### admin 登录
 POST http://127.0.0.1:10010/auth/login/doLogin
 Content-Type: application/json
 
 {
   "username": "admin",
   "pwd": "123456"
+}
+
+### normal 登录
+POST http://127.0.0.1:10010/auth/login/doLogin
+Content-Type: application/json
+
+{
+  "username": "normal",
+  "pwd": "yubin123456"
 }
 
 ### 添加用户

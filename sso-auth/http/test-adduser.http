@@ -1,13 +1,14 @@
 POST {{url-prefix}}/admin/user/add
 Content-Type: application/json
+User: admin
 
 {
-  "username": "yubin-test56",
-  "password": "yubin12512321",
+  "username": "normal",
+  "password": "yubin123456",
   "role": 2,
-  "screenName": "yubin54",
+  "screenName": "normal",
   "permissionList": [],
-  "jupyterhubAdmin": true
+  "jupyterhubAdmin": false
 }
 
 ### 删除

@@ -1,0 +1,19 @@
+### 增加权限
+
+POST {{url-prefix}}/auth/admin/permission/add
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "permissionList": ["weibode"]
+}
+
+### 删除权限
+
+POST {{url-prefix}}/auth/admin/permission/delete
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "permission": "weibod"
+}
