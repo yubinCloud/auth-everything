@@ -6,6 +6,7 @@ import com.xxl.job.admin.core.util.I18nUtil;
 import com.xxl.job.admin.core.util.JacksonUtil;
 import com.xxl.job.admin.dao.XxlJobUserDao;
 import com.xxl.job.admin.feign.client.AuthFeignClient;
+import com.xxl.job.admin.feign.response.User;
 import com.xxl.job.admin.feign.response.UserInfo;
 import com.xxl.job.core.biz.model.ReturnT;
 import org.springframework.context.annotation.Configuration;
@@ -51,7 +52,7 @@ public class LoginService {
      * @return
      */
     private XxlJobUser fetchRemoteUser(String username) {
-        UserInfo userInRemote = authFeignClient.userInfo(username);
+        User userInRemote = authFeignClient.userInfo(username);
         if (userInRemote == null) {
             return null;
         }
@@ -59,7 +60,7 @@ public class LoginService {
         userInXxl.setId(Math.toIntExact(userInRemote.getId()));
         userInXxl.setUsername(userInRemote.getUsername());
         userInXxl.setPassword(userInRemote.getPassword());
-        if (Objects.equals(userInRemote.getRole(), "super-admin")) {
+        if (userInRemote.getRoleList().contains("super-admin")) {
             userInXxl.setRole(1);
         } else {
             userInXxl.setRole(0);

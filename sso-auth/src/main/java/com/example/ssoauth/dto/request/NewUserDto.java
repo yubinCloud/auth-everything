@@ -28,9 +28,8 @@ public class NewUserDto {
     @Schema(description = "显示的名称")
     private String screenName;
 
-    @Range(min = 1, max = 3, message = "角色字段应该在 1-3 之间")
-    @Schema(description = "角色：1：super-admin，2：normal，3： visitor")
-    private int role;
+    @Schema(description = "角色列表")
+    private List<Integer> roleList;
 
     @Schema(description = "权限列表")
     private List<String> permissionList;

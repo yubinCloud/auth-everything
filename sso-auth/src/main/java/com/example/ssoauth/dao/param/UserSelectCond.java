@@ -10,7 +10,5 @@ public class UserSelectCond {
 
     private String screenName;
 
-    private String role;
-
     private String note;
 }

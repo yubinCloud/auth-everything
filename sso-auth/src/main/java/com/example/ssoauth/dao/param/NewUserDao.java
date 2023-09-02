@@ -13,7 +13,7 @@ public class NewUserDao {
 
     private String screenName;
 
-    private Integer role;
+    private String roleList;
 
     private String permissionList;
 

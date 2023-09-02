@@ -3,6 +3,8 @@ package com.example.ssoauth.mapper;
 import com.example.ssoauth.dao.result.RoleDao;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 /**
 * @author yubin
 * @description 针对表【role(角色表)】的数据库操作Mapper
@@ -17,6 +19,8 @@ public interface RoleMapper {
     int insert(RoleDao record);
 
     int insertSelective(RoleDao record);
+
+    List<RoleDao> selectAll();
 
     RoleDao selectByPrimaryKey(Integer id);
 

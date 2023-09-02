@@ -11,7 +11,5 @@ public class UpdateUserParam {
 
     private String screenName;
 
-    private Integer role;
-
     private String note;
 }

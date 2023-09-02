@@ -1,8 +1,8 @@
 
 const MYSQL_HOST = process.env.MYSQL_HOST ? process.env.MYSQL_HOST : '127.0.0.1';
 const MYSQL_USER = process.env.MYSQL_USER ? process.env.MYSQL_USER : 'root';
-const MYSQL_PWD = process.env.MYSQL_PWD ? process.env.MYSQL_PWD : 'root';
-const MYSQL_PORT = process.env.MYSQL_PORT ? process.env.MYSQL_PORT : '3307';
+const MYSQL_PWD = process.env.MYSQL_PWD ? process.env.MYSQL_PWD : 'yubin3869';
+const MYSQL_PORT = process.env.MYSQL_PORT ? process.env.MYSQL_PORT : '3306';
 const MYSQL_DB = process.env.MYSQL_DB ? process.env.MYSQL_DB : 'antv_data_server';
 
 export default {

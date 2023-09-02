@@ -7,11 +7,18 @@
     <resultMap id="BaseResultMap" type="com.example.ssoauth.dao.result.RoleDao">
             <id property="roleId" column="role_id" jdbcType="INTEGER"/>
             <result property="name" column="name" jdbcType="VARCHAR"/>
+            <result property="permissionList" column="permission_list" jdbcType="OTHER" javaType="cn.hutool.json.JSONArray" typeHandler="com.example.ssoauth.mybatis.JsonTypeHandler"/>
     </resultMap>
 
     <sql id="Base_Column_List">
-        role_id,name
+        role_id,name,permission_list
     </sql>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM role
+    </select>
 
     <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
         select
