@@ -42,7 +42,7 @@ public class UserConverterUtil {
 
     @Named("strListToJsonStr")
     public String strListToJsonStr(List<String> list) {
-        return JSONUtil.parseArray(list).toString();
+        return CommonConverterUtil.strListToJsonStr(list);
     }
 
     @Named("integerListToJsonStr")

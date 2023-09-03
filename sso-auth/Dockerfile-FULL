@@ -1,0 +1,19 @@
+FROM maven:3.9-amazoncorretto-17 AS builder
+
+# 替换 Aliyun
+COPY settings.xml /root/.m2/
+
+COPY pom.xml /build/
+COPY src /build/src
+
+WORKDIR /build
+
+RUN mvn clean package -Dmaven.test.skip=true --quiet
+
+
+FROM openjdk:17
+
+WORKDIR /root
+COPY --from=builder /build/target/*.jar app.jar
+
+ENTRYPOINT ["java", "-jar", "app.jar"]

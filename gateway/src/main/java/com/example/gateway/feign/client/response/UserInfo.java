@@ -29,10 +29,14 @@ public class UserInfo {
     /**
      *
      */
-    private String role;
+    private List<String> roleList;
 
     /**
      * 权限列表
      */
     private List<String> permissionList;
+
+    private String note;
+
+    private Long createTime;
 }

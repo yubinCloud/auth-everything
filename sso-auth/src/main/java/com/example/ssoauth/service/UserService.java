@@ -1,5 +1,6 @@
 package com.example.ssoauth.service;
 
+import cn.dev33.satoken.dao.SaTokenDaoRedisJackson;
 import cn.hutool.json.JSONUtil;
 import com.example.ssoauth.dao.param.DeleteUserPermissionParam;
 import com.example.ssoauth.dao.param.NewUserDao;
@@ -40,6 +41,10 @@ public class UserService {
     private final UserConverterUtil userConverterUtil;
 
     private final JupyterExchange jupyterExchange;
+
+    private final SaTokenDaoRedisJackson redisJackson;
+
+    static private final String KEY_PREFIX_PERM = "aet:auth-perm:";
 
     @Transactional
     public void addUser(NewUserDto userDto, String whoAmI) {
@@ -99,12 +104,14 @@ public class UserService {
         String jsonStr = JSONUtil.parseArray(permList).toString();
         var insertParam = new PermissionInsertParam(username, jsonStr);
         userMapper.appendPermission(insertParam);
+        redisJackson.delete(KEY_PREFIX_PERM + username);
     }
 
     @Transactional
     public void deletePermission(String username, String permission) {
         var param = new DeleteUserPermissionParam(username, permission);
         userMapper.deletePermission(param);
+        redisJackson.delete(KEY_PREFIX_PERM + username);
     }
 
     private String findJupyterToken(String username) {

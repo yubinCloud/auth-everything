@@ -20,5 +20,4 @@ public interface RoleConverter {
             @Mapping(source = "permissionList", target = "permissionList", qualifiedByName = "jsonArrayToStrList")
     })
     Role toRole(RoleDao roleDao);
-
 }

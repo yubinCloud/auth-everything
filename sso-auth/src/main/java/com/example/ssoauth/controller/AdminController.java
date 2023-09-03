@@ -15,11 +15,14 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 @RestController
@@ -95,6 +98,9 @@ public class AdminController {
         return R.ok("update success");
     }
 
+    /**
+     * TODO: 删除 Redis 中的用户权限信息的缓存
+     */
     @PostMapping("/permission/add")
     @Operation(summary = "增加权限")
     public R<String> addPermission(@RequestBody @Valid AddPermParam param) {
@@ -114,6 +120,37 @@ public class AdminController {
     public R<List<Role>> getRoleList() {
         var roleList = roleService.findAll();
         return R.ok(roleList);
+    }
+
+    /**
+     * WARNING: 需要注意修改 RoleLookupTable 数据与 DB 中数据的一致性
+     */
+    @PostMapping("/role/update")
+    @Operation(summary = "更改角色信息")
+    public R<String> updateRole() {
+        throw new NotImplementedException("Not Implemented");
+    }
+
+    @PostMapping("/role/add")
+    @Operation(summary = "增加角色信息")
+    public R<String> addRole() {
+        throw new NotImplementedException("Not Implemented");
+    }
+
+    static final Set<Integer> FORBIDDEN_ROLES = new HashSet<>(List.of(new Integer[]{1, 2}));
+
+    @DeleteMapping("/role/delete/{id}")
+    @Operation(summary = "删除角色信息")
+    public R<String> deleteRole(@PathVariable("id") int roleId) {
+        if (FORBIDDEN_ROLES.contains(roleId)) {
+            return R.error("该角色不允许被删除", null);
+        }
+        int result = roleService.deleteRole(roleId);
+        if (result == 1) {
+            return R.ok("delete success");
+        } else {
+            return R.error("delete fail", "delete fail");
+        }
     }
 
     private String prepostParam(String selectParam) {
