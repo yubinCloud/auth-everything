@@ -1,4 +1,3 @@
-
 import resbody from '../util/resbody.js';
 import path from 'path'
 import fs from 'fs';
@@ -8,6 +7,7 @@ import { getLoginId } from '../util/utils.js';
 import OSS from 'ali-oss';
 import multer from 'multer';
 import bodyParser from 'body-parser';
+import { getUserInfo, addVisualForUser, addVisualForRole } from '../exchange/ssoauth.js';
 const filePath = path.resolve(".") + '/file'
 var jsonParser = bodyParser.json({ limit: '1000mb' });
 let url = '/visual'
@@ -44,6 +44,14 @@ export default (app) => {
         res.json(resbody.getFailResult('', '图片不存在'));
       }
     })
+  })
+
+  app.get(url + '/test-put', function (req, res) {
+    const path = filePath + "/";
+    console.log(path);
+    res.json(resbody.getSuccessResult({
+      p: path
+    }))
   })
 
   app.post(url + '/put-file', jsonParser, multer({ dest: filePath + '/' }).any(), function (req, res) {
@@ -91,11 +99,24 @@ export default (app) => {
       res.json(resbody.getFailResult(error));
     });
   })
+  /**
+   * 增加大屏时，要通过请求 sso-auth 来为该用户添加 permission
+   */
   app.post(url + '/save', jsonParser, function (req, res) {
     const data = req.body;
-    data.loginid = getLoginId(req);
+    const loginid = getLoginId(req);
+    data.loginid = loginid;
     visualDao.save(data).then(data => {
-      res.json(resbody.getSuccessResult(data));
+      visualId = data.id;
+      addVisualForUser(loginid, visualId).then(resp => {
+        res.json(resbody.getSuccessResult(data));
+      }).catch(error => {
+        visualDao.del(visualId, loginid).then(d => {
+          res.json(resbody.getFailResult(error));
+        }).catch(e => {
+          res.json(resbody.getFailResult(error));
+        })
+      })
     }).catch(error => {
       res.json(resbody.getFailResult(error));
     });
@@ -108,6 +129,53 @@ export default (app) => {
     }).catch(error => {
       res.json(resbody.getFailResult(error));
     });
+  })
+  
+  /**
+   * 自己添加的 API
+   */
+  app.get(url + '/preview-list', jsonParser, function (req, res) {
+    const loginid = getLoginId(req);
+    getUserInfo(loginid).then(axiosResp => {
+      const userInfo = axiosResp.data;
+      const permissionList = userInfo['permissionList'];
+      let visualIdList = [];
+      for (let i = 0; i < permissionList.length; i++) {
+        const perm = permissionList[i];
+        if (perm.startsWith("avue:") && perm.length > 5) {
+          visualIdList.push(perm.substring(5));
+        }
+      }
+      visualIdList = Array.from(visualIdList)
+      const query = {
+        id: visualIdList
+      }
+      visualDao.list(query).then(data => {
+        res.json(resbody.getSuccessResult(data));
+      }).catch(error => {
+        res.json(resbody.getFailResult(error));
+      });
+    })
+  })
+
+  app.post(url + '/assign-permission/user', jsonParser, function (req, res) {
+    const loginid = getLoginId(req);
+    const visualId = req.body.visualId
+    const users = req.body.users;
+    const query = {
+      loginid: loginid,
+      id: visualId
+    }
+    visualDao.list(query).then(resultSet => {
+      if (resultSet.length <= 0) {
+        res.json(resbody.getFailResult('不允许分配该视图 ID 的权限'))
+      } else {
+        // TODO: 为每个用户添加权限
+        for (let i = 0; i < users.length; i++) {
+          addVisualForUser(users[i], visualId)
+        }
+      }
+    })
   })
 
 }

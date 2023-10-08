@@ -71,11 +71,13 @@ public class StpInterfaceImpl implements StpInterface {
             return roleList;
         }
         String keyInRedis = KEY_PREFIX_ROLE + username;
-        roleList = (List<String>) redisJackson.getObject(keyInRedis);
-        if (roleList == null) {
+        Object objInRedis = redisJackson.getObject(keyInRedis);
+        if (objInRedis == null) {
             var userInfo = getUserInfo(username);
             roleList = userInfo.getRoleList();
             redisJackson.setObject(keyInRedis, roleList, REDIS_TIMEOUT);
+        } else {
+            roleList = (List<String>) objInRedis;
         }
         roleCache.put(username, roleList);
         return roleList;

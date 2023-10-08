@@ -1,10 +1,8 @@
 import axios from "axios";
-
-const SIDECAR_HOST = process.env.SIDECAR_HOST ? process.env.SIDECAR_HOST : '127.0.0.1';
-const SIDECAR_PORT = process.env.SIDECAR_PORT ? process.env.SIDECAR_PORT : '10012';
+import { conf } from "./config.js";
 
 const dsWorkerClient = axios.create({
-    baseURL: `http://${SIDECAR_HOST}:${SIDECAR_PORT}/ds-worker/ds-worker`
+    baseURL: `http://${conf.SIDECAR_HOST}:${conf.SIDECAR_PORT}/ds-worker/ds-worker`
 })
 
 

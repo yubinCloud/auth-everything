@@ -6,6 +6,7 @@ import com.example.ssoauth.dto.response.PageResp;
 import com.example.ssoauth.dto.response.R;
 import com.example.ssoauth.entity.Role;
 import com.example.ssoauth.entity.User;
+import com.example.ssoauth.mapstruct.RoleConverter;
 import com.example.ssoauth.service.RoleService;
 import com.example.ssoauth.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,6 +14,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
@@ -20,9 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 
 @RestController
@@ -39,6 +39,8 @@ public class AdminController {
     private final UserService userService;
 
     private final RoleService roleService;
+
+    private final RoleConverter roleConverter;
 
     @PostMapping("/user/add")
     @Operation(summary = "添加用户")
@@ -98,50 +100,75 @@ public class AdminController {
         return R.ok("update success");
     }
 
-    /**
-     * TODO: 删除 Redis 中的用户权限信息的缓存
-     */
     @PostMapping("/permission/add")
-    @Operation(summary = "增加权限")
+    @Operation(summary = "perm | 增加用户权限")
     public R<String> addPermission(@RequestBody @Valid AddPermParam param) {
         userService.addPermission(param.getUsername(), param.getPermissionList());
         return R.ok("permission add success.");
     }
 
     @PostMapping("/permission/delete")
-    @Operation(summary = "删除权限")
+    @Operation(summary = "perm | 删除用户权限")
     public R<String> deletePermission(@RequestBody @Valid DeletePermParam param) {
         userService.deletePermission(param.getUsername(), param.getPermission());
         return R.ok("permission delete success");
     }
 
     @GetMapping("/role/list")
-    @Operation(summary = "查看所有角色")
+    @Operation(summary = "role | 查看所有角色")
     public R<List<Role>> getRoleList() {
         var roleList = roleService.findAll();
         return R.ok(roleList);
+    }
+
+    @GetMapping("/role/one/{id}")
+    @Operation(summary = "role | 查看某一个角色的信息")
+    public R<Role> getOneRole(
+            @PathVariable("id") @NotNull @Valid int roleId
+    ) {
+        var role = roleService.findById(roleId);
+        if (role == null) {
+            return R.ok(null, "角色不存在");
+        }
+        return R.ok(role);
     }
 
     /**
      * WARNING: 需要注意修改 RoleLookupTable 数据与 DB 中数据的一致性
      */
     @PostMapping("/role/update")
-    @Operation(summary = "更改角色信息")
-    public R<String> updateRole() {
-        throw new NotImplementedException("Not Implemented");
+    @Operation(summary = "role | 更改角色信息")
+    public R<String> updateRole(
+            @RequestBody @Valid UpdateRoleDto updateRoleDto
+    ) {
+        roleService.updateRole(updateRoleDto);
+        return R.ok("update success");
     }
 
     @PostMapping("/role/add")
-    @Operation(summary = "增加角色信息")
-    public R<String> addRole() {
-        throw new NotImplementedException("Not Implemented");
+    @Operation(summary = "role | 增加角色")
+    public R<String> addRole(
+            @RequestBody @Valid NewRoleDto param
+    ) {
+        if (Objects.isNull(param.getPermissionList())) {
+            param.setPermissionList(new ArrayList<>());
+        }
+        var roleDao = roleConverter.toRoleDao(param);
+        int cnt = roleService.addRole(roleDao);
+        if (cnt == 1) {
+            return R.ok("add success");
+        } else {
+            return R.error("add failed", null);
+        }
     }
 
-    static final Set<Integer> FORBIDDEN_ROLES = new HashSet<>(List.of(new Integer[]{1, 2}));
+    static final Set<Integer> FORBIDDEN_ROLES = new HashSet<>(List.of(1, 2, 3));
 
     @DeleteMapping("/role/delete/{id}")
-    @Operation(summary = "删除角色信息")
-    public R<String> deleteRole(@PathVariable("id") int roleId) {
+    @Operation(summary = "role | 删除角色信息")
+    public R<String> deleteRole(
+            @PathVariable("id") @NotNull @Valid int roleId
+    ) {
         if (FORBIDDEN_ROLES.contains(roleId)) {
             return R.error("该角色不允许被删除", null);
         }

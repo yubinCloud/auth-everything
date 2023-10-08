@@ -4,6 +4,10 @@ import cn.dev33.satoken.router.SaRouterStaff;
 
 public interface Authority {
 
+    public default boolean isEnabled() {
+        return true;
+    }
+
     public String getMatchPath();
 
     /**

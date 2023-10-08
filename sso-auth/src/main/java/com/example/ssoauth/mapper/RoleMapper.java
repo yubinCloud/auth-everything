@@ -1,8 +1,10 @@
 package com.example.ssoauth.mapper;
 
 
+import cn.hutool.json.JSONArray;
 import com.example.ssoauth.dao.result.RoleDao;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -19,8 +21,15 @@ public interface RoleMapper {
 
     RoleDao selectByPrimaryKey(Integer id);
 
+    int insertOne(RoleDao roleDao);
+
     int deleteByPrimaryKey(Integer id);
 
     int updateByPrimaryKey(RoleDao record);
 
+    int updateName(@Param("roleId") Integer roleId, @Param("name") String name);
+
+    int addPermissions(@Param("roleId") Integer roleId, @Param("permissionList") JSONArray permissionList);
+
+    int deletePermission(@Param("roleId") Integer roleId, @Param("permission") String permission);
 }

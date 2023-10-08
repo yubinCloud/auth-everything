@@ -14,4 +14,8 @@ public class CommonConverterUtil {
     public static String strListToJsonStr(List<String> list) {
         return JSONUtil.parseArray(list).toString();
     }
+
+    public static JSONArray strListToJsonArray(List<String> list) {
+        return JSONUtil.parseArray(list);
+    }
 }

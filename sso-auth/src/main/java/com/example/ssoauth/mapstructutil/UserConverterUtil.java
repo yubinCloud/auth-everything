@@ -56,6 +56,9 @@ public class UserConverterUtil {
      * @return
      */
     public User toUser(UserDao userDao) {
+        if (userDao == null) {
+            return null;
+        }
         var user = new User();
         user.setId(userDao.getId());
         user.setUsername(userDao.getUsername());

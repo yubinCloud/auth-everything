@@ -2,6 +2,6 @@ POST {{url-prefix}}/login/doLogin
 Content-Type: application/json
 
 {
-  "username": "normal",
-  "pwd": "yubin123456"
+  "username": "admin",
+  "pwd": "123456"
 }

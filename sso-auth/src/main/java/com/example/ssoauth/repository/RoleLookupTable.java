@@ -5,7 +5,6 @@ import com.example.ssoauth.mapper.RoleMapper;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.concurrent.locks.Lock;
@@ -17,12 +16,8 @@ import java.util.stream.Collectors;
 @Repository
 public class RoleLookupTable {
 
-    private RoleMapper roleMapper;
-
     @Autowired
-    public void setRoleMapper(RoleMapper roleMapper) {
-        this.roleMapper = roleMapper;
-    }
+    private RoleMapper roleMapper;
 
     private final Map<Integer, RoleDao> roleTable = new HashMap<>();  // WARNING: 共享资源，需要进行并发控制
 
@@ -34,6 +29,13 @@ public class RoleLookupTable {
 
     @PostConstruct
     public void init() {
+        loadData();
+    }
+
+    /**
+     * 重新从数据库加载数据
+     */
+    public void reloadData() {
         loadData();
     }
 

@@ -5,8 +5,8 @@
 <mapper namespace="com.example.ssoauth.mapper.RoleMapper">
 
     <resultMap id="BaseResultMap" type="com.example.ssoauth.dao.result.RoleDao">
-            <id property="roleId" column="role_id" jdbcType="INTEGER"/>
-            <result property="name" column="name" jdbcType="VARCHAR"/>
+        <id property="roleId" column="role_id" jdbcType="INTEGER"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
         <result property="permissionList" column="permission_list" jdbcType="OTHER" javaType="cn.hutool.json.JSONArray" typeHandler="com.example.ssoauth.mybatis.JsonTypeHandler"/>
     </resultMap>
 
@@ -27,14 +27,39 @@
         where  role_id = #{roleId,jdbcType=INTEGER} 
     </select>
 
+    <insert id="insertOne" parameterType="com.example.ssoauth.dao.result.RoleDao" useGeneratedKeys="true" keyProperty="roleId">
+        insert into role
+        (<include refid="Base_Column_List" />)
+        values
+        (null,#{name,jdbcType=VARCHAR},#{permissionList,jdbcType=OTHER,javaType=cn.hutool.json.JSONArray,typeHandler=com.example.ssoauth.mybatis.JsonTypeHandler})
+    </insert>
+
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
         delete from role
         where  role_id = #{roleId,jdbcType=INTEGER} 
     </delete>
+
     <update id="updateByPrimaryKey" parameterType="com.example.ssoauth.dao.result.RoleDao">
         update role
-        set 
-            name =  #{name,jdbcType=VARCHAR},
-        where   role_id = #{roleId,jdbcType=INTEGER} 
+        set name =  #{name,jdbcType=VARCHAR}
+        where role_id = #{roleId,jdbcType=INTEGER}
+    </update>
+
+    <update id="updateName">
+        update role
+        set name =  #{name,jdbcType=VARCHAR}
+        where role_id = #{roleId,jdbcType=INTEGER}
+    </update>
+
+    <update id="addPermissions">
+        update role
+        set name = json_merge(permissionList, #{permissionList,jdbcType=OTHER,javaType=cn.hutool.json.JSONArray,typeHandler=com.example.ssoauth.mybatis.JsonTypeHandler}),
+        where roleId = #{roleId,jdbcType=INTEGER}
+    </update>
+
+    <update id="deletePermission">
+        update role
+        set permission_list = JSON_REMOVE(permission_list, JSON_UNQUOTE(JSON_SEARCH(permission_list, 'one', #{permission})))
+        where role_id = #{roleId,jdbcType=INTEGER} and JSON_SEARCH(permission_list, 'one', #{permission});
     </update>
 </mapper>

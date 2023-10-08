@@ -82,7 +82,10 @@ function getUpdateSql (params) {
 function getParamsSql (params) {
   let list = [];
   Object.keys(params).forEach(ele => {
-    let value = params[ele] + '';
+    let value = params[ele];
+    if (!Array.isArray(value)) {
+      value = value + '';
+    }
     if (ele === 'loginid') {
       list.push(`loginid = '${value}'`)
       return
@@ -188,7 +191,10 @@ export const list = ({ table, data, parent, hump, column }, order) => {
       total: 0,
       records: []
     }
+    console.log(data.id)
+    console.log(Array.isArray(data.id))
     let params = deepClone(data);
+    console.log(Array.isArray(params.id))
     let sql = `SELECT ${column ? column : '*'} FROM ${table}`;
     let page = data.current;
     let size = data.size;

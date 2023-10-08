@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"af-askari/internal/controller/apisix"
 	"context"
 
 	"github.com/gogf/gf/v2/frame/g"
@@ -21,13 +22,15 @@ var (
 				group.Middleware(ghttp.MiddlewareHandlerResponse)
 				group.Bind(
 					hello.NewV1(),
+					apisix.NewV1(),
 				)
 			})
-			s.BindHandler("/health/live", func(r *ghttp.Request) {
+			s.BindHandler("GET:/health/live", func(r *ghttp.Request) {
 				r.Response.WriteJson(g.Map{
 					"status": "UP",
 				})
 			})
+			s.SetPort(10510)
 			s.Run()
 			return nil
 		},

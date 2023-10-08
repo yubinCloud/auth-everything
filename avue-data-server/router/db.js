@@ -1,7 +1,6 @@
 import ObjectsToCsv from 'objects-to-csv';
-import { v4 as uuidv4 } from 'uuid';
 import bodyParser from 'body-parser';
-import axios from "axios";
+import fs from 'fs';
 
 import resbody from '../util/resbody.js';
 import dbDao from '../dao/db.js';
@@ -98,11 +97,18 @@ export default (app) => {
       let dsConf = getDsConf(data[0]);
       execSelectSQL(dsConf, sql).then(dsresp => {
         let data = dsresp.data.data;
-        console.log(data)
-        // 将 data 写入 csv 中
+        // 将 data 写入 csv 中  待测试
         const fname = Date.now().toString() + '.csv';
-        new ObjectsToCsv(data).toDisk('./exported-files/' + fname).then(
-          () => res.json(resbody.getSuccessResult({'url': '/avue-download/' + fname}))
+        new ObjectsToCsv(data).toString().then(
+          (csvStr) => {
+            FS_OPTIONS = {flag: 'w', encoding: 'utf8'}
+            fs.writeFile('./exported-files/' + fname, csvStr, FS_OPTIONS, function (err) {
+              if (err) {
+                res.json(resbody.getFailResult(err));
+              }
+              res.json(resbody.getSuccessResult({'url': '/avue-download/' + fname}));
+            })
+          }
         ).catch(error => {
           res.json(resbody.getFailResult(error));
         })

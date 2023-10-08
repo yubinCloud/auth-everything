@@ -38,7 +38,7 @@ public class SaTokenConfigure {
                 .addExclude("/jupyter/**")
                 .addExclude("/ws/**")
                 .addExclude("/ds-worker/**")
-                .addExclude("/avue/**")
+//                .addExclude("/avue/**")
                 // 鉴权方法：每次访问进入
                 .setAuth(obj -> {
                     // ********** 登录校验：除登录接口外，均需要登录 ***********
@@ -46,7 +46,9 @@ public class SaTokenConfigure {
                     // *****************************************************
 
                     for (var authority: authorities) {
-                        authority.authInfo();
+                        if (authority.isEnabled()) {
+                            authority.authInfo();
+                        }
                     }
                 }).setError(e -> {
                     if (e instanceof SaTokenException) {

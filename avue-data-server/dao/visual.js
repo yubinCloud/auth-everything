@@ -83,7 +83,13 @@ export default {
     return new Promise(resolve => {
       let visual;
       let config;
-      list({ table, data: { id, loginid }, parent: true }).then(res1 => {
+      let data;
+      if (loginid != undefined) {
+        data = { id, loginid };
+      } else {
+        data = { id };
+      }
+      list({ table, data: data, parent: true }).then(res1 => {
         visual = res1[0];
         return list({ table: tableConfig, data: { visual_id: id }, parent: true })
       }).then(res2 => {
