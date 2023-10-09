@@ -26,7 +26,7 @@ public class RouteConfig {
                 .route("public-api", r -> r.path("/public-api/**")
                         .filters(f -> f
                                 .stripPrefix(1)
-                                .modifyRequestBody(String.class, String.class, new RequestEncryptionFunction(objectMapper, askariExchange))
+//                                .modifyRequestBody(String.class, String.class, new RequestEncryptionFunction(objectMapper, askariExchange))
                                 .modifyResponseBody(String.class, String.class, new ResponseEncryptionFunction(objectMapper, askariExchange)))
                         .uri("lb://dynamic-api")
                 ).build();

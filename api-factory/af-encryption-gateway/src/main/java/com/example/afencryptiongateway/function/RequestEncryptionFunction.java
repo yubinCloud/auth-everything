@@ -7,6 +7,7 @@ import com.example.afencryptiongateway.exchange.AskariExchange;
 import com.example.afencryptiongateway.exchange.request.FetchSecretKeyRequest;
 import com.example.afencryptiongateway.exchange.response.AskariResp;
 import com.example.afencryptiongateway.exchange.response.FetchSecretKeyResponse;
+import com.example.afencryptiongateway.util.JwtUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -37,9 +38,9 @@ public class RequestEncryptionFunction implements RewriteFunction<String, String
 
     @Override
     public Publisher<String> apply(ServerWebExchange exchange, String body) {
-        String username = exchange.getRequest().getHeaders().getFirst(USERNAME_HEADER);
+        String username = JwtUtil.parseUsername(exchange);
         if (username == null) {
-            throw new ForbidRequestException("未携带 %s 请求头".formatted(USERNAME_HEADER));
+            throw new ForbidRequestException("请求未携带 token");
         }
         FetchSecretKeyRequest fetchSecretKeyRequest = new FetchSecretKeyRequest();
         fetchSecretKeyRequest.setUsername(username);

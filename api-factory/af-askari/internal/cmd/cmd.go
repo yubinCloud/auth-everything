@@ -1,7 +1,8 @@
 package cmd
 
 import (
-	"af-askari/internal/controller/apisix"
+	"af-askari/internal/controller/auth"
+	"af-askari/internal/controller/private"
 	"context"
 
 	"github.com/gogf/gf/v2/frame/g"
@@ -22,7 +23,8 @@ var (
 				group.Middleware(ghttp.MiddlewareHandlerResponse)
 				group.Bind(
 					hello.NewV1(),
-					apisix.NewV1(),
+					private.NewV1(),
+					auth.NewV1(),
 				)
 			})
 			s.BindHandler("GET:/health/live", func(r *ghttp.Request) {

@@ -1,4 +1,4 @@
-package apisix
+package encryption_service
 
 import (
 	"af-askari/internal/consts"
@@ -7,31 +7,24 @@ import (
 	"encoding/base64"
 	"github.com/gogf/gf/v2/os/gcache"
 	"time"
-
-	"af-askari/api/apisix/v1"
 )
 
-func (c *ControllerV1) FetchSecretKey(ctx context.Context, req *v1.FetchSecretKeyReq) (res *v1.FetchSecretKeyRes, err error) {
-	var secretKey string
-	cacheKey := consts.SecretKeyCachePrefix + req.Username
+func CreateSecretKey(ctx context.Context, username string) (secretKey string, err error) {
+	cacheKey := consts.SecretKeyCachePrefix + username
 	cacheValue := gcache.MustGet(ctx, cacheKey)
 	if cacheValue.Val() == nil {
 		keyBytes := make([]byte, 16)
 		_, err := rand.Read(keyBytes)
 		if err != nil {
-			return nil, err
+			return "", err
 		}
 		secretKey = base64.StdEncoding.EncodeToString(keyBytes)
 		err = gcache.Set(ctx, cacheKey, secretKey, 24*30*time.Hour)
 		if err != nil {
-			return nil, err
+			return "", err
 		}
 	} else {
 		secretKey = cacheValue.String()
 	}
-	res = &v1.FetchSecretKeyRes{
-		SecretKey: secretKey,
-		Alg:       "AES",
-	}
-	return
+	return secretKey, nil
 }

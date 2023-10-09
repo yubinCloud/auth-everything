@@ -2,16 +2,16 @@
 // Code generated and maintained by GoFrame CLI tool. DO NOT EDIT. 
 // =================================================================================
 
-package apisix
+package auth
 
 import (
 	"context"
 	
-	"af-askari/api/apisix/v1"
+	"af-askari/api/auth/v1"
 )
 
-type IApisixV1 interface {
-	FetchSecretKey(ctx context.Context, req *v1.FetchSecretKeyReq) (res *v1.FetchSecretKeyRes, err error)
+type IAuthV1 interface {
+	AuthLogin(ctx context.Context, req *v1.AuthLoginReq) (res *v1.AuthLoginRes, err error)
 }
 
 

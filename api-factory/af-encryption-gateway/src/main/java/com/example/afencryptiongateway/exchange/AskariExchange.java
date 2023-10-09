@@ -14,7 +14,7 @@ public interface AskariExchange {
     /**
      * 获取 secret key
      */
-    @PostExchange("/apisix/encryption/secret-key")
+    @PostExchange("/private/secret-key")
     Mono<AskariResp<FetchSecretKeyResponse>> fetchSecretKey(@RequestBody FetchSecretKeyRequest body);
 
 }
