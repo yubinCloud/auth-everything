@@ -9,7 +9,7 @@ spec:
 
   selector:
     matchLabels:
-      app: mysql8
+      app: mysql8-sts
   
   template:
     metadata:
@@ -19,6 +19,7 @@ spec:
       containers:
       - name: mysql8-sts
         image: aet-mysql8
+        imagePullPolicy: Never
         ports:
         - containerPort: 3306
         volumeMounts:
@@ -26,6 +27,12 @@ spec:
           mountPath: /etc/mysql/my.cnf
         - name: mysql-pvc
           mountPath: /var/lib/mysql
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              name: public-env
+              key: mysql-password
       volumes:
       - name: mysql-cnf
         configMap:

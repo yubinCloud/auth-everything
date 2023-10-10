@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: public-env
+  namespace: aet
+data:
+  mysql-password: root
