@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql8-sts
+  namespace: aet
+spec:
+  serviceName: mysql8-svc
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: mysql8
+  
+  template:
+    metadata:
+      labels:
+        app: mysql8-sts
+    spec:
+      containers:
+      - name: mysql8-sts
+        image: aet-mysql8
+        ports:
+        - containerPort: 3306
+        volumeMounts:
+        - name: mysql-cnf
+          mountPath: /etc/mysql/my.cnf
+        - name: mysql-pvc
+          mountPath: /var/lib/mysql
+      volumes:
+      - name: mysql-cnf
+        configMap:
+          name: mysql8-config-cm
+  
+  volumeClaimTemplates:
+  - metadata:
+      name: mysql-pvc
+      namespace: aet
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: longhorn
+      resources:
+        requests:
+          storage: 2Gi
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: mysql8-svc
+spec:
+  selector:
+    app: mysql8-sts
+  type:  ClusterIP
+  ports:
+  - protocol: TCP
+    port: 3306
+    targetPort: 3306
