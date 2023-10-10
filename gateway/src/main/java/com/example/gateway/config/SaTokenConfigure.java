@@ -20,8 +20,7 @@ public class SaTokenConfigure {
 
     @Bean
     public SaReactorFilter getSaReactorFilter() {
-        return new SaReactorFilter()
-                // 拦截地址
+        var filter = new SaReactorFilter()
                 .addInclude("/**")    /* 拦截全部path */
                 // 开放地址
                 .addExclude("/favicon.ico")
@@ -57,6 +56,15 @@ public class SaTokenConfigure {
                         return R.error(e.getMessage());
                     }
                 });
+        // 添加每个 exclude
+        for (var authority: authorities) {
+            if (authority.isEnabled()) {
+                for (String exclude: authority.excludes()) {
+                    filter = filter.addExclude(exclude);
+                }
+            }
+        }
+        return filter;
     }
 
     private R<Object> handleSaTokenException(SaTokenException e) {

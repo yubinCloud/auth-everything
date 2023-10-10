@@ -119,8 +119,8 @@ services:
     container_name: af-askari
     hostname: af-askari
     image: af-askari
-    ports:
-      - 10510:10510
+    expose:
+      - 10510
     networks:
       - platform-net
   
@@ -133,8 +133,8 @@ services:
     container_name: af-encryption-gateway
     hostname: af-encryption-gateway
     image: af-encryption-gateway
-    expose:
-      - 10500
+    ports:
+      - 10500:10500
     env_file:
       - ./.env
     networks:

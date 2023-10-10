@@ -21,9 +21,12 @@ export default (app) => {
       res.json(resbody.getFailResult(error));
     });
   })
+  // 查看大屏的详情
+  // 不校验 loginid，权限的校验放在了 gateway 中
   app.get(url + '/detail', jsonParser, function (req, res) {
     const id = req.query.id;
-    const loginid = getLoginId(req);
+    // const loginid = getLoginId(req);
+    const loginid = undefined;
     visualDao.detail(id, loginid).then(data => {
       res.json(resbody.getSuccessResult(data));
     }).catch(error => {
@@ -142,7 +145,7 @@ export default (app) => {
       let visualIdList = [];
       for (let i = 0; i < permissionList.length; i++) {
         const perm = permissionList[i];
-        if (perm.startsWith("avue:") && perm.length > 5) {
+        if (perm.startsWith("avue:vs:") && perm.length > 5) {
           visualIdList.push(perm.substring(5));
         }
       }
@@ -160,7 +163,7 @@ export default (app) => {
 
   app.post(url + '/assign-permission/user', jsonParser, function (req, res) {
     const loginid = getLoginId(req);
-    const visualId = req.body.visualId
+    const visualId = "avue:vs:" + req.body.visualId
     const users = req.body.users;
     const query = {
       loginid: loginid,
@@ -170,7 +173,7 @@ export default (app) => {
       if (resultSet.length <= 0) {
         res.json(resbody.getFailResult('不允许分配该视图 ID 的权限'))
       } else {
-        // TODO: 为每个用户添加权限
+        // 为每个用户添加权限
         for (let i = 0; i < users.length; i++) {
           addVisualForUser(users[i], visualId)
         }

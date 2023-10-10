@@ -93,6 +93,13 @@ spring:
           filters:
             - StripPrefix=1
 
+        - id: af-askari
+          uri: lb://af-askari
+          predicates:
+            - Path=/af-askari/**
+          filters:
+            - StripPrefix=1
+
       globalcors:
         cors-configurations:
           '[/**]':

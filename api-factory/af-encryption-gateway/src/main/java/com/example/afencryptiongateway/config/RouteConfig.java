@@ -21,14 +21,28 @@ public class RouteConfig {
 
     @Bean
     public RouteLocator routes(RouteLocatorBuilder builder, ObjectMapper objectMapper) {
-        return builder
-                .routes()
+        return builder.routes()
+                // ******************* shared 服务 ************************
                 .route("public-api", r -> r.path("/public-api/**")
                         .filters(f -> f
                                 .stripPrefix(1)
-//                                .modifyRequestBody(String.class, String.class, new RequestEncryptionFunction(objectMapper, askariExchange))
+                                .modifyRequestBody(String.class, String.class, new RequestEncryptionFunction(objectMapper, askariExchange))
                                 .modifyResponseBody(String.class, String.class, new ResponseEncryptionFunction(objectMapper, askariExchange)))
                         .uri("lb://dynamic-api")
-                ).build();
+                )
+                // ******************* shared-data ************************
+                .route("shared-data", r -> r.path("/shared-data/**")
+                        .filters(f -> f
+                                .modifyRequestBody(String.class, String.class, new RequestEncryptionFunction(objectMapper, askariExchange))
+                                .modifyResponseBody(String.class, String.class, new ResponseEncryptionFunction(objectMapper, askariExchange)))
+                        .uri("lb://ds-coordinator")
+                )
+                // ******************* askari 服务 ************************
+                .route("askira", r -> r.path("/askari/auth/**")
+                        .filters(f -> f
+                                .stripPrefix(1))
+                        .uri("lb://af-askari")
+                )
+                .build();
     }
 }

@@ -16,4 +16,4 @@ spring:
 sidecar:
   ip: ${AF_ASKARI_HOST:127.0.0.1}
   port: ${AF_ASKARI_PORT:10510}
-  health-check-url: http://${DYNAMIC_API_HOST:127.0.0.1}:${DYNAMIC_API_PORT:10510}/health/live
+  health-check-url: http://${AF_ASKARI_HOST:127.0.0.1}:${AF_ASKARI_PORT:10510}/health/live

@@ -19,11 +19,11 @@ public class AvueDataServerAuthority implements Authority {
     @Override
     public SaRouterStaff authInfo() {
         return SaRouter.match(MATCH_PATH + "/**").free(r -> {
-            // 检查 view-id
+            // 大屏页面，检查用户是否具有该大屏 view-id 的权限
             SaRouter.match(MATCH_PATH + "/visual/detail", rq -> {
                 String viewId = SaHolder.getRequest().getParam("id", null);
                 if (viewId != null) {
-                    StpUtil.checkPermission("avue:" + viewId);
+                    StpUtil.checkPermission("avue:vs:" + viewId);
                 }
             });
         }).stop();

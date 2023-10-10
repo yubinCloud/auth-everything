@@ -2,6 +2,9 @@ package com.example.gateway.authority;
 
 import cn.dev33.satoken.router.SaRouterStaff;
 
+import java.util.Collections;
+import java.util.List;
+
 public interface Authority {
 
     public default boolean isEnabled() {
@@ -15,4 +18,8 @@ public interface Authority {
      * @return
      */
     public SaRouterStaff authInfo();
+
+    public default List<String> excludes() {
+        return Collections.emptyList();
+    }
 }
