@@ -1,0 +1,23 @@
+version: '3'
+services:
+  
+  ##################################################################
+  #################### Basic infrastructure ########################
+  ##################################################################
+  mysql8:
+    build:
+      context: ./mysql8
+    container_name: aet-mysql8
+    hostname: mysql8
+    image: aet-mysql8
+    expose:
+      - "3306"
+    # ports:
+    #   - 3307:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+    privileged: true
+    volumes:
+      - ./mysql8/volume/conf/my.cnf:/etc/mysql/my.cnf
+      - ./mysql8/volume/data:/var/lib/mysql
+    restart: always

@@ -2,7 +2,7 @@ FROM golang:1.20 as builder
 ADD . /src
 WORKDIR /src
 RUN go mod download
-RUN GOOS=linux GOARCH=amd64 go build -o app
+RUN GOOS=linux go build -o app
 
 
 

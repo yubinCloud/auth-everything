@@ -1,7 +1,10 @@
 package com.example.afencryptiongateway.function;
 
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.crypto.symmetric.AES;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import com.example.afencryptiongateway.exception.ForbidRequestException;
 import com.example.afencryptiongateway.exchange.AskariExchange;
 import com.example.afencryptiongateway.exchange.request.FetchSecretKeyRequest;
@@ -39,26 +42,39 @@ public class RequestEncryptionFunction implements RewriteFunction<String, String
     @Override
     public Publisher<String> apply(ServerWebExchange exchange, String body) {
         String username = JwtUtil.parseUsername(exchange);
-        if (username == null) {
-            throw new ForbidRequestException("请求未携带 token");
-        }
         FetchSecretKeyRequest fetchSecretKeyRequest = new FetchSecretKeyRequest();
         fetchSecretKeyRequest.setUsername(username);
         Mono<AskariResp<FetchSecretKeyResponse>> fetchResp = askariExchange.fetchSecretKey(fetchSecretKeyRequest);
         return fetchResp.handle((resp, sink) -> {
-            Map<String, Object> requestJSON = new HashMap<>();
             String secretKey = resp.getData().getSecretKey();
+//            String secretKey = "iQ3DuGokIVmH9qDGzdLl7Q==";
             byte[] keyBytes = Base64.decode(secretKey);
             AES aes = SecureUtil.aes(keyBytes);
-            String encryptHex = aes.encryptHex(body);
-            String magic = aes.encryptHex(ENCRYPTION_MAGIC_NUMBER);
-            requestJSON.put("data", encryptHex);
-            requestJSON.put("magic", magic);
+//            System.out.println(aes.encryptHex(body));
+            String decryptStr;
+            log.info("secretKey: " + secretKey + "; body: " + body);
+            if (StrUtil.isBlank(body)) {
+                decryptStr = "";
+            } else {
+                decryptStr = aes.decryptStr(body);
+            }
+            JSONObject jsonObject = JSONUtil.parseObj(decryptStr);
             try {
-                sink.next(objectMapper.writeValueAsString(requestJSON));
+                sink.next(objectMapper.writeValueAsString(jsonObject));
             } catch (JsonProcessingException e) {
                 sink.error(new ForbidRequestException("请求数据无法解析"));
             }
         });
+    }
+
+    public static void main(String[] args) {
+        String secretKey = "0K+14t9dympNtjIxLYNbXQ==";
+        byte[] keyBytes = Base64.decode(secretKey);
+        AES aes = SecureUtil.aes(keyBytes);
+        String body = "{ \"entname\":  \"威海丰达物流有限公司\"}";
+        JSONObject jsonObject = JSONUtil.parseObj(body);
+        String encryptHex = aes.encryptHex(body);
+        System.out.println(jsonObject.toString());
+        System.out.println(encryptHex);
     }
 }

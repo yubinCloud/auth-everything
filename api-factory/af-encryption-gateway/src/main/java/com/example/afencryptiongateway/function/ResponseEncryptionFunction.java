@@ -1,7 +1,10 @@
 package com.example.afencryptiongateway.function;
 
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.crypto.symmetric.AES;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import com.example.afencryptiongateway.exception.ForbidRequestException;
 import com.example.afencryptiongateway.exchange.AskariExchange;
 import com.example.afencryptiongateway.exchange.request.FetchSecretKeyRequest;
@@ -39,18 +42,21 @@ public class ResponseEncryptionFunction implements RewriteFunction<String, Strin
     @Override
     public Publisher<String> apply(ServerWebExchange exchange, String body) {
         String username = JwtUtil.parseUsername(exchange);
-        if (username == null) {
-            throw new ForbidRequestException("请求未携带 token");
-        }
         FetchSecretKeyRequest fetchSecretKeyRequest = new FetchSecretKeyRequest();
         fetchSecretKeyRequest.setUsername(username);
         Mono<AskariResp<FetchSecretKeyResponse>> fetchResp = askariExchange.fetchSecretKey(fetchSecretKeyRequest);
         return fetchResp.handle((resp, sink) -> {
             Map<String, Object> respJSON = new HashMap<>();
-            String secretKey = resp.getData().getSecretKey();
+            String secretKey = resp.getData().getSecretKey();  // 字符串密钥
+//            String secretKey = "iQ3DuGokIVmH9qDGzdLl7Q==";
             byte[] keyBytes = Base64.decode(secretKey);
             AES aes = SecureUtil.aes(keyBytes);
-            String encryptHex = aes.encryptHex(body);  // 加密为16进制表示
+            String encryptHex;
+            if (StrUtil.isBlank(body)) {
+                encryptHex = "";
+            } else {
+                encryptHex = aes.encryptHex(body);  // 加密为16进制表示
+            }
             String magic = aes.encryptHex(ENCRYPTION_MAGIC_NUMBER);  // 魔数，用于校验解密结果
             respJSON.put("data", encryptHex);
             respJSON.put("magic", magic);
@@ -61,4 +67,15 @@ public class ResponseEncryptionFunction implements RewriteFunction<String, Strin
             }
         });
     }
+
+//    public static void main(String[] args) {
+//        String secretKey = "iQ3DuGokIVmH9qDGzdLl7Q==";
+//        byte[] keyBytes = Base64.decode(secretKey);
+//        AES aes = SecureUtil.aes(keyBytes);
+//        String raw = "a729e71b54481f36912eea10062cfb9afbf0fb11d72d89296075e012c1d9477d473fac1ff23f6a2b1d3a8305fec2cdb5";
+//        String body = aes.decryptStr(raw);
+//        JSONObject jsonObject = JSONUtil.parseObj(body);
+//        System.out.println(body);
+//        System.out.println(jsonObject);
+//    }
 }

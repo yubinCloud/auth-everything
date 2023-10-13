@@ -10,54 +10,59 @@ spec:
   selector:
     matchLabels:
       app: mysql8-sts
-  
+
+  strategy:
+    type: Recreate
+
   template:
     metadata:
       labels:
         app: mysql8-sts
     spec:
       containers:
-      - name: mysql8-sts
-        image: aet-mysql8
-        imagePullPolicy: Never
-        ports:
-        - containerPort: 3306
-        volumeMounts:
-        - name: mysql-cnf
-          mountPath: /etc/mysql/my.cnf
-        - name: mysql-pvc
-          mountPath: /var/lib/mysql
-        env:
-        - name: MYSQL_ROOT_PASSWORD
-          valueFrom:
-            configMapKeyRef:
-              name: public-env
-              key: mysql-password
+        - name: mysql8-sts
+          image: aet-mysql8
+          imagePullPolicy: Never
+          securityContext:
+            privileged: true
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - name: mysql-cnf
+              mountPath: /etc/mysql/my.cnf
+            - name: mysql-data-pvc
+              mountPath: /var/lib/mysql
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: public-env
+                  key: mysql-password
       volumes:
-      - name: mysql-cnf
-        configMap:
-          name: mysql8-config-cm
-  
+        - name: mysql-cnf
+          configMap:
+            name: mysql8-config-cm
+
   volumeClaimTemplates:
-  - metadata:
-      name: mysql-pvc
-      namespace: aet
-    spec:
-      accessModes: [ "ReadWriteOnce" ]
-      storageClassName: longhorn
-      resources:
-        requests:
-          storage: 2Gi
+    - metadata:
+        name: mysql-data-pvc
+        namespace: aet
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: longhorn
+        resources:
+          requests:
+            storage: 2Gi
 ---
 kind: Service
 apiVersion: v1
 metadata:
-  name: mysql8-svc
+  name: mysql8
 spec:
   selector:
     app: mysql8-sts
-  type:  ClusterIP
+  clusterIP: None
   ports:
-  - protocol: TCP
-    port: 3306
-    targetPort: 3306
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306

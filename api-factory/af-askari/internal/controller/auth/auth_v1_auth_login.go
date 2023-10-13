@@ -9,7 +9,7 @@ import (
 )
 
 func (c *ControllerV1) AuthLogin(ctx context.Context, req *v1.AuthLoginReq) (res *v1.AuthLoginRes, err error) {
-	if req.Username != "admin" || req.Password != "inet_store@2018" {
+	if req.Username != "admin" || req.Password != "vA2S2pPVzt" {
 		res = &v1.AuthLoginRes{
 			SecretKey: "",
 			Token:     "",

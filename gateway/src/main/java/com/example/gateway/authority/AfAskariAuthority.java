@@ -28,8 +28,6 @@ public class AfAskariAuthority implements Authority {
 
     @Override
     public List<String> excludes() {
-        List<String> list = new ArrayList<>();
-        list.add(MATCH_PATH + "/auth/login");
-        return list;
+        return List.of(MATCH_PATH + "/auth/login");
     }
 }
