@@ -4,7 +4,7 @@ metadata:
   name: mysql8-sts
   namespace: aet
 spec:
-  serviceName: mysql8-svc
+  serviceName: mysql8
   replicas: 1
 
   selector:
