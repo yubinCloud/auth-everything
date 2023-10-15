@@ -1,13 +1,11 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  labels:
-    app: sentinel
-    # kuboard 相关 label
-    k8s.kuboard.cn/layer: monitor
-    k8s.kuboard.cn/name: sentinel
   name: sentinel
   namespace: aet
+  labels:
+    k8s.kuboard.cn/layer: monitor
+    k8s.kuboard.cn/name: sentinel
 spec:
   selector:
     matchLabels:

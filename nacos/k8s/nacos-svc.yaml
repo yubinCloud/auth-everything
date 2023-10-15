@@ -41,7 +41,7 @@ spec:
               valueFrom:
                 configMapKeyRef:
                   name: public-env
-                  key: mysql-password
+                  key: MYSQL_PWD
             - name: MYSQL_SERVICE_DB_NAME
               value: "nacos"
           envFrom:

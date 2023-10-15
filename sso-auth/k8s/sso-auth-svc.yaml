@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:  sso-auth
+  namespace: aet
+  labels:
+    k8s.kuboard.cn/layer: svc
+    k8s.kuboard.cn/name: gateway
+spec:
+  selector:
+    matchLabels:
+      app: sso-auth
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: sso-auth
+    spec:
+      containers:
+        - name: aet-auth
+          image: aet-auth
+          imagePullPolicy: Never
+          ports:
+          - containerPort: 9590
+          envFrom:
+            - configMapRef:
+                name: public-env
+      restartPolicy: Always
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: sso-auth
+  namespace: aet
+spec:
+  selector:
+    app: sso-auth
+  type: ClusterIP
+  ports:
+  - port:  9590
+    targetPort:  9590

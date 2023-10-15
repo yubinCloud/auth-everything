@@ -37,7 +37,7 @@ spec:
               valueFrom:
                 configMapKeyRef:
                   name: public-env
-                  key: mysql-password
+                  key: MYSQL_PWD
       volumes:
         - name: mysql-cnf
           configMap:
