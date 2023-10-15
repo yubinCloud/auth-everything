@@ -1,26 +1,26 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: mysql8-sts
+  name: mysql8
   namespace: aet
+  labels:
+    k8s.kuboard.cn/layer: db
+    k8s.kuboard.cn/name: mysql8
 spec:
   serviceName: mysql8
   replicas: 1
 
   selector:
     matchLabels:
-      app: mysql8-sts
-
-  strategy:
-    type: Recreate
+      app: mysql8
 
   template:
     metadata:
       labels:
-        app: mysql8-sts
+        app: mysql8
     spec:
       containers:
-        - name: mysql8-sts
+        - name: mysql8
           image: aet-mysql8
           imagePullPolicy: Never
           securityContext:
@@ -42,25 +42,18 @@ spec:
         - name: mysql-cnf
           configMap:
             name: mysql8-config-cm
-
-  volumeClaimTemplates:
-    - metadata:
-        name: mysql-data-pvc
-        namespace: aet
-      spec:
-        accessModes: ["ReadWriteOnce"]
-        storageClassName: longhorn
-        resources:
-          requests:
-            storage: 2Gi
+        - name: mysql-data-pvc
+          persistentVolumeClaim:
+            claimName: mysql8-data-pvc
 ---
 kind: Service
 apiVersion: v1
 metadata:
   name: mysql8
+  namespace: aet
 spec:
   selector:
-    app: mysql8-sts
+    app: mysql8
   clusterIP: None
   ports:
     - protocol: TCP

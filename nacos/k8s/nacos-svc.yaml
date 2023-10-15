@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nacos
+  namespace: aet
+  labels:
+    app: nacos
+    k8s.kuboard.cn/layer: midware
+    k8s.kuboard.cn/name: nacos
+spec:
+  selector:
+    matchLabels:
+      app: nacos
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: nacos
+    spec:
+      containers:
+        - name: aet-nacos
+          image: aet-nacos
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8848
+              name: client-port
+            - containerPort: 9848
+              name: client-rpc
+            - containerPort: 9849
+              name: raft-rpc
+            - containerPort: 7848
+              name: old-raft-rpc
+          env:
+            - name: MYSQL_SERVICE_HOST
+              value: "mysql8"
+            - name: MYSQL_SERVICE_PORT
+              value: "3306"
+            - name: MYSQL_SERVICE_USER
+              value: "root"
+            - name: MYSQL_SERVICE_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: public-env
+                  key: mysql-password
+            - name: MYSQL_SERVICE_DB_NAME
+              value: "nacos"
+          envFrom:
+            - configMapRef:
+                name: nacos-env-cm
+      restartPolicy: Always
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: nacos
+  namespace: aet
+spec:
+  selector:
+    app: nacos
+  clusterIP: None
+  ports:
+    - port: 8848
+      name: server
+      targetPort: 8848
+    - port: 9848
+      name: client-rpc
+      targetPort: 9848
+    - port: 9849
+      name: raft-rpc
+      targetPort: 9849
+    ## 兼容1.4.x版本的选举端口
+    - port: 7848
+      name: old-raft-rpc
+      targetPort: 7848
