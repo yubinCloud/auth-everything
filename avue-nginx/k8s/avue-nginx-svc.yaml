@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: avue-nginx
+  namespace: aet
+  labels:
+    k8s.kuboard.cn/layer: svc
+    k8s.kuboard.cn/name: avue-nginx
+spec:
+  selector:
+    matchLabels:
+      app: avue-nginx
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: avue-nginx
+    spec:
+      restartPolicy: Always
+      containers:
+        # avue nginx 服务
+        - name: avue-nginx
+          image: aet-avue-nginx
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8095
+          volumeMounts:
+            - name: avue-exported-files
+              mountPath: /opt/exported-files
+        # sidecar
+        - name: sidecar-avue-nginx
+          image: aet-nacos-sidecar
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 10013
+          envFrom:
+            - configMapRef:
+                name: public-env
+          env:
+            - name: APP_PORT
+              value: "10013"
+            - name: APP_NAME
+              value: "avue-nginx"
+            - name: SERVICE_IP
+              value: "avue-nginx"
+            - name: SERVICE_PORT
+              value: "8095"
+      volumes:
+        - name: avue-exported-files
+          persistentVolumeClaim:
+            claimName: avue-exported-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: avue-nginx
+  namespace: aet
+spec:
+  selector:
+    app: avue-nginx
+  type: ClusterIP
+  ports:
+    - protocol: TCP
+      port: 8095
+      targetPort: 8095

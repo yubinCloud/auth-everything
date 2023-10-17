@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: xxl-job-mysql
+  namespace: aet
+  labels:
+    k8s.kuboard.cn/layer: db
+    k8s.kuboard.cn/name: xxl-job-mysql
+spec:
+  serviceName: xxl-job-mysql
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: xxl-job-mysql
+
+  template:
+    metadata:
+      labels:
+        app: xxl-job-mysql
+    spec:
+      containers:
+        - name: xxl-job-mysql
+          image: aet-xxl-job-mysql
+          imagePullPolicy: Never
+          securityContext:
+            privileged: true
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - name: mysql-cnf
+              mountPath: /etc/mysql/my.cnf
+            - name: mysql-data-pvc
+              mountPath: /var/lib/mysql
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: public-env
+                  key: XXL_JOB_MYSQL_PWD
+      volumes:
+        - name: mysql-cnf
+          configMap:
+            name: xxl-job-mysql-config-cm
+        - name: mysql-data-pvc
+          persistentVolumeClaim:
+            claimName: xxl-job-mysql-data-pvc
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: xxl-job-mysql
+  namespace: aet
+spec:
+  selector:
+    app: xxl-job-mysql
+  clusterIP: None
+  ports:
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306

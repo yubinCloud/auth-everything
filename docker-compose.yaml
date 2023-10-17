@@ -342,6 +342,7 @@ services:
     environment:
       - ENV_FOR_DYNACONF=internal
       - TZ=Asia/Shanghai
+      - SIDECAR_HOST=sidecar-ds-coordinator
     depends_on:
       gateway:
         condition: service_healthy

@@ -32,6 +32,9 @@ spring:
               - uri: http://${NACOS_HOST:127.0.0.1}:${NACOS_PORT:8848}
 
     gateway:
+      httpclient:
+        websocket:
+          max-frame-payload-length: 10485760
       routes:
         - id: sentinel-dashboard
           uri: lb://sentinel-dashboard
@@ -108,6 +111,7 @@ spring:
             allowed-headers: "*"
             allow-credentials: true
             exposedHeaders: "Content-Disposition,Content-Type,Cache-Control"
+        add-to-simple-url-handler-mapping: true
     openfeign:
       httpclient:
         enabled: true

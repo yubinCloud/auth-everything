@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: avue-data-server
+  namespace: aet
+  labels:
+    k8s.kuboard.cn/layer: svc
+    k8s.kuboard.cn/name: avue-data-server
+spec:
+  selector:
+    matchLabels:
+      app: avue-data-server
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: avue-data-server
+    spec:
+      restartPolicy: Always
+      containers:
+        # avue nginx 服务
+        - name: avue-data-server
+          image: aet-avue-data-server
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 10002
+          env:
+            - name: MYSQL_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: public-env
+                  key: MYSQL_HOST
+            - name: MYSQL_USER
+              value: "root"
+            - name: MYSQL_PWD
+              valueFrom:
+                configMapKeyRef:
+                  name: public-env
+                  key: MYSQL_PWD
+            - name: MYSQL_PORT
+              value: "3306"
+            - name: MYSQL_DB
+              value: "antv_data_server"
+            - name: SIDECAR_HOST
+              value: "localhost"
+          volumeMounts:
+            - name: avue-exported-files
+              mountPath: /opt/exported-files
+            - name: avue-internal-files
+              mountPath: /src/file
+        # sidecar
+        - name: sidecar-avue-data-server
+          image: aet-nacos-sidecar
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 10012
+          envFrom:
+            - configMapRef:
+                name: public-env
+          env:
+            - name: APP_PORT
+              value: "10012"
+            - name: APP_NAME
+              value: "avue-data-server"
+            - name: SERVICE_IP
+              value: "avue-data-server"
+            - name: SERVICE_PORT
+              value: "10002"
+            - name: SERVICE_HEALTH_CHECK_URL
+              value: "http://127.0.0.1:10002/health"
+
+      volumes:
+        - name: avue-exported-files
+          persistentVolumeClaim:
+            claimName: avue-exported-pvc
+        - name: avue-internal-files
+          persistentVolumeClaim:
+            claimName: avue-internal-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: avue-data-server
+  namespace: aet
+spec:
+  selector:
+    app: avue-data-server
+  type: ClusterIP
+  ports:
+    - protocol: TCP
+      port: 10002
+      targetPort: 10002

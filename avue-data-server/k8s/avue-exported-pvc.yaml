@@ -1,0 +1,13 @@
+# 存储 avue-data-server 的导出表格的文件
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: avue-exported-pvc
+  namespace: aet
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 1Gi

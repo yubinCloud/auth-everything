@@ -1,0 +1,13 @@
+# 存储 elaticsearch 7 的数据
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: es7-data
+  namespace: aet
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 1Gi

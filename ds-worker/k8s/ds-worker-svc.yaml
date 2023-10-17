@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:  ds-worker
+  namespace: aet
+  labels:
+    k8s.kuboard.cn/layer: svc
+    k8s.kuboard.cn/name: ds-worker
+spec:
+  selector:
+    matchLabels:
+      app: ds-worker
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: ds-worker
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: ds-worker
+          image: aet-ds-worker
+          imagePullPolicy: Never
+          ports:
+          - containerPort: 9300
+          envFrom:
+            - configMapRef:
+                name: public-env
+          
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: ds-worker
+  namespace: aet
+spec:
+  selector:
+    app: ds-worker
+  type: ClusterIP
+  ports:
+  - port:  9300
+    targetPort:  9300

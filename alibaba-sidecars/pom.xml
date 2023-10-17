@@ -11,6 +11,7 @@
         <module>ds-coordinator</module>
         <module>dynamic-api</module>
         <module>af-askari</module>
+        <module>nacos-sidecar</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>
