@@ -83,6 +83,29 @@ services:
     networks:
       - platform-net
   
+  minio-server:
+    image: bitnami/minio:2023.10.16
+    container_name: ${PROJECT_PREFIX}-${MINIO_HOST}
+    hostname: ${MINIO_HOST}
+    expose:
+      - 9000  # S3 API
+      - 9001  # console port
+    volumes:
+      - ./minio-server/volume/data:/bitnami/minio/data
+    environment:
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
+      - MINIO_DEFAULT_BUCKETS="simulator-img"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      start_period: 10s
+      interval: 5s
+      timeout: 10s
+      retries: 3
+    restart: ${DOCKER_RESTART_POLICY}
+    networks:
+      - platform-net
+  
   sentinel-dashboard:
     build:
       context: ./sentinel-dashboard
@@ -351,6 +374,32 @@ services:
     restart: ${DOCKER_RESTART_POLICY}
     networks:
       - platform-net
+  
+  simulator:
+    build:
+      context: ./simulator
+    container_name: aet-simulator
+    hostname: simulator
+    image: aet-simulator
+    expose:
+      - 9660
+    env_file:
+      - ./.env
+    environment:
+      - FRONT_PROTOCOL=http
+      - FRONT_HOST="10.245.142.209"
+      - FRONT_HOST="8091"
+      - MINIO_URL="minio-server:9000"
+      - MINIO_ACCESS_KEY=${MINIO_ROOT_USER}
+      - MINIO_SECRET_KEY=${MINIO_ROOT_PASSWORD}
+      - ENV_FOR_DYNACONF=prod
+      - MERGE_ENABLED_FOR_DYNACONF="true"
+    depends_on:
+      minio-server:
+        condition: service_healthy
+    restart: ${DOCKER_RESTART_POLICY}
+    networks:
+      - platform-net
 
   ##################################################################
   #################### Alibaba Sidecars ############################
@@ -423,6 +472,28 @@ services:
       - ./.env
     environment:
       - APP_PORT=${SIDECAR_DS_COORDINATOR_PORT}
+    depends_on:
+      gateway:
+        condition: service_healthy
+    restart: ${DOCKER_RESTART_POLICY}
+    networks:
+      - platform-net
+    
+  sidecar-simulator:
+    build:
+      context: ./alibaba-sidecars/nacos-sidecar
+    container_name: aet-sidecar-simulator
+    hostname: sidecar-simulator
+    image: aet-nacos-sidecar
+    expose:
+      - 10017
+    env_file:
+      - ./.env
+    environment:
+      - APP_PORT=10017
+      - APP_NAME="simulator"
+      - SERVICE_IP=simulator
+      - SERVICE_PORT="9660"
     depends_on:
       gateway:
         condition: service_healthy

@@ -1,4 +1,4 @@
 export default {
   id: 'id',
-  column: ['driver_class', 'name', 'password', 'remark', 'url', 'username', 'loginid']
+  column: ['driver_class', 'name', 'password', 'remark', 'url', 'username']
 }

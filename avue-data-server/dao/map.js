@@ -4,12 +4,11 @@ import mapMode from '../modules/map.js'
 let table = 'blade_visual_map'
 export default {
   list: (data) => list({ table, data, column: 'id,name' }),
-  detail: (id, loginid) => list({ table, data: { id, loginid }, parent: true, hump: true }),
+  detail: (id) => list({ table, data: { id }, parent: true, hump: true }),
   update: (data) => update({
     table: table,
     data: {
       id: data.id,
-      loginid: data.loginid
     },
     params: hTol(mapMode.column, data)
   }),
@@ -18,11 +17,10 @@ export default {
     column: toColumn(mapMode.id, mapMode.column),
     data: hTol(mapMode.column, data)
   }),
-  del: (id, loginid) => del({
+  del: (id) => del({
     table: table,
     data: {
-      id,
-      loginid
+      id
     }
   }),
 }

@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:  avue-helper
+  namespace: aet
+  labels:
+    k8s.kuboard.cn/layer: svc
+    k8s.kuboard.cn/name: avue-helper
+spec:
+  selector:
+    matchLabels:
+      app: avue-helper
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: avue-helper
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: avue-helper
+          image: aet-avue-helper
+          imagePullPolicy: Never
+          ports:
+          - containerPort: 9620
+          envFrom:
+            - configMapRef:
+                name: public-env
+          
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: avue-helper
+  namespace: aet
+spec:
+  selector:
+    app: avue-helper
+  type: ClusterIP
+  ports:
+  - port:  9620
+    targetPort:  9620

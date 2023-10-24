@@ -4,12 +4,11 @@ import categoryMode from '../modules/category.js'
 let table = 'blade_visual_category'
 export default {
   list: (data) => list({ table, data, parent: true, hump: true }),
-  detail: (id, loginid) => list({ table, data: { id, loginid }, parent: true, hump: true }),
+  detail: (id) => list({ table, data: { id }, parent: true, hump: true }),
   update: (data) => update({
     table: table,
     data: {
-      id: data.id,
-      loginid: data.loginid
+      id: data.id
     },
     params: hTol(categoryMode.column, data)
   }),
@@ -18,11 +17,10 @@ export default {
     column: toColumn(categoryMode.id, categoryMode.column),
     data: hTol(categoryMode.column, data)
   }),
-  del: (id, loginid) => del({
+  del: (id) => del({
     table: table,
     data: {
-      id,
-      loginid
+      id
     }
   }),
 }

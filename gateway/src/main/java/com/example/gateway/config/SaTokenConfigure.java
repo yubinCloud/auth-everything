@@ -37,6 +37,9 @@ public class SaTokenConfigure {
                 .addExclude("/jupyter/**")
                 .addExclude("/ws/**")
                 .addExclude("/ds-worker/**")
+                .addExclude("/simulator/**")
+                .addExclude("/s3/**")
+                .addExclude("/minio-console/**")
 //                .addExclude("/avue/**")
                 // 鉴权方法：每次访问进入
                 .setAuth(obj -> {

@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: af-apisix-dashboard
+  namespace: aet
+  labels:
+    k8s.kuboard.cn/layer: svc
+    k8s.kuboard.cn/name: af-apisix-dashboard
+    subsystem: api-factory
+spec:
+  selector:
+    matchLabels:
+      app: af-apisix-dashboard
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: af-apisix-dashboard
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: af-apisix-dashboard
+          image: apache/apisix-dashboard:3.0.1-alpine
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 9000
+          volumeMounts:
+            - name: dashboard-conf
+              mountPath: /usr/local/apisix-dashboard/conf/conf.yaml
+              readOnly: true
+              subPath: conf.yaml
+      volumes:
+        - name: dashboard-conf
+          configMap:
+            name: af-apisix-dashboard-config-cm
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: af-apisix-dashboard
+  namespace: aet
+spec:
+  selector:
+    app: af-apisix-dashboard
+  type: ClusterIP
+  ports:
+  - port: 9000
+    targetPort: 9000

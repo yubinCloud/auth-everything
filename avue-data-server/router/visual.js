@@ -14,7 +14,6 @@ let url = '/visual'
 export default (app) => {
   app.get(url + '/list', jsonParser, function (req, res) {
     const query = req.query;
-    query.loginid = getLoginId(req);
     visualDao.list(query).then(data => {
       res.json(resbody.getSuccessResult(data));
     }).catch(error => {
@@ -25,8 +24,6 @@ export default (app) => {
   // 不校验 loginid，权限的校验放在了 gateway 中
   app.get(url + '/detail', jsonParser, function (req, res) {
     const id = req.query.id;
-    // const loginid = getLoginId(req);
-    const loginid = undefined;
     visualDao.detail(id, loginid).then(data => {
       res.json(resbody.getSuccessResult(data));
     }).catch(error => {
@@ -85,7 +82,6 @@ export default (app) => {
   })
   app.post(url + '/update', jsonParser, function (req, res) {
     const data = req.body;
-    data.loginid = getLoginId(req);
     let name = data.config ? 'update' : 'updates'
     visualDao[name](data).then(data => {
       res.json(resbody.getSuccessResult(data));
@@ -95,8 +91,7 @@ export default (app) => {
   })
   app.post(url + '/copy', jsonParser, function (req, res) {
     const id = req.query.id;
-    const loginid = getLoginId(req);
-    visualDao.copy(id, loginid).then(data => {
+    visualDao.copy(id).then(data => {
       res.json(resbody.getSuccessResult(data.id));
     }).catch(error => {
       res.json(resbody.getFailResult(error));
@@ -107,78 +102,66 @@ export default (app) => {
    */
   app.post(url + '/save', jsonParser, function (req, res) {
     const data = req.body;
-    const loginid = getLoginId(req);
-    data.loginid = loginid;
     visualDao.save(data).then(data => {
-      visualId = data.id;
-      addVisualForUser(loginid, visualId).then(resp => {
-        res.json(resbody.getSuccessResult(data));
-      }).catch(error => {
-        visualDao.del(visualId, loginid).then(d => {
-          res.json(resbody.getFailResult(error));
-        }).catch(e => {
-          res.json(resbody.getFailResult(error));
-        })
-      })
+      res.json(resbody.getSuccessResult(data));
     }).catch(error => {
       res.json(resbody.getFailResult(error));
     });
   })
   app.post(url + '/remove', jsonParser, function (req, res) {
     const ids = req.query.ids;
-    const loginid = getLoginId(req);
-    visualDao.del(ids, loginid).then(data => {
+    visualDao.del(ids).then(data => {
       res.json(resbody.getSuccessResult(data));
     }).catch(error => {
       res.json(resbody.getFailResult(error));
     });
   })
   
-  /**
-   * 自己添加的 API
-   */
-  app.get(url + '/preview-list', jsonParser, function (req, res) {
-    const loginid = getLoginId(req);
-    getUserInfo(loginid).then(axiosResp => {
-      const userInfo = axiosResp.data;
-      const permissionList = userInfo['permissionList'];
-      let visualIdList = [];
-      for (let i = 0; i < permissionList.length; i++) {
-        const perm = permissionList[i];
-        if (perm.startsWith("avue:vs:") && perm.length > 5) {
-          visualIdList.push(perm.substring(5));
-        }
-      }
-      visualIdList = Array.from(visualIdList)
-      const query = {
-        id: visualIdList
-      }
-      visualDao.list(query).then(data => {
-        res.json(resbody.getSuccessResult(data));
-      }).catch(error => {
-        res.json(resbody.getFailResult(error));
-      });
-    })
-  })
+  // /**
+  //  * 自己添加的 API
+  //  */
+  // app.get(url + '/preview-list', jsonParser, function (req, res) {
+  //   const loginid = getLoginId(req);
+  //   getUserInfo(loginid).then(axiosResp => {
+  //     const userInfo = axiosResp.data;
+  //     const permissionList = userInfo['permissionList'];
+  //     let visualIdList = [];
+  //     for (let i = 0; i < permissionList.length; i++) {
+  //       const perm = permissionList[i];
+  //       if (perm.startsWith("avue:vs:") && perm.length > 5) {
+  //         visualIdList.push(perm.substring(5));
+  //       }
+  //     }
+  //     visualIdList = Array.from(visualIdList)
+  //     const query = {
+  //       id: visualIdList
+  //     }
+  //     visualDao.list(query).then(data => {
+  //       res.json(resbody.getSuccessResult(data));
+  //     }).catch(error => {
+  //       res.json(resbody.getFailResult(error));
+  //     });
+  //   })
+  // })
 
-  app.post(url + '/assign-permission/user', jsonParser, function (req, res) {
-    const loginid = getLoginId(req);
-    const visualId = "avue:vs:" + req.body.visualId
-    const users = req.body.users;
-    const query = {
-      loginid: loginid,
-      id: visualId
-    }
-    visualDao.list(query).then(resultSet => {
-      if (resultSet.length <= 0) {
-        res.json(resbody.getFailResult('不允许分配该视图 ID 的权限'))
-      } else {
-        // 为每个用户添加权限
-        for (let i = 0; i < users.length; i++) {
-          addVisualForUser(users[i], visualId)
-        }
-      }
-    })
-  })
+  // app.post(url + '/assign-permission/user', jsonParser, function (req, res) {
+  //   const loginid = getLoginId(req);
+  //   const visualId = "avue:vs:" + req.body.visualId
+  //   const users = req.body.users;
+  //   const query = {
+  //     loginid: loginid,
+  //     id: visualId
+  //   }
+  //   visualDao.list(query).then(resultSet => {
+  //     if (resultSet.length <= 0) {
+  //       res.json(resbody.getFailResult('不允许分配该视图 ID 的权限'))
+  //     } else {
+  //       // 为每个用户添加权限
+  //       for (let i = 0; i < users.length; i++) {
+  //         addVisualForUser(users[i], visualId)
+  //       }
+  //     }
+  //   })
+  // })
 
 }

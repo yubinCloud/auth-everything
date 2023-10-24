@@ -14,7 +14,6 @@ let url = '/db'
 export default (app) => {
   app.get(url + '/list', jsonParser, function (req, res) {
     const query = req.query;
-    query.loginid = getLoginId(req);
     dbDao.list(query).then(data => {
       res.json(resbody.getSuccessResult(data));
     }).catch(error => {
@@ -23,8 +22,7 @@ export default (app) => {
   })
   app.get(url + '/detail', jsonParser, function (req, res) {
     const id = req.query.id;
-    const loginid = getLoginId(req);
-    dbDao.detail(id, loginid).then(data => {
+    dbDao.detail(id).then(data => {
       res.json(resbody.getSuccessResult(data[0]));
     }).catch(error => {
       res.json(resbody.getFailResult(error));
@@ -32,8 +30,7 @@ export default (app) => {
   })
   app.post(url + '/remove', jsonParser, function (req, res) {
     const id = req.query.ids;
-    const loginid = getLoginId(req);
-    dbDao.del(id, loginid).then(data => {
+    dbDao.del(id).then(data => {
       res.json(resbody.getSuccessResult(data));
     }).catch(error => {
       res.json(resbody.getFailResult(error));
@@ -52,7 +49,6 @@ export default (app) => {
   app.post(url + '/dynamic-query', function (req, res) {
     const body = JSON.parse(crypto.decrypt(req.headers.data));
     const id = body.id
-    const loginid = getLoginId(req)
     const sql = body.sql;
     dbDao.detail(id, loginid).then(data => {
       let dsConf = getDsConf(data[0]);
@@ -71,7 +67,6 @@ export default (app) => {
   })
   app.post(url + '/submit', jsonParser, function (req, res) {
     const data = req.body;
-    data.loginid = getLoginId(req);
     if (data.id) {
       dbDao.update(data).then(data => {
         res.json(resbody.getSuccessResult(data));
@@ -91,7 +86,6 @@ export default (app) => {
   app.post(url + '/sql-export', function (req, res) {
     const body = JSON.parse(crypto.decrypt(req.headers.data));
     const id = body.id;
-    const loginid = getLoginId(req);
     const sql = body.sql;
     dbDao.detail(id, loginid).then(data => {
       let dsConf = getDsConf(data[0]);

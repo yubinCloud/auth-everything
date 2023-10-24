@@ -30,6 +30,10 @@ spring:
               - uri: http://${SENTINEL_HOST:127.0.0.1}:${SENTINEL_PORT:8080}
             nacos:
               - uri: http://${NACOS_HOST:127.0.0.1}:${NACOS_PORT:8848}
+            minio-server-s3:
+              - uri: http://${MINIO_HOST:127.0.0.1}:${MINIO_S3_PORT:9000}
+            minio-server-console:
+              - uri: http://${MINIO_HOST:127.0.0.1}:${MINIO_CONSOLE_PORT:9001}
 
     gateway:
       httpclient:
@@ -96,12 +100,38 @@ spring:
           filters:
             - StripPrefix=1
 
+        - id: simulator
+          uri: lb://simulator
+          predicates:
+            - Path=/simulator/**
+          filters:
+            - StripPrefix=1
+
+        - id: minio-server-s3
+          uri: lb://minio-server-s3
+          predicates:
+            - Path=/s3/**
+          filters:
+            - StripPrefix=1
+
+        - id: minio-server-console
+          uri: lb://minio-server-console
+          predicates:
+            - Path=/minio-console/**
+          filters:
+            - StripPrefix=1
+
         - id: af-askari
           uri: lb://af-askari
           predicates:
             - Path=/af-askari/**
           filters:
             - StripPrefix=1
+
+        - id: avue-helper
+          uri: lb://avue-helper
+          predicates:
+            - Path=/avue-helper/**
 
       globalcors:
         cors-configurations:

@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: minio-server
+  namespace: aet
+  labels:
+    k8s.kuboard.cn/layer: db
+    k8s.kuboard.cn/name: minio-server
+spec:
+  serviceName: minio-server
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: minio-server
+
+  template:
+    metadata:
+      labels:
+        app: minio-server
+    spec:
+      containers:
+        - name: minio-server
+          image: bitnami/minio:2023.10.16
+          imagePullPolicy: Never
+          securityContext:
+            privileged: true
+          ports:
+            - containerPort: 9000
+              name: s3
+            - containerPort: 9001
+              name: console          
+          volumeMounts:
+            - name: minio-server-data
+              mountPath: /bitnami/minio/data
+          env:
+            - name: MINIO_ROOT_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: public-env
+                  key: MINIO_ROOT_USER
+            - name: MINIO_ROOT_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: public-env
+                  key: MINIO_ROOT_PASSWORD
+            - name: MINIO_DEFAULT_BUCKETS
+              value: "simulator-img"
+      volumes:
+        - name: minio-server-data
+          persistentVolumeClaim:
+            claimName: minio-server-pvc
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: minio-server
+  namespace: aet
+spec:
+  selector:
+    app: minio-server
+  type: ClusterIP
+  ports:
+    - name: s3
+      port: 9000
+      targetPort: 9000
+    - name: console
+      port: 9001
+      targetPort: 9001

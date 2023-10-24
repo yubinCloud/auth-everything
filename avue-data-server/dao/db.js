@@ -4,12 +4,11 @@ import dbMode from '../modules/db.js'
 let table = 'blade_visual_db'
 export default {
   list: (data) => list({ table, data, hump: true }),
-  detail: (id, loginid) => list({ table, data: { id, loginid }, parent: true, hump: true }),
+  detail: (id) => list({ table, data: { id }, parent: true, hump: true }),
   update: (data) => update({
     table: table,
     data: {
       id: data.id,
-      loginid: data.loginid
     },
     params: hTol(dbMode.column, data)
   }),
@@ -18,11 +17,10 @@ export default {
     column: toColumn(dbMode.id, dbMode.column),
     data: hTol(dbMode.column, data)
   }),
-  del: (id, loginid) => del({
+  del: (id) => del({
     table: table,
     data: {
       id,
-      loginid
     }
   }),
 }

@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: af-etcd
+  namespace: aet
+  labels:
+    k8s.kuboard.cn/layer: db
+    k8s.kuboard.cn/name: af-etcd
+    subsystem: api-factory
+spec:
+  serviceName: af-etcd
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: af-etcd
+
+  template:
+    metadata:
+      labels:
+        app: af-etcd
+    spec:
+      containers:
+        - name: af-etcd
+          image: bitnami/etcd:3.4.15
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 2379
+          volumeMounts:
+            - name: etcd-data-pvc
+              mountPath: /bitnami/etcd
+          env:
+            - name: ETCD_ENABLE_V2
+              value: "true"
+            - name: ALLOW_NONE_AUTHENTICATION
+              value: "yes"
+            - name: ETCD_ADVERTISE_CLIENT_URLS
+              value: "http://af-etcd:2379"
+            - name: ETCD_LISTEN_CLIENT_URLS
+              value: "http://0.0.0.0:2379"
+      volumes:
+        - name: etcd-data-pvc
+          persistentVolumeClaim:
+            claimName: af-etcd-data-pvc
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: af-etcd
+  namespace: aet
+spec:
+  selector:
+    app: af-etcd
+  clusterIP: None
+  ports:
+    - protocol: TCP
+      port: 2379
+      targetPort: 2379

@@ -17,6 +17,11 @@ public class AvueDataServerAuthority implements Authority {
     }
 
     @Override
+    public boolean isEnabled() {
+        return false;
+    }
+
+    @Override
     public SaRouterStaff authInfo() {
         return SaRouter.match(MATCH_PATH + "/**").free(r -> {
             // 大屏页面，检查用户是否具有该大屏 view-id 的权限

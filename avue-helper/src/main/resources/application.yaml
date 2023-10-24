@@ -17,6 +17,9 @@ spring:
       discovery:
         server-addr: http://${NACOS_HOST:127.0.0.1}:${NACOS_PORT:8848}
 
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+
 springdoc:
   swagger-ui:
     path: /docs
