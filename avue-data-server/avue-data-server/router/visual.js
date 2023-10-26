@@ -24,7 +24,7 @@ export default (app) => {
   // 不校验 loginid，权限的校验放在了 gateway 中
   app.get(url + '/detail', jsonParser, function (req, res) {
     const id = req.query.id;
-    visualDao.detail(id, loginid).then(data => {
+    visualDao.detail(id).then(data => {
       res.json(resbody.getSuccessResult(data));
     }).catch(error => {
       res.json(resbody.getFailResult(error));

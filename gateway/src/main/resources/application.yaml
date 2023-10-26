@@ -133,6 +133,13 @@ spring:
           predicates:
             - Path=/avue-helper/**
 
+        - id: genreports
+          uri: lb://genreports
+          predicates:
+            - Path=/genreports/**
+          filters:
+            - StripPrefix=1
+
       globalcors:
         cors-configurations:
           '[/**]':

@@ -4,7 +4,7 @@ EXPOSE 10002
 
 # Bundle APP files
 WORKDIR /src/
-COPY ./ .
+COPY ./avue-data-server/ .
 
 # Install app dependencies
 ENV NPM_CONFIG_LOGLEVEL warn

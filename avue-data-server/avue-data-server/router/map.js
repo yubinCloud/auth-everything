@@ -2,7 +2,6 @@
 import resbody from '../util/resbody.js';
 import mapDao from '../dao/map.js';
 import bodyParser from 'body-parser';
-import { getLoginId } from '../util/utils.js';
 var jsonParser = bodyParser.json({ limit: '1000mb' });
 let url = '/map'
 export default (app) => {
@@ -16,7 +15,7 @@ export default (app) => {
   })
   app.get(url + '/detail', jsonParser, function (req, res) {
     const id = req.query.id;
-    mapDao.detail(id, loginid).then(data => {
+    mapDao.detail(id).then(data => {
       res.json(resbody.getSuccessResult(data[0]));
     }).catch(error => {
       res.json(resbody.getFailResult(error));
@@ -25,7 +24,7 @@ export default (app) => {
 
   app.get(url + '/data', jsonParser, function (req, res) {
     const id = req.query.id;
-    mapDao.detail(id, loginid).then(data => {
+    mapDao.detail(id).then(data => {
       res.json(JSON.parse(data[0].data));
     }).catch(error => {
       res.json(resbody.getFailResult(error));
@@ -33,7 +32,7 @@ export default (app) => {
   })
   app.post(url + '/remove', jsonParser, function (req, res) {
     const id = req.query.ids;
-    mapDao.del(id, loginid).then(data => {
+    mapDao.del(id).then(data => {
       res.json(resbody.getSuccessResult(data));
     }).catch(error => {
       res.json(resbody.getFailResult(error));

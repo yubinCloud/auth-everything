@@ -3,8 +3,6 @@ package com.example.afencryptiongateway.function;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.crypto.symmetric.AES;
-import cn.hutool.json.JSONObject;
-import cn.hutool.json.JSONUtil;
 import com.example.afencryptiongateway.exception.ForbidRequestException;
 import com.example.afencryptiongateway.exchange.AskariExchange;
 import com.example.afencryptiongateway.exchange.request.FetchSecretKeyRequest;
@@ -57,6 +55,7 @@ public class ResponseEncryptionFunction implements RewriteFunction<String, Strin
             } else {
                 encryptHex = aes.encryptHex(body);  // 加密为16进制表示
             }
+            log.info("response body: " + body);
             String magic = aes.encryptHex(ENCRYPTION_MAGIC_NUMBER);  // 魔数，用于校验解密结果
             respJSON.put("data", encryptHex);
             respJSON.put("magic", magic);

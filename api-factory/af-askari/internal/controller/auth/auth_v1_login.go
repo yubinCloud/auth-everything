@@ -5,7 +5,7 @@ import (
 	"af-askari/internal/service/encryption_service"
 	"context"
 
-	"af-askari/api/auth/v1"
+	v1 "af-askari/api/auth/v1"
 )
 
 func (c *ControllerV1) AuthLogin(ctx context.Context, req *v1.AuthLoginReq) (res *v1.AuthLoginRes, err error) {

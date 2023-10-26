@@ -7,10 +7,10 @@
         <artifactId>alibaba-sidecars</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <artifactId>ds-coordinator</artifactId>
+    <artifactId>simulator</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>ds-coordinator</name>
-    <description>ds-coordinator</description>
+    <name>simulator</name>
+    <description>simulator</description>
     <properties>
         <java.version>17</java.version>
     </properties>

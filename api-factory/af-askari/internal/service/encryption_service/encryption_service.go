@@ -5,8 +5,9 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/base64"
-	"github.com/gogf/gf/v2/os/gcache"
 	"time"
+
+	"github.com/gogf/gf/v2/os/gcache"
 )
 
 func CreateSecretKey(ctx context.Context, username string) (secretKey string, err error) {

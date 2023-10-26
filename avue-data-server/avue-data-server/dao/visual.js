@@ -8,7 +8,6 @@ function save (data) {
   return new Promise(resolve => {
     let visual = data.visual;
     let config = data.config;
-    visual.loginid = data.loginid;
     let id;
     insert({
       table,
@@ -50,8 +49,7 @@ export default {
         return update({
           table: table,
           data: {
-            id: data.visual.id,
-            loginid: data.loginid
+            id: data.visual.id
           },
           params: {
             background_url: data.visual.backgroundUrl
@@ -68,7 +66,6 @@ export default {
       table: table,
       data: {
         id: data.visual.id,
-        loginid: data.loginid
       },
       params: {
         title: visual.title,
@@ -79,16 +76,11 @@ export default {
     })
   },
   save: (data) => save(data),
-  detail: (id, loginid) => {
+  detail: (id) => {
     return new Promise(resolve => {
       let visual;
       let config;
-      let data;
-      if (loginid != undefined) {
-        data = { id, loginid };
-      } else {
-        data = { id };
-      }
+      let data = { id };
       list({ table, data: data, parent: true }).then(res1 => {
         visual = res1[0];
         return list({ table: tableConfig, data: { visual_id: id }, parent: true })
@@ -98,14 +90,13 @@ export default {
       })
     })
   },
-  copy: (id, loginid) => {
+  copy: (id) => {
     return new Promise((resolve) => {
       let data = {
         visual: {},
         config: {},
-        loginid: loginid
       }
-      list({ table, data: { id, loginid }, parent: true }).then(res1 => {
+      list({ table, data: { id }, parent: true }).then(res1 => {
         data.visual = res1[0]
         return list({ table: tableConfig, data: { visual_id: data.visual.id }, parent: true })
       }).then(res2 => {
@@ -116,11 +107,10 @@ export default {
       })
     })
   },
-  del: (id, loginid) => del({
+  del: (id) => del({
     table: table,
     data: {
-      id,
-      loginid
+      id
     }
   }),
 }

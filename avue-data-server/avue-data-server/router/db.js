@@ -6,7 +6,7 @@ import resbody from '../util/resbody.js';
 import dbDao from '../dao/db.js';
 import crypto from '../util/crypto.js';
 import { content } from '../db/pool.js';
-import { getSqlConfig, getLoginId, getDsConf } from '../util/utils.js';
+import { getSqlConfig, getDsConf } from '../util/utils.js';
 import { execSelectSQL } from '../exchange/dsworker.js';
 var jsonParser = bodyParser.json({ limit: '1000mb' });
 let url = '/db'
@@ -50,7 +50,7 @@ export default (app) => {
     const body = JSON.parse(crypto.decrypt(req.headers.data));
     const id = body.id
     const sql = body.sql;
-    dbDao.detail(id, loginid).then(data => {
+    dbDao.detail(id).then(data => {
       let dsConf = getDsConf(data[0]);
       execSelectSQL(dsConf, sql).then(dsresp => {
         res.json(resbody.getSuccessResult(dsresp.data.data));
@@ -87,7 +87,7 @@ export default (app) => {
     const body = JSON.parse(crypto.decrypt(req.headers.data));
     const id = body.id;
     const sql = body.sql;
-    dbDao.detail(id, loginid).then(data => {
+    dbDao.detail(id).then(data => {
       let dsConf = getDsConf(data[0]);
       execSelectSQL(dsConf, sql).then(dsresp => {
         let data = dsresp.data.data;

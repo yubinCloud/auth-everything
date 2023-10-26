@@ -12,6 +12,7 @@
         <module>dynamic-api</module>
         <module>af-askari</module>
         <module>nacos-sidecar</module>
+        <module>simulator</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>

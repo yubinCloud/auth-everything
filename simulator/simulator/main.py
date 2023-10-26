@@ -38,6 +38,12 @@ def startup_event_of_minio():
     logger.info(f'MinIO 设置 bucket {bucket_name} 的 policy 为 public')
     app.state.minio_client = minio_client
 
+
+@app.get('/health')
+def health_check():
+    return {'status': 'UP'}
+
+
 app.include_router(api_router)
 
 

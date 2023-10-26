@@ -11,7 +11,7 @@
  Target Server Version : 80018
  File Encoding         : 65001
 
- Date: 20/10/2023 14:44:09
+ Date: 24/10/2023 15:09:40
 */
 CREATE DATABASE IF NOT EXISTS sso_auth;
 

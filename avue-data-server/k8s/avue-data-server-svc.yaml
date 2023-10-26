@@ -18,7 +18,7 @@ spec:
     spec:
       restartPolicy: Always
       containers:
-        # avue nginx 服务
+        # avue-data-server 服务
         - name: avue-data-server
           image: aet-avue-data-server
           imagePullPolicy: Never

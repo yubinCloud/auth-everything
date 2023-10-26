@@ -6,7 +6,7 @@ from dependencies import use_browser
 from schema.response import R
 from schema.response.simulate import ImageURL
 from schema.request.simulate import SaveVisualImgRequestBody
-from service import PathService, SimulateService
+from service import SimulateService
 from config import settings
 
 
@@ -15,31 +15,11 @@ simulate_router = APIRouter(
 )
 
 
-@simulate_router.post(
-    '/test',
-    response_model=R[str],
-    summary='测试调用浏览器'
-)
-async def test_playwright(
-    browser: Browser = Depends(use_browser),
-    path_service: PathService = Depends()
-):
-    page = await browser.new_page()
-    await page.goto(path_service.get_login_path())  # 进入登录页
-    await page.wait_for_load_state('networkidle')
-    result = await page.query_selector_all('#app > div > div.login-left > div > p:nth-child(2)')
-    content = await result[0].text_content()
-    await page.close()
-    return content
-
-
-
 async def save_imgs_func(
     visual_id: str,
     components: List[str],
-    credits: dict,
+    credits: str,
     browser: Browser,
-    path_service: PathService,
     simulate_service: SimulateService,
 ):
     """
@@ -52,23 +32,19 @@ async def save_imgs_func(
     :param simulate_service: _description_
     """
     page = await browser.new_page()
-    await page.goto(path_service.get_login_path())  # 进入登录页
-    await page.wait_for_load_state('networkidle')
-    await simulate_service.simualte_login(page, credits)
-    await simulate_service.save_images(page, visual_id, components)
+    await simulate_service.save_images(page, visual_id, components, credits)
     await page.close()
     
 
 @simulate_router.post(
     '/save-visual-imgs-async',
     response_model=R[str],
-    summary='保存大屏中所有组件的图片（异步）'
+    summary='保存大屏中组件的图片（异步）'
 )
 async def save_visual_imgs_async(
     backgroud_tasks: BackgroundTasks,
     body: SaveVisualImgRequestBody = Body(...),
     browser: Browser = Depends(use_browser),
-    path_service: PathService = Depends(),
     simulate_service: SimulateService = Depends()
 ):
     backgroud_tasks.add_task(
@@ -77,7 +53,6 @@ async def save_visual_imgs_async(
         body.visual.components,
         body.credits,
         browser,
-        path_service,
         simulate_service
     )
     return R.success('success')
@@ -86,12 +61,11 @@ async def save_visual_imgs_async(
 @simulate_router.post(
     '/save-visual-imgs-sync',
     response_model=R[List[ImageURL]],
-    summary='保存大屏中的所有组件（同步）'
+    summary='保存大屏中的组件（同步）'
 )
 async def save_visual_imgs_sync(
     body: SaveVisualImgRequestBody = Body(...),
     browser: Browser = Depends(use_browser),
-    path_service: PathService = Depends(),
     simulate_service: SimulateService = Depends()
 ):
     await save_imgs_func(
@@ -99,7 +73,6 @@ async def save_visual_imgs_sync(
         body.visual.components,
         body.credits,
         browser,
-        path_service,
         simulate_service
     )
     visual_id = body.visual.visual_id
@@ -111,3 +84,4 @@ async def save_visual_imgs_sync(
         for component_id in body.visual.components
     ]
     return R.success(urls)
+

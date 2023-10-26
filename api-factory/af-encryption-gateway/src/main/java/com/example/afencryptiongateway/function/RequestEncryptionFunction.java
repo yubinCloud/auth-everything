@@ -52,7 +52,7 @@ public class RequestEncryptionFunction implements RewriteFunction<String, String
             AES aes = SecureUtil.aes(keyBytes);
 //            System.out.println(aes.encryptHex(body));
             String decryptStr;
-            log.info("secretKey: " + secretKey + "; body: " + body);
+            log.info("request body: " + body);
             if (StrUtil.isBlank(body)) {
                 decryptStr = "";
             } else {

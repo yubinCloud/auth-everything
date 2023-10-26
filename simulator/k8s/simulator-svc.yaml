@@ -31,6 +31,12 @@ spec:
               value: "10.245.142.209"
             - name: FRONT_PORT
               value: "8091"
+            - name: FRONT_IMG_MOD_PROTOCOL
+              value: "http"
+            - name: FRONT_IMG_MOD_HOST
+              value: "10.245.142.209"
+            - name: FRONT_IMG_MOD_PORT
+              value: "8093"
             - name: MINIO_URL
               value: "minio-server:9000"
             - name: MINIO_ACCESS_KEY
