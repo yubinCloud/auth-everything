@@ -391,10 +391,10 @@ services:
       - SIDECAR_HOST=sidecar-simulator
       - SIDECAR_PORT=10017
       - FRONT_PROTOCOL=http
-      - FRONT_HOST=10.245.142.209
+      - FRONT_HOST=dadp-web-unit
       - FRONT_PORT=8091
       - FRONT_IMG_MOD_PROTOCOL=http
-      - FRONT_IMG_MOD_HOST=10.245.142.209
+      - FRONT_IMG_MOD_HOST=dadp-web-unit
       - FRONT_IMG_MOD_PORT=8093
       - MINIO_URL=minio-server:9000
       - MINIO_ACCESS_KEY=${MINIO_ROOT_USER}

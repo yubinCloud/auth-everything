@@ -1,0 +1,11 @@
+FROM keymetrics/pm2:18-alpine
+
+# Bundle APP files
+WORKDIR /src/
+COPY ./avue-data-server/package-lock.json .
+COPY ./avue-data-server/package.json .
+
+# Install app dependencies
+ENV NPM_CONFIG_LOGLEVEL warn
+RUN npm config set registry=https://registry.npmmirror.com/ && \
+    npm install
