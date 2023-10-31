@@ -1,6 +1,8 @@
 package com.example.avuehelper.dao;
 
 import java.io.Serializable;
+
+import cn.hutool.json.JSONObject;
 import lombok.Data;
 
 /**
@@ -28,6 +30,11 @@ public class VisualConfigDao implements Serializable {
      * 组件json
      */
     private String component;
+
+    /**
+     * 大屏的变量
+     */
+    private JSONObject variable;
 
     private static final long serialVersionUID = 1L;
 

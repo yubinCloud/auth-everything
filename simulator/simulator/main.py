@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from minio import Minio
 import json
 from loguru import logger
+from pathlib import Path
 
 from config import settings
 from controller import api_router
@@ -56,4 +57,9 @@ if __name__ == '__main__':
         allow_methods=["*"],
         allow_headers=["*"],
     )
+    # 打印 banner
+    banner = Path('./banner.txt')
+    if banner.exists():
+        with banner.open('r') as f:
+          print(f.read())
     uvicorn.run(app, host=settings.app.host, port=settings.app.port)

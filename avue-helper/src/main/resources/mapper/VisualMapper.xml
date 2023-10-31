@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.avuehelper.mapper.VisualMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.avuehelper.dao.VisualDao">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="title" column="title" jdbcType="VARCHAR"/>
+            <result property="backgroundUrl" column="background_url" jdbcType="VARCHAR"/>
+            <result property="category" column="category" jdbcType="INTEGER"/>
+            <result property="password" column="password" jdbcType="VARCHAR"/>
+            <result property="createUser" column="create_user" jdbcType="BIGINT"/>
+            <result property="createDept" column="create_dept" jdbcType="BIGINT"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="updateUser" column="update_user" jdbcType="BIGINT"/>
+            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+            <result property="status" column="status" jdbcType="INTEGER"/>
+            <result property="isDeleted" column="is_deleted" jdbcType="INTEGER"/>
+            <result property="loginid" column="loginid" jdbcType="VARCHAR"/>
+            <result property="variable" column="variable" jdbcType="OTHER" typeHandler="com.example.avuehelper.mybatis.JsonTypeHandler" />
+    </resultMap>
+
+    <resultMap id="VisualVariableDao" type="com.example.avuehelper.entity.VisualVariable">
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="variable" column="variable" jdbcType="OTHER" typeHandler="com.example.avuehelper.mybatis.JsonTypeHandler" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,title,background_url,
+        category,password,create_user,
+        create_dept,create_time,update_user,
+        update_time,status,is_deleted,
+        loginid,variable
+    </sql>
+
+    <select id="selectVariableByVisualId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT `id`, `variable`
+        FROM blade_visual
+        WHERE id = #{visualId,jdbcType=BIGINT}
+    </select>
+    
+    <update id="updateVariable" parameterType="com.example.avuehelper.entity.VisualVariable">
+        UPDATE blade_visual
+        SET variable = #{variable,typeHandler=com.example.avuehelper.mybatis.JsonTypeHandler}
+        WHERE id = #{id,jdbcType=BIGINT}
+    </update>
+
+</mapper>

@@ -11,7 +11,8 @@ import org.apache.ibatis.annotations.Mapper;
 */
 @Mapper
 public interface VisualConfigMapper {
-    VisualConfigDao selectByVisualId(long visualId);
+
+    VisualConfigDao selectComponentByVisualId(long visualId);
 }
 
 

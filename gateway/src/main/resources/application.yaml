@@ -88,6 +88,11 @@ spring:
           filters:
             - StripPrefix=1
 
+        - id: avue-helper
+          uri: lb://avue-helper
+          predicates:
+            - Path=/avue-helper/**
+
         - id: ds-worker
           uri: lb://ds-worker
           predicates:
@@ -128,11 +133,6 @@ spring:
           filters:
             - StripPrefix=1
 
-        - id: avue-helper
-          uri: lb://avue-helper
-          predicates:
-            - Path=/avue-helper/**
-
         - id: genreports
           uri: lb://genreports
           predicates:
@@ -167,6 +167,7 @@ sa-token:
   token-style: uuid
   is-log: false
   jwt-secret-key: ${JWT_SECRET:sfaisokhnfsdsadaitfasf}
+  is-print: false
 
 
 management:

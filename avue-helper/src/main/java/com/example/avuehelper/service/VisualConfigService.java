@@ -18,7 +18,7 @@ public class VisualConfigService {
     private final VisualConfigMapper visualConfigMapper;
 
     public List<String> getComponentFromVisual(long visualId) {
-        var vc = visualConfigMapper.selectByVisualId(visualId);
+        var vc = visualConfigMapper.selectComponentByVisualId(visualId);
         if (vc == null) {
             return Collections.emptyList();
         }

@@ -15,9 +15,9 @@
         id,visual_id,detail,component
     </sql>
 
-    <select id="selectByVisualId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    <select id="selectComponentByVisualId" parameterType="java.lang.Long" resultMap="BaseResultMap">
         SELECT
-            <include refid="Base_Column_List"></include>
+            `id`, `component`
         FROM blade_visual_config
         WHERE visual_id = #{visualId,jdbcType=BIGINT}
     </select>
