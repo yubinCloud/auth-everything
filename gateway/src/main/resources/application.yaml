@@ -1,6 +1,7 @@
 server:
   port: ${APP_PORT:10010}
 
+
 spring:
   application:
     name: @artifactId@
@@ -27,13 +28,27 @@ spring:
           instances:
             sentinel-dashboard:
               - uri: http://${SENTINEL_HOST:127.0.0.1}:${SENTINEL_PORT:8080}
+            nacos:
+              - uri: http://${NACOS_HOST:127.0.0.1}:${NACOS_PORT:8848}
+            minio-server-s3:
+              - uri: http://${MINIO_HOST:127.0.0.1}:${MINIO_S3_PORT:9000}
+            minio-server-console:
+              - uri: http://${MINIO_HOST:127.0.0.1}:${MINIO_CONSOLE_PORT:9001}
 
     gateway:
+      httpclient:
+        websocket:
+          max-frame-payload-length: 10485760
       routes:
         - id: sentinel-dashboard
           uri: lb://sentinel-dashboard
           predicates:
             - Path=/sentinel/**
+
+        - id: nacos
+          uri: lb://nacos
+          predicates:
+            - Path=/nacos/**
 
         - id: sso-auth
           uri: lb://sso-auth
@@ -73,6 +88,11 @@ spring:
           filters:
             - StripPrefix=1
 
+        - id: avue-helper
+          uri: lb://avue-helper
+          predicates:
+            - Path=/avue-helper/**
+
         - id: ds-worker
           uri: lb://ds-worker
           predicates:
@@ -85,6 +105,41 @@ spring:
           filters:
             - StripPrefix=1
 
+        - id: simulator
+          uri: lb://simulator
+          predicates:
+            - Path=/simulator/**
+          filters:
+            - StripPrefix=1
+
+        - id: minio-server-s3
+          uri: lb://minio-server-s3
+          predicates:
+            - Path=/s3/**
+          filters:
+            - StripPrefix=1
+
+        - id: minio-server-console
+          uri: lb://minio-server-console
+          predicates:
+            - Path=/minio-console/**
+          filters:
+            - StripPrefix=1
+
+        - id: af-askari
+          uri: lb://af-askari
+          predicates:
+            - Path=/af-askari/**
+          filters:
+            - StripPrefix=1
+
+        - id: genreports
+          uri: lb://genreports
+          predicates:
+            - Path=/genreports/**
+          filters:
+            - StripPrefix=1
+
       globalcors:
         cors-configurations:
           '[/**]':
@@ -93,6 +148,7 @@ spring:
             allowed-headers: "*"
             allow-credentials: true
             exposedHeaders: "Content-Disposition,Content-Type,Cache-Control"
+        add-to-simple-url-handler-mapping: true
     openfeign:
       httpclient:
         enabled: true
@@ -111,6 +167,7 @@ sa-token:
   token-style: uuid
   is-log: false
   jwt-secret-key: ${JWT_SECRET:sfaisokhnfsdsadaitfasf}
+  is-print: false
 
 
 management:

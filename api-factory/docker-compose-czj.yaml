@@ -1,0 +1,21 @@
+version: '3'
+services:
+  # ********************************************************
+  # ************** encryption-gateway **********************
+  # ********************************************************
+  af-encryption-gateway:
+    build:
+      context: ./af-encryption-gateway
+    container_name: af-encryption-gateway
+    hostname: af-encryption-gateway
+    image: af-encryption-gateway
+    ports:
+      - 10500:10500
+    env_file:
+      - ./.env
+    networks:
+      - platform-net
+
+networks:
+  platform-net:
+    external: true

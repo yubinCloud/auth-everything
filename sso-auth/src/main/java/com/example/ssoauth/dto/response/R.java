@@ -55,6 +55,10 @@ public class R<T> implements Serializable {
         return new R<>(CODE_ERROR, msg, null);
     }
 
+    public static <T> R<T> error(String msg, T data) {
+        return new R<>(CODE_ERROR, msg, data);
+    }
+
     public static R<Object> badRequest(String msg) {
         return new R<>(BAD_REQUEST, msg, null);
     }

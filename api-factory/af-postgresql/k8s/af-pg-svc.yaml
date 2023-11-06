@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: af-postgresql
+  namespace: aet
+  labels:
+    k8s.kuboard.cn/layer: db
+    k8s.kuboard.cn/name: af-postgresql
+spec:
+  serviceName: af-postgresql
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: af-postgresql
+
+  template:
+    metadata:
+      labels:
+        app: af-postgresql
+    spec:
+      containers:
+        - name: af-postgresql
+          image: postgres:16-alpine
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: pg-data
+              mountPath: /var/lib/postgresql/data/pgdata
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: public-env
+                  key: AF_POSTGRESQL_PASSWORD
+            - name: PGDATA
+              value: "/var/lib/postgresql/data/pgdata"
+      volumes:
+        - name: pg-data
+          persistentVolumeClaim:
+            claimName: af-pg-data-pvc
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: af-postgresql
+  namespace: aet
+spec:
+  selector:
+    app: af-postgresql
+  clusterIP: None
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432

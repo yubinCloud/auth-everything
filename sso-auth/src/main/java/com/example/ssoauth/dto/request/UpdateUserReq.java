@@ -19,9 +19,6 @@ public class UpdateUserReq {
     @Schema(description = "修改的用户显示名")
     private String screenName;
 
-    @Schema(description = "修改的角色 ID")
-    private Integer role;
-
     @Schema(description = "修改是否具有 Jupyter Hub 的管理权限")
     private Boolean jupyterhubAdmin;
 

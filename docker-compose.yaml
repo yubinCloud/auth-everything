@@ -83,6 +83,30 @@ services:
     networks:
       - platform-net
   
+  minio-server:
+    image: bitnami/minio:2023.10.16
+    container_name: ${PROJECT_PREFIX}-${MINIO_HOST}
+    hostname: ${MINIO_HOST}
+    expose:
+      - 9000  # S3 API
+      - 9001  # console port
+    volumes:
+      - ./minio-server/volume/data:/bitnami/minio/data
+    environment:
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
+      - MINIO_DEFAULT_BUCKETS=simulator-img
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      start_period: 10s
+      interval: 5s
+      timeout: 10s
+      retries: 3
+    privileged: true
+    restart: ${DOCKER_RESTART_POLICY}
+    networks:
+      - platform-net
+  
   sentinel-dashboard:
     build:
       context: ./sentinel-dashboard
@@ -297,8 +321,8 @@ services:
       - MYSQL_DB=antv_data_server
       - SIDECAR_HOST=sidecar-avue-data-server
     volumes:
-      - ./avue-data-server/exported-files:/src/exported-files
-      - ./avue-data-server/file:/src/file
+      - ./avue-data-server/avue-data-server/exported-files:/src/exported-files
+      - ./avue-data-server/avue-data-server/file:/src/file
     healthcheck:
       test: ["CMD-SHELL", "pm2 list | grep avue-data-server || exit 1; echo healthy"]
       interval: 5s
@@ -342,10 +366,43 @@ services:
     environment:
       - ENV_FOR_DYNACONF=internal
       - TZ=Asia/Shanghai
+      - SIDECAR_HOST=sidecar-ds-coordinator
+      - SIDECAR_PORT=10014
     depends_on:
       gateway:
         condition: service_healthy
       elasticsearch7:
+        condition: service_healthy
+    restart: ${DOCKER_RESTART_POLICY}
+    networks:
+      - platform-net
+  
+  simulator:
+    build:
+      context: ./simulator
+    container_name: aet-simulator
+    hostname: simulator
+    image: aet-simulator
+    expose:
+      - 9660
+    env_file:
+      - ./.env
+    environment:
+      - SIDECAR_HOST=sidecar-simulator
+      - SIDECAR_PORT=10017
+      - FRONT_PROTOCOL=http
+      - FRONT_HOST=dadp-web-unit
+      - FRONT_PORT=8091
+      - FRONT_IMG_MOD_PROTOCOL=http
+      - FRONT_IMG_MOD_HOST=dadp-web-unit
+      - FRONT_IMG_MOD_PORT=8093
+      - MINIO_URL=minio-server:9000
+      - MINIO_ACCESS_KEY=${MINIO_ROOT_USER}
+      - MINIO_SECRET_KEY=${MINIO_ROOT_PASSWORD}
+      - ENV_FOR_DYNACONF=prod
+      - MERGE_ENABLED_FOR_DYNACONF=true
+    depends_on:
+      minio-server:
         condition: service_healthy
     restart: ${DOCKER_RESTART_POLICY}
     networks:
@@ -366,6 +423,12 @@ services:
       - ./.env
     environment:
       - APP_PORT=${SIDECAR_JUPYTER_SERVICE_PORT}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f localhost:10011/actuator/health | grep UP || exit 1; echo healthy"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 300s
     depends_on:
       gateway:
         condition: service_healthy
@@ -385,6 +448,12 @@ services:
       - ./.env
     environment:
       - APP_PORT=${SIDECAR_AVUE_DATA_SERVER_PORT}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f localhost:10012/actuator/health | grep UP || exit 1; echo healthy"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 300s
     depends_on:
       - avue-data-server
     restart: ${DOCKER_RESTART_POLICY}
@@ -403,25 +472,99 @@ services:
       - ./.env
     environment:
       - APP_PORT=${SIDECAR_AVUE_NGINX_PORT}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f localhost:10013/actuator/health | grep UP || exit 1; echo healthy"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 300s
     depends_on:
       avue-nginx:
         condition: service_healthy
     restart: ${DOCKER_RESTART_POLICY}
     networks:
       - platform-net
-
+    
   sidecar-ds-coordinator:
     build:
-      context: ./alibaba-sidecars/ds-coordinator
-    container_name: ${PROJECT_PREFIX}-${SIDECAR_DS_COORDINATOR_HOST}
-    hostname: ${SIDECAR_DS_COORDINATOR_HOST}
-    image: ${PROJECT_PREFIX}-${SIDECAR_DS_COORDINATOR_HOST}
+      context: ./alibaba-sidecars/nacos-sidecar
+    container_name: aet-sidecar-ds-coordinator
+    hostname: sidecar-ds-coordinator
+    image: aet-nacos-sidecar
     expose:
-      - ${SIDECAR_DS_COORDINATOR_PORT}
+      - 10014
     env_file:
       - ./.env
     environment:
-      - APP_PORT=${SIDECAR_DS_COORDINATOR_PORT}
+      - APP_PORT=10014
+      - APP_NAME=ds-coordinator
+      - SERVICE_IP=ds-coordinator
+      - SERVICE_PORT=15530
+      - SERVICE_HEALTH_CHECK_URL=http://ds-coordinator:15530/health
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f localhost:10014/actuator/health | grep UP || exit 1; echo healthy"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 300s
+    depends_on:
+      gateway:
+        condition: service_healthy
+    restart: ${DOCKER_RESTART_POLICY}
+    networks:
+      - platform-net
+    
+  sidecar-simulator:
+    build:
+      context: ./alibaba-sidecars/nacos-sidecar
+    container_name: aet-sidecar-simulator
+    hostname: sidecar-simulator
+    image: aet-nacos-sidecar
+    expose:
+      - 10017
+    env_file:
+      - ./.env
+    environment:
+      - APP_PORT=10017
+      - APP_NAME=simulator
+      - SERVICE_IP=simulator
+      - SERVICE_PORT=9660
+      - SERVICE_HEALTH_CHECK_URL=http://simulator:9660/health
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f localhost:10014/actuator/health | grep UP || exit 1; echo healthy"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 300s
+    depends_on:
+      gateway:
+        condition: service_healthy
+    restart: ${DOCKER_RESTART_POLICY}
+    networks:
+      - platform-net
+  
+  sidecar-genreports:
+    build:
+      context: ./alibaba-sidecars/nacos-sidecar
+    container_name: aet-sidecar-genreports
+    hostname: sidecar-genreports
+    image: aet-nacos-sidecar
+    expose:
+      - 10018
+    env_file:
+      - ./.env
+    environment:
+      - APP_PORT=10018
+      - APP_NAME=genreports
+      - SERVICE_IP=genreports
+      - SERVICE_PORT=8110
+      - SERVICE_HEALTH_CHECK_URL=http://genreports:8110/health
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f localhost:10018/actuator/health | grep UP || exit 1; echo healthy"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 300s
     depends_on:
       gateway:
         condition: service_healthy

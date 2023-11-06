@@ -24,7 +24,7 @@ public class CaffeineConfig {
     }
 
     @Bean
-    public Cache<String, String> roleCache() {
+    public Cache<String, List<String>> roleCache() {
         return Caffeine.newBuilder()
                 .expireAfterWrite(1, TimeUnit.MINUTES)
                 .initialCapacity(30)

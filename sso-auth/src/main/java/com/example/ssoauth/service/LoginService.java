@@ -6,6 +6,7 @@ import com.example.ssoauth.constant.SaLoginConfExtraKey;
 import com.example.ssoauth.dto.response.LoginResp;
 import com.example.ssoauth.exception.LoginException;
 import com.example.ssoauth.mapstruct.UserConverter;
+import com.example.ssoauth.mapstructutil.UserConverterUtil;
 import com.example.ssoauth.util.PasswordEncoder;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,8 @@ public class LoginService {
     private final UserService userService;
 
     private final UserConverter userConverter;
+
+    private final UserConverterUtil userConverterUtil;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -39,9 +42,7 @@ public class LoginService {
             throw new LoginException();  // 用户名或密码校验错误
         }
         // 2. 根据账号id，进行登录
-        String role = userInDb.getRole();
-        var loginConf = SaLoginConfig.setExtra(SaLoginConfExtraKey.ROLE, role);  // 此处填入的参数应该保持用户表唯一，比如用户id，不可以直接填入整个 User 对象
-        StpUtil.login(username, loginConf);
+        StpUtil.login(username);
         // 3. 登录 jupyter
         var cookies = jupyterService.loginJupyter(username);
         for (String cookie: cookies) {

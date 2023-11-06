@@ -29,11 +29,7 @@ public class UserDao {
      */
     private String screenName;
 
-    /**
-     * 
-     */
-    private Integer role;
-
+    private JSONArray roleList;
 
     private JSONArray permissionList;
 

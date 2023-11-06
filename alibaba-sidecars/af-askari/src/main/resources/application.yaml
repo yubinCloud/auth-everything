@@ -1,0 +1,19 @@
+server:
+  port: ${APP_PORT:10016}
+spring:
+  application:
+    name: @artifactId@
+  cloud:
+    nacos:
+      discovery:
+        server-addr: http://${NACOS_HOST:127.0.0.1}:${NACOS_PORT:8848}
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+
+sidecar:
+  ip: ${AF_ASKARI_HOST:127.0.0.1}
+  port: ${AF_ASKARI_PORT:10510}
+  health-check-url: http://${AF_ASKARI_HOST:127.0.0.1}:${AF_ASKARI_PORT:10510}/health/live

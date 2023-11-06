@@ -1,14 +1,15 @@
 package com.example.ssoauth.service;
 
+import cn.dev33.satoken.dao.SaTokenDaoRedisJackson;
 import cn.hutool.json.JSONUtil;
 import com.example.ssoauth.dao.param.DeleteUserPermissionParam;
 import com.example.ssoauth.dao.param.NewUserDao;
 import com.example.ssoauth.dao.param.PermissionInsertParam;
 import com.example.ssoauth.dao.param.UserSelectCond;
-import com.example.ssoauth.dao.result.UserDetailDao;
-import com.example.ssoauth.dao.result.UserWithRoleDao;
+import com.example.ssoauth.dao.result.UserDao;
 import com.example.ssoauth.dto.request.NewUserDto;
 import com.example.ssoauth.dto.request.UpdateUserReq;
+import com.example.ssoauth.entity.User;
 import com.example.ssoauth.exception.BaseBusinessException;
 import com.example.ssoauth.exception.LoginException;
 import com.example.ssoauth.exception.UserAddException;
@@ -18,6 +19,7 @@ import com.example.ssoauth.exchange.request.JupyterUsrCreateRequest;
 import com.example.ssoauth.exchange.response.JR;
 import com.example.ssoauth.mapper.UserMapper;
 import com.example.ssoauth.mapstruct.UserConverter;
+import com.example.ssoauth.mapstructutil.UserConverterUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +38,13 @@ public class UserService {
 
     private final UserConverter userConverter;
 
+    private final UserConverterUtil userConverterUtil;
+
     private final JupyterExchange jupyterExchange;
+
+    private final SaTokenDaoRedisJackson redisJackson;
+
+    static private final String KEY_PREFIX_PERM = "aet:auth-perm:";
 
     @Transactional
     public void addUser(NewUserDto userDto, String whoAmI) {
@@ -54,9 +62,9 @@ public class UserService {
         }
     }
 
-    public UserDetailDao findByUsername(String username) {
-        UserWithRoleDao userDao = userMapper.selectByUsername(username);
-        return userConverter.toUserDetail(userDao);
+    public User findByUsername(String username) {
+        UserDao userDao = userMapper.selectByUsername(username);
+        return userConverterUtil.toUser(userDao);
     }
 
     @Transactional
@@ -69,9 +77,9 @@ public class UserService {
         userMapper.deleteByUsername(username);
     }
 
-    public PageInfo<UserWithRoleDao> selectByPage(UserSelectCond cond, int pageNum, int pageSize) {
+    public PageInfo<User> selectByPage(UserSelectCond cond, int pageNum, int pageSize) {
         return PageHelper.startPage(pageNum, pageSize).doSelectPageInfo(
-                () -> userMapper.selectByCond(cond)
+                () -> userMapper.selectByCond(cond).stream().map(userConverterUtil::toUser).toList()
         );
     }
 
@@ -96,12 +104,14 @@ public class UserService {
         String jsonStr = JSONUtil.parseArray(permList).toString();
         var insertParam = new PermissionInsertParam(username, jsonStr);
         userMapper.appendPermission(insertParam);
+        redisJackson.delete(KEY_PREFIX_PERM + username);
     }
 
     @Transactional
     public void deletePermission(String username, String permission) {
         var param = new DeleteUserPermissionParam(username, permission);
         userMapper.deletePermission(param);
+        redisJackson.delete(KEY_PREFIX_PERM + username);
     }
 
     private String findJupyterToken(String username) {

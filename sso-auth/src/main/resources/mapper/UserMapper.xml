@@ -9,51 +9,35 @@
             <result property="username" column="username" jdbcType="VARCHAR"/>
             <result property="password" column="password" jdbcType="VARCHAR"/>
             <result property="screenName" column="screen_name" jdbcType="VARCHAR"/>
-            <result property="role" column="role" jdbcType="INTEGER"/>
+            <result property="roleList" column="role_list" jdbcType="OTHER" javaType="cn.hutool.json.JSONArray" typeHandler="com.example.ssoauth.mybatis.JsonTypeHandler"/>
             <result property="permissionList" column="permission_list" jdbcType="OTHER" javaType="cn.hutool.json.JSONArray" typeHandler="com.example.ssoauth.mybatis.JsonTypeHandler"/>
             <result property="note" column="note" jdbcType="VARCHAR"/>
             <result property="createTime" column="create_time" jdbcType="BIGINT"/>
     </resultMap>
 
-    <resultMap id="UserWithRoleDao" type="com.example.ssoauth.dao.result.UserWithRoleDao">
-        <id property="id" column="id" jdbcType="BIGINT"/>
-        <result property="username" column="username" jdbcType="VARCHAR"/>
-        <result property="password" column="password" jdbcType="VARCHAR"/>
-        <result property="screenName" column="screen_name" jdbcType="VARCHAR"/>
-        <result property="role" column="role" jdbcType="VARCHAR"/>
-        <result property="permissionList" column="permission_list" jdbcType="OTHER" javaType="cn.hutool.json.JSONArray"
-                typeHandler="com.example.ssoauth.mybatis.JsonTypeHandler"/>
-        <result property="note" column="note" jdbcType="VARCHAR"/>
-        <result property="createTime" column="create_time" jdbcType="BIGINT"/>
-    </resultMap>
-
     <sql id="UserDao_ColumnList">
         id,username,password,
-        screen_name,role,permission_list, note, create_time
+        screen_name,role_list,permission_list, note, create_time
     </sql>
-
-    <sql id="UserWithRoleDao_ColumnList">
-        id, username, password, screen_name, r.name as `role`, permission_list, note, create_time
-    </sql>
-
 
 
     <insert id="insert" parameterType="com.example.ssoauth.dao.param.NewUserDao">
         insert into user
         ( id,username,password
-        ,screen_name,role,permission_list, note, create_time
+        ,screen_name
+        ,role_list,permission_list,note,create_time
         )
         values (#{id,jdbcType=BIGINT},#{username,jdbcType=VARCHAR},#{password,jdbcType=VARCHAR},
-                #{screenName,jdbcType=VARCHAR},#{role,jdbcType=INTEGER},#{permissionList,jdbcType=VARCHAR},#{note,jdbcType=VARCHAR},
+                #{screenName,jdbcType=VARCHAR},
+                #{roleList,jdbcType=VARCHAR},#{permissionList,jdbcType=VARCHAR},#{note,jdbcType=VARCHAR},
                 UNIX_TIMESTAMP()
                )
     </insert>
 
-    <select id="selectByCond" parameterType="com.example.ssoauth.dao.param.UserSelectCond" resultMap="UserWithRoleDao">
+    <select id="selectByCond" parameterType="com.example.ssoauth.dao.param.UserSelectCond" resultMap="UserDao">
         select
-            <include refid="UserWithRoleDao_ColumnList"></include>
+            <include refid="UserDao_ColumnList"></include>
         from user as u
-        left join role as r on u.role = r.role_id
         <where>
             <if test="username != null">
                 and u.username LIKE #{username}
@@ -61,21 +45,17 @@
             <if test="screenName != null">
                 and screen_name LIKE #{screenName}
             </if>
-            <if test="role != null">
-                and r.name = #{role}
-            </if>
             <if test="note != null">
                 and note like #{note}
             </if>
         </where>
     </select>
 
-    <select id="selectByUsername" parameterType="java.lang.String" resultMap="UserWithRoleDao">
-        select
-        <include refid="UserWithRoleDao_ColumnList"></include>
-        from user as u
-        left join role as r on u.role = r.role_id
-        where u.username = #{username,jdbcType=VARCHAR}
+    <select id="selectByUsername" parameterType="java.lang.String" resultMap="UserDao">
+        SELECT
+        <include refid="UserDao_ColumnList" />
+        FROM user
+        where username = #{username}
     </select>
 
     <delete id="deleteByUsername" parameterType="java.lang.String">
@@ -92,9 +72,6 @@
             </if>
             <if test="screenName != null">
                 screen_name = #{screenName},
-            </if>
-            <if test="role != null">
-                role = #{role,jdbcType=INTEGER},
             </if>
             <if test="note != null">
                 note = #{note},

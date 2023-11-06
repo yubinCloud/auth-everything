@@ -2,7 +2,6 @@ package com.example.ssoauth.mapper;
 
 import com.example.ssoauth.dao.param.*;
 import com.example.ssoauth.dao.result.UserDao;
-import com.example.ssoauth.dao.result.UserWithRoleDao;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -20,9 +19,9 @@ public interface UserMapper {
 
     int insert(NewUserDao userDao);
 
-    List<UserWithRoleDao> selectByCond(UserSelectCond cond);
+    List<UserDao> selectByCond(UserSelectCond cond);
 
-    UserWithRoleDao selectByUsername(String username);
+    UserDao selectByUsername(String username);
 
     void updateUserInfo(UpdateUserParam param);
 

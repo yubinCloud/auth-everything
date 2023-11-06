@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql8
+  namespace: aet
+  labels:
+    k8s.kuboard.cn/layer: db
+    k8s.kuboard.cn/name: mysql8
+spec:
+  serviceName: mysql8
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: mysql8
+
+  template:
+    metadata:
+      labels:
+        app: mysql8
+    spec:
+      containers:
+        - name: mysql8
+          image: aet-mysql8
+          imagePullPolicy: Never
+          securityContext:
+            privileged: true
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - name: mysql-cnf
+              mountPath: /etc/mysql/my.cnf
+            - name: mysql-data-pvc
+              mountPath: /var/lib/mysql
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: public-env
+                  key: MYSQL_PWD
+      volumes:
+        - name: mysql-cnf
+          configMap:
+            name: mysql8-config-cm
+        - name: mysql-data-pvc
+          persistentVolumeClaim:
+            claimName: mysql8-data-pvc
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: mysql8
+  namespace: aet
+spec:
+  selector:
+    app: mysql8
+  clusterIP: None
+  ports:
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306

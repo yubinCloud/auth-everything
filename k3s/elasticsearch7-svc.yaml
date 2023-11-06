@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: elasticsearch7
+  namespace: aet
+  labels:
+    k8s.kuboard.cn/layer: db
+    k8s.kuboard.cn/name: elasticsearch7
+spec:
+  serviceName: "elasticsearch7"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: elasticsearch7
+  template:
+    metadata:
+      labels:
+        app: elasticsearch7
+    spec:
+      containers:
+        - name: elasticsearch7
+          image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.5.1
+          imagePullPolicy: Never
+          securityContext:
+            privileged: true
+          ports:
+            - name: http
+              containerPort: 9200
+            - name: transport
+              containerPort: 9300
+          env:
+            - name: http.cors.enabled
+              value: "true"
+            - name: http.cors.allow-origin
+              value: "*"
+            - name: bootstrap.memory_lock
+              value: "true"
+            - name: discovery.type  # 单节点模式
+              value: "single-node"
+            - name: ES_JAVA_OPTS    # 指定内存限制
+              value: "-Xms512m -Xmx512m"
+      #     volumeMounts:
+      #       - name: es7-data
+      #         mountPath: /usr/share/elasticsearch/data
+      # volumes:
+      #   - name: es7-data
+      #     persistentVolumeClaim:
+      #       claimName: es7-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: elasticsearch7
+  namespace: aet
+  labels:
+    app: elasticsearch7
+spec:
+  selector:
+    app: elasticsearch7
+  ports:
+    - name: http
+      port: 9200
+      targetPort: http
+    - name: transport
+      port: 9300
+      targetPort: transport
+  clusterIP: None

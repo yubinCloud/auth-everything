@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sidecar-jupyter-service
+  namespace: aet
+  labels:
+    k8s.kuboard.cn/layer: gateway
+    k8s.kuboard.cn/name: sidecar-jupyter-service
+spec:
+  selector:
+    matchLabels:
+      app: sidecar-jupyter-service
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: sidecar-jupyter-service
+    spec:
+      containers:
+      - name: sidecar-jupyter-service
+        image: aet-nacos-sidecar
+        imagePullPolicy: Never
+        ports:
+          - containerPort: 10011
+        envFrom:
+          - configMapRef:
+              name: public-env
+        env:
+          - name: APP_PORT
+            value: "10011"
+          - name: APP_NAME
+            value: "jupyter-service"
+          - name: SERVICE_IP
+            value: "10.245.142.209"
+          - name: SERVICE_PORT
+            value: "8010"
+      restartPolicy: Always 
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sidecar-jupyter-service
+  namespace: aet
+spec:
+  selector:
+    app: sidecar-jupyter-service
+  type: ClusterIP
+  ports:
+  - protocol: TCP
+    port: 10011
+    targetPort: 10011

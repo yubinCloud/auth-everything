@@ -7,7 +7,6 @@
         <artifactId>alibaba-sidecars</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <groupId>org.inet.aet.sidecar</groupId>
     <artifactId>ds-coordinator</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>ds-coordinator</name>

@@ -1,0 +1,13 @@
+# 存储 avue-data-server 的 src 目录下的 file 目录
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: avue-internal-pvc
+  namespace: aet
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 1Gi

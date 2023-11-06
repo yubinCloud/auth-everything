@@ -1,6 +1,6 @@
-POST  http://10.245.143.119:8010/jupyter/hub/dadp/user/login
+POST  http://10.245.142.209:8010/jupyter/hub/dadp/user/login
 Content-Type: application/json
-User: admin
+User: test1017
 
 ###
 

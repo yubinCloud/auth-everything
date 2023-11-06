@@ -1,0 +1,24 @@
+server:
+  port: ${APP_PORT:10015}
+spring:
+  application:
+    name: @artifactId@
+  cloud:
+    nacos:
+      discovery:
+        server-addr: http://${NACOS_HOST:127.0.0.1}:${NACOS_PORT:8848}
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+
+sidecar:
+  ip: ${DYNAMIC_API_HOST:127.0.0.1}
+  port: ${DYNAMIC_API_PORT:10505}
+  health-check-url: http://${DYNAMIC_API_HOST:127.0.0.1}:${DYNAMIC_API_PORT:10505}/health/live
+
+management:
+  endpoint:
+    health:
+      show-details: always

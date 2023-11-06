@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: simulator
+  namespace: aet
+  labels: 
+    k8s.kuboard.cn/layer: svc
+    k8s.kuboard.cn/name: simulator
+spec:
+  selector: 
+    matchLabels:
+      app: simulator
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: simulator
+    spec:
+      restartPolicy: Always
+      containers:
+        # simulator 容器
+        - name: simulator
+          image: aet-simulator
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 9660
+          env:
+            - name: FRONT_PROTOCOL
+              value: http
+            - name: FRONT_HOST
+              value: "10.245.142.209"
+            - name: FRONT_PORT
+              value: "8091"
+            - name: FRONT_IMG_MOD_PROTOCOL
+              value: "http"
+            - name: FRONT_IMG_MOD_HOST
+              value: "10.245.142.209"
+            - name: FRONT_IMG_MOD_PORT
+              value: "8093"
+            - name: MINIO_URL
+              value: "minio-server:9000"
+            - name: MINIO_ACCESS_KEY
+              valueFrom:
+                configMapKeyRef:
+                  name: public-env
+                  key: MINIO_ROOT_USER
+            - name: MINIO_SECRET_KEY
+              valueFrom:
+                configMapKeyRef:
+                  name: public-env
+                  key: MINIO_ROOT_PASSWORD
+            # dynaconf 相关配置
+            - name: ENV_FOR_DYNACONF
+              value: prod
+            - name: MERGE_ENABLED_FOR_DYNACONF
+              value: "true"
+        # sidecar 容器
+        - name: sidecar-simulator
+          image: aet-nacos-sidecar
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 10017
+          envFrom:
+            - configMapRef:
+                name: public-env
+          env:
+            - name: APP_PORT
+              value: "10017"
+            - name: APP_NAME
+              value: "simulator"
+            - name: SERVICE_IP
+              value: "simulator"
+            - name: SERVICE_PORT
+              value: "9660"
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: simulator
+  namespace: aet
+spec:
+  selector:
+    app: simulator
+  type: ClusterIP
+  ports:
+  - port: 9660
+    targetPort: 9660

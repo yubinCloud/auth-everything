@@ -1,0 +1,52 @@
+default:
+  app:
+    host: 127.0.0.1
+    port: 9660
+  sidecar:
+    host: 127.0.0.1
+    port: 10017
+  front:
+    protocol: http
+    host: 10.245.142.209
+    port: 8091
+    auth:
+      username: admin
+      password: "123456"
+    img_module:
+      protocol: http
+      host: 10.245.142.209
+      port: 8093
+    path:
+      login: /login
+  minio:
+    url: localhost:9000
+    access_key: admin
+    secret_key: inet_store@2018
+    bucket_name: "simulator-img"
+  playwright:
+    headless: false
+
+
+prod:
+  app:
+    host: 0.0.0.0
+    port: 9660
+  sidecar:
+    host: "@format {env[SIDECAR_HOST]}"
+    port: "@format {env[SIDECAR_PORT]}"
+  front:
+    protocol: "@format {env[FRONT_PROTOCOL]}"
+    host: "@format {env[FRONT_HOST]}"
+    port: "@format {env[FRONT_PORT]}"
+    img_module:
+      protocol: "@format {env[FRONT_IMG_MOD_PROTOCOL]}"
+      host: "@format {env[FRONT_IMG_MOD_HOST]}"
+      port: "@format {env[FRONT_IMG_MOD_PORT]}"
+  minio:
+    url: "@format {env[MINIO_URL]}"
+    access_key: "@format {env[MINIO_ACCESS_KEY]}"
+    secret_key: "@format {env[MINIO_SECRET_KEY]}"
+  playwright:
+    headless: true
+  
+  

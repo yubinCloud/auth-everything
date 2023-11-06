@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway
+  namespace: aet
+  labels:
+    k8s.kuboard.cn/layer: gateway
+    k8s.kuboard.cn/name: gateway
+spec:
+  selector:
+    matchLabels:
+      app: gateway
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: gateway
+    spec:
+      containers:
+      - name: aet-gateway
+        image: aet-gateway
+        imagePullPolicy: Never
+        ports:
+          - containerPort: 10010
+        envFrom:
+          - configMapRef:
+              name: public-env
+        # # 存活探针，探测 10010 端口是否可以建立连接
+        # livenessProbe:
+        #   tcpSocket:
+        #     port: 10010
+        #   initialDelaySeconds: 300
+        #   timeoutSeconds: 5
+        #   periodSeconds: 7
+        # # 就绪探针，探测 actuator 状态
+        # readinessProbe:
+        #   httpGet:
+        #     port: 10010
+        #     path: /actuator/health
+        #   initialDelaySeconds: 300
+        #   timeoutSeconds: 5
+        #   periodSeconds: 7
+      restartPolicy: Always 
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway
+  namespace: aet
+spec:
+  selector:
+    app: gateway
+  type: NodePort
+  ports:
+  - protocol: TCP
+    port: 10010
+    targetPort: 10010
+    nodePort: 30010

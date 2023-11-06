@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: xxljob-admin
+  namespace: aet
+  labels:
+    k8s.kuboard.cn/layer: svc
+    k8s.kuboard.cn/name: xxljob-admin
+spec:
+  selector:
+    matchLabels:
+      app: xxljob-admin
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: xxljob-admin
+    spec:
+      containers:
+      - name: xxljob-admin
+        image: aet-xxljob-admin
+        imagePullPolicy: Never
+        ports:
+          - containerPort: 8090
+        envFrom:
+          - configMapRef:
+              name: public-env
+        env:
+          - name: PARAMS
+            value: "--spring.datasource.username=root --spring.datasource.password=${XXL_JOB_MYSQL_PWD} --spring.datasource.url=jdbc:mysql://${XXL_JOB_MYSQL_HOST}:${XXL_JOB_MYSQL_PORT}/xxl_job?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=GMT"
+        # env:
+        #   - name: XXL_MYSQL_HOST
+        #     valueFrom:
+        #         configMapKeyRef:
+        #           name: public-env
+        #           key: XXL_JOB_MYSQL_HOST
+        #   - name: XXL_MYSQL_PORT
+        #     value: "3306"
+        #   - name: XXL_MYSQL_DB
+        #     value: "xxl_job"
+        #   - name: XXL_MYSQL_USER
+        #     value: "root"
+        #   - name: XXL_MYSQL_PWD
+        #     valueFrom:
+        #         configMapKeyRef:
+        #           name: public-env
+        #           key: XXL_JOB_MYSQL_PWD
+      restartPolicy: Always 
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: xxljob-admin
+  namespace: aet
+spec:
+  selector:
+    app: xxljob-admin
+  type: ClusterIP
+  ports:
+  - protocol: TCP
+    port: 8090
+    targetPort: 8090

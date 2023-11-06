@@ -29,9 +29,9 @@ public class UserInfoResp {
     private String screenName;
 
     /**
-     *
+     * 角色列表
      */
-    private String role;
+    private List<String> roleList;
 
     /**
      * 权限列表

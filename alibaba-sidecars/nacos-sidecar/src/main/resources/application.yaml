@@ -1,0 +1,24 @@
+server:
+  port: ${APP_PORT:8080}
+spring:
+  application:
+    name: ${APP_NAME:nacos-sidecar}
+  cloud:
+    nacos:
+      discovery:
+        server-addr: http://${NACOS_HOST:127.0.0.1}:${NACOS_PORT:8848}
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+
+sidecar:
+  ip: ${SERVICE_IP:127.0.0.1}
+  port: ${SERVICE_PORT:8080}
+  health-check-url: ${SERVICE_HEALTH_CHECK_URL:}
+
+management:
+  endpoint:
+    health:
+      show-details: always

@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sentinel
+  namespace: aet
+  labels:
+    k8s.kuboard.cn/layer: monitor
+    k8s.kuboard.cn/name: sentinel
+spec:
+  selector:
+    matchLabels:
+      app: sentinel
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: sentinel
+    spec:
+      containers:
+        - name: sentinel
+          image: aet-sentinel-dashboard
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+      restartPolicy: Always
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: sentinel
+  namespace: aet
+spec:
+  selector:
+    app: sentinel
+  clusterIP: None
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080

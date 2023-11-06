@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.avuehelper.mapper.VisualConfigMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.avuehelper.dao.VisualConfigDao">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="visualId" column="visual_id" jdbcType="BIGINT"/>
+            <result property="detail" column="detail" jdbcType="VARCHAR"/>
+            <result property="component" column="component" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,visual_id,detail,component
+    </sql>
+
+    <select id="selectComponentByVisualId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT
+            `id`, `component`
+        FROM blade_visual_config
+        WHERE visual_id = #{visualId,jdbcType=BIGINT}
+    </select>
+</mapper>

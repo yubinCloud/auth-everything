@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>点击按钮调用函数</title>
+</head>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<body>
+
+<button onclick="myFunction()">点击我</button>
+
+<script>
+function myFunction() {
+  alert("Hello World!");
+  axios({
+    method:"get",
+    url:"http://localhost:10010/actuator/health"
+  }).then(function (resp) {
+  alert(resp.data);
+  console.log(resp.data)
+})
+}
+</script>
+
+
+</body>
+</html>

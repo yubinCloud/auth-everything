@@ -1,0 +1,7 @@
+fastapi==0.103.2
+uvicorn==0.23.2
+dynaconf==3.2.3
+playwright
+minio==7.1.17
+loguru==0.7.2
+httpx==0.25.0

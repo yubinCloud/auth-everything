@@ -1,10 +1,7 @@
 package com.example.ssoauth.controller;
 
 import cn.dev33.satoken.stp.StpUtil;
-import com.example.ssoauth.dao.result.JupyterContext;
-import com.example.ssoauth.dao.result.UserDetailDao;
-import com.example.ssoauth.dto.response.UserInfoResp;
-import com.example.ssoauth.mapstruct.UserConverter;
+import com.example.ssoauth.entity.User;
 import com.example.ssoauth.service.JupyterService;
 import com.example.ssoauth.service.UserService;
 import com.example.ssoauth.util.PasswordEncoder;
@@ -30,15 +27,12 @@ public class InternalController {
 
     private final JupyterService jupyterService;
 
-    private final UserConverter userConverter;
-
     private final PasswordEncoder passwordEncoder;
 
     @GetMapping("/user/info/{username}")
     @Operation(summary = "查看用户信息")
-    public UserInfoResp userInfo(@PathVariable String username) {
-        UserDetailDao userDetail = userService.findByUsername(username);
-        return userConverter.toUserInfoResp(userDetail);
+    public User userInfo(@PathVariable String username) {
+        return userService.findByUsername(username);
     }
 
     @GetMapping("/user/pwd-hash")

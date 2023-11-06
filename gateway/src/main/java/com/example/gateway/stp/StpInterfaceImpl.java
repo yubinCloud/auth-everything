@@ -6,11 +6,9 @@ import com.example.gateway.feign.client.AuthFeignClient;
 import com.example.gateway.feign.client.response.UserInfo;
 import com.github.benmanes.caffeine.cache.Cache;
 import jakarta.annotation.Resource;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -26,7 +24,7 @@ public class StpInterfaceImpl implements StpInterface {
     private AuthFeignClient authFeignClient;
 
     @Resource
-    private Cache<String, String> roleCache;
+    private Cache<String, List<String>> roleCache;
 
     @Resource
     private Cache<String, List<String>> permissionCache;
@@ -65,25 +63,23 @@ public class StpInterfaceImpl implements StpInterface {
      * 返回一个账号所拥有的角色标识集合 (权限与角色可分开校验)
      */
     @Override
+    @SuppressWarnings("unchecked")
     public List<String> getRoleList(Object loginId, String loginType) {
-        List<String> roleList = new ArrayList<>();
         String username = (String) loginId;
-        String role = roleCache.getIfPresent(username);
-        if (role != null) {
-            roleList.add(role);
+        List<String> roleList = roleCache.getIfPresent(username);
+        if (roleList != null) {
             return roleList;
         }
         String keyInRedis = KEY_PREFIX_ROLE + username;
-        role = redisJackson.get(keyInRedis);
-        if (role == null) {
+        Object objInRedis = redisJackson.getObject(keyInRedis);
+        if (objInRedis == null) {
             var userInfo = getUserInfo(username);
-            role = userInfo.getRole();
-            roleList.add(role);
-            redisJackson.set(keyInRedis, role, REDIS_TIMEOUT);
+            roleList = userInfo.getRoleList();
+            redisJackson.setObject(keyInRedis, roleList, REDIS_TIMEOUT);
         } else {
-            roleList.add(role);
+            roleList = (List<String>) objInRedis;
         }
-        roleCache.put(username, role);
+        roleCache.put(username, roleList);
         return roleList;
     }
 
