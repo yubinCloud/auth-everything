@@ -85,16 +85,16 @@ public class UserService {
 
     @Transactional
     public void updateUserInfo(UpdateUserReq updateUserReq, String whoAmI) {
-        if (updateUserReq.getJupyterhubAdmin() != null) {
-            String jupyterToken = findJupyterToken(whoAmI);
-            var body = new JupyterUserUpdateRequest();
-            body.setName(updateUserReq.getUsername());
-            body.setAdmin(updateUserReq.getJupyterhubAdmin());
-            var jupyterResp = jupyterExchange.updateUser(updateUserReq.getUsername(), body, jupyterToken);
-            if (jupyterResp.getCode() != JR.SUCCESS) {
-                throw new BaseBusinessException("Exception in update jupyterhub-admin.");
-            }
-        }
+//        if (updateUserReq.getJupyterhubAdmin() != null) {
+//            String jupyterToken = findJupyterToken(whoAmI);
+//            var body = new JupyterUserUpdateRequest();
+//            body.setName(updateUserReq.getUsername());
+//            body.setAdmin(updateUserReq.getJupyterhubAdmin());
+//            var jupyterResp = jupyterExchange.updateUser(updateUserReq.getUsername(), body, jupyterToken);
+//            if (jupyterResp.getCode() != JR.SUCCESS) {
+//                throw new BaseBusinessException("Exception in update jupyterhub-admin.");
+//            }
+//        }
         var param = userConverter.toUpdateUserParam(updateUserReq);
         userMapper.updateUserInfo(param);
     }

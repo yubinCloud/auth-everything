@@ -4,12 +4,13 @@ services:
   # ************************ DB ****************************
   # ********************************************************
   af-postgresql:
-    image: postgres:16-alpine
+    build:
+      context: ./af-postgresql
     container_name: aet-af-postgresql
     hostname: af-postgresql
     environment:
+      - POSTGRES_USER=${AF_POSTGRESQL_USER}
       - POSTGRES_PASSWORD=${AF_POSTGRESQL_PASSWORD}
-      - PGDATA=/var/lib/postgresql/data/pgdata
     volumes:
       - ./api-factory/af-postgresql/volume/data:/var/lib/postgresql/data
     expose:

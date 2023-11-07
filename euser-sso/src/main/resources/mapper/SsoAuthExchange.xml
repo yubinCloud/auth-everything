@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.eusersso.mapper.EuserMapper">
+
+
+    <resultMap id="EuserMapping" type="com.example.eusersso.dao.EuserDao">
+        <id property="uid" column="uid" jdbcType="INTEGER"/>
+        <result property="username" column="username" jdbcType="VARCHAR"/>
+        <result property="password" column="password" jdbcType="VARCHAR"/>
+        <result property="checked" column="checked" jdbcType="BOOLEAN"/>
+        <result property="screenName" column="screen_name" jdbcType="VARCHAR"/>
+        <result property="createdBy" column="created_by" jdbcType="VARCHAR"/>
+        <result property="createTime" column="create_time" jdbcType="BIGINT"/>
+        <result property="note" column="note" jdbcType="VARCHAR"/>
+        <result property="avueRoles" column="avue_roles" jdbcType="OTHER" typeHandler="com.example.eusersso.mybatis.IntegerListTypeHandler"/>
+        <result property="publicApiRoles" column="publicapi_roles" jdbcType="OTHER" typeHandler="com.example.eusersso.mybatis.IntegerListTypeHandler"/>
+    </resultMap>
+
+    <sql id="Euser-ColumnList">
+        uid, username, password, checked, screen_name, created_by, create_time, note, avue_roles, publicapi_roles
+    </sql>
+
+    <select id="selectByUsername" parameterType="java.lang.String" resultMap="EuserMapping">
+        SELECT <include refid="Euser-ColumnList"/>
+        FROM euser
+        WHERE username = #{username}
+    </select>
+
+    <insert id="insertOne" parameterType="EuserDao">
+        INSERT INTO euser
+        (username, password, checked, screen_name, created_by, create_time, note)
+        VALUES
+        (#{username}, #{password}, #{checked,jdbcType=BOOLEAN}, #{screenName}, #{createdBy,jdbcType=VARCHAR}, #{createTime,jdbcType=BIGINT}, #{note})
+    </insert>
+</mapper>

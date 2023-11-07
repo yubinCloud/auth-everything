@@ -217,23 +217,6 @@ services:
     networks:
       - platform-net
 
-  jupyter-gateway:
-    build:
-      context: ./jupyter-gateway
-    container_name: ${PROJECT_PREFIX}-${JUPYTER_GATEWAY_HOST}
-    hostname: ${JUPYTER_GATEWAY_HOST}
-    image: ${PROJECT_PREFIX}-${JUPYTER_GATEWAY_HOST}
-    expose:
-      - ${JUPYTER_GATEWAY_PORT}
-    env_file:
-      - ./.env
-    depends_on:
-      gateway:
-        condition: service_healthy
-    restart: ${DOCKER_RESTART_POLICY}
-    networks:
-      - platform-net
-
   xxljob-admin:
     build:
       context: ./xxl-job/xxl-job-admin
@@ -306,8 +289,6 @@ services:
       - platform-net
 
   avue-data-server:
-    build:
-      context: ./avue-data-server
     container_name: ${PROJECT_PREFIX}-${AVUE_DATA_SERVER_HOST}
     hostname: ${AVUE_DATA_SERVER_HOST}
     image: ${PROJECT_PREFIX}-${AVUE_DATA_SERVER_HOST}
@@ -331,6 +312,23 @@ services:
       start_period: 60s
     depends_on:
       gateway:
+        condition: service_healthy
+    restart: ${DOCKER_RESTART_POLICY}
+    networks:
+      - platform-net
+  
+  avue-helper:
+    build:
+      context: ./avue-helper
+    container_name: ${PROJECT_PREFIX}-${AVUE_HELPER_HOST}
+    hostname: ${AVUE_HELPER_HOST}
+    image: ${PROJECT_PREFIX}-${AVUE_HELPER_HOST}
+    expose:
+      - 9620
+    env_file:
+      - ./.env
+    depends_on:
+      avue-data-server:
         condition: service_healthy
     restart: ${DOCKER_RESTART_POLICY}
     networks:

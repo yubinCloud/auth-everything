@@ -3,6 +3,8 @@ server:
 spring:
   application:
     name: ${APP_NAME:nacos-sidecar}
+  main:
+    banner-mode: off
   cloud:
     nacos:
       discovery:

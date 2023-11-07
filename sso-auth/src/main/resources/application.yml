@@ -40,6 +40,7 @@ sa-token:
   is-log: false
   # jwt 密钥
   jwt-secret-key: ${JWT_SECRET:sfaisokhnfsdsadaitfasf}
+  is-print: false
 
 mybatis:
   mapper-locations: classpath:mapper/*.xml

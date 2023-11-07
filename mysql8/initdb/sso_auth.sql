@@ -11,11 +11,8 @@
  Target Server Version : 80018
  File Encoding         : 65001
 
- Date: 24/10/2023 15:09:40
+ Date: 30/10/2023 18:50:00
 */
-CREATE DATABASE IF NOT EXISTS sso_auth;
-
-USE sso_auth;
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
@@ -29,7 +26,7 @@ CREATE TABLE `role`  (
   `name` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '角色名称',
   `permission_list` json NOT NULL COMMENT '该角色所拥有的的权限',
   PRIMARY KEY (`role_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '角色表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '角色表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of role
