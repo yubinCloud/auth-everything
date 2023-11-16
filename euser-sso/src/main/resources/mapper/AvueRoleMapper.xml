@@ -24,14 +24,14 @@
 
     <insert id="insertOne" parameterType="AvueRole" useGeneratedKeys="true" keyProperty="roleId">
         INSERT INTO avue_role (name, permissions)
-        VALUES (#{name}, #{permissions,typeHandler=AvuePermissionsTypeHandler})
+        VALUES (#{name}, #{permissions,typeHandler=AvuePermissionsTypeHandler}::jsonb)
     </insert>
 
     <update id="updateOne" parameterType="com.example.eusersso.entity.AvueRole">
         UPDATE avue_role
         <set>
             <if test="name != null">name=#{name},</if>
-            <if test="permissions != null">permissions=#{permissions,typeHandler=AvuePermissionsTypeHandler},</if>
+            <if test="permissions != null">permissions=#{permissions,typeHandler=AvuePermissionsTypeHandler}::jsonb,</if>
         </set>
         WHERE role_id = #{roleId,jdbcType=roleId}
     </update>
