@@ -7,10 +7,14 @@ import dbRoute from './router/db.js'
 import recordRoute from './router/record.js'
 import bodyParser from 'body-parser';
 import morgan from 'morgan';
+import resbody from './util/resbody.js';
 const app = express();
 
 app.use(morgan('short'));
 app.use(bodyParser.urlencoded({ limit: '1000mb', extended: true }));
+app.use(function(err, req, res, next) {
+    res.json(resbody.getFailResult('', '图片不存在'));
+});
 //跨越解决
 app.all('*', function (req, res, next) {
     res.header('Access-Control-Allow-Credentials', true)

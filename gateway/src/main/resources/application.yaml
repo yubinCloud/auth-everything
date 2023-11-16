@@ -140,6 +140,35 @@ spring:
           filters:
             - StripPrefix=1
 
+        - id: euser-sso
+          uri: lb://euser-sso
+          predicates:
+            - Path=/euser-sso/**
+
+        - id: euser-gateway
+          uri: lb://euser-gateway
+          predicates:
+            - Path=/euser-gateway/**
+          filters:
+            - StripPrefix=1
+
+        - id: af-askari
+          uri: lb://askari
+          predicates:
+            - Path=/af-askari/**
+          filters:
+            - StripPrefix=1
+
+        - id: public-api
+          uri: lb://af-encryption-gateway
+          predicates:
+            - Path=/public-api/**
+
+        - id: af-dynamic-api
+          uri: lb://dynamic-api
+          predicates:
+            - Path=/dynamic-api/**
+
       globalcors:
         cors-configurations:
           '[/**]':

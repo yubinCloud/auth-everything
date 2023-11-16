@@ -1,6 +1,7 @@
 package com.example.avuehelper.mapper;
 
 import com.example.avuehelper.dao.VisualDao;
+import com.example.avuehelper.dto.response.VisualName;
 import com.example.avuehelper.entity.VisualVariable;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -16,5 +17,7 @@ public interface VisualMapper {
     VisualDao selectVariableByVisualId(long visualId);
 
     int updateVariable(VisualVariable param);
+
+    VisualName queryVisualName(long visualId);
 
 }

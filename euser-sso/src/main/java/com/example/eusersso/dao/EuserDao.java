@@ -3,6 +3,7 @@ package com.example.eusersso.dao;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 import lombok.Data;
 
@@ -32,7 +33,13 @@ public class EuserDao implements Serializable {
 
     private String note;
 
+    private Map<String, Object> labels;
+
+    private String lastUpdatedIuser;
+
+    private Long lastUpdatedTime;
+
     private List<Integer> avueRoles;
 
-    private List<Integer> publicApiRoles;
+    private List<Integer> publicApiIds;
 }

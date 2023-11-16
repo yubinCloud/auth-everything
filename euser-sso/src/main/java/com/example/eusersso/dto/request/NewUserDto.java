@@ -6,6 +6,8 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 @Schema(description = "创建新用户的信息")
 public class NewUserDto {
@@ -28,6 +30,9 @@ public class NewUserDto {
 
     @Schema(description = "是否允许立即使用")
     private boolean checked;
+
+    @Schema(description = "分配的角色列表，元素必须为角色 ID")
+    private List<Integer> avueRoles;
 
     @Size(max = 200, message = "备注最长 200 字")
     @Schema(description = "备注")

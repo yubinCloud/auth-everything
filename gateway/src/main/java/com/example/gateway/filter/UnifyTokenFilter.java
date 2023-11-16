@@ -7,16 +7,13 @@ import org.springframework.core.annotation.Order;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
-import org.springframework.web.util.UriComponents;
-import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 
 /**
- * 统一将请求的 token 放到接下来的 header 中
+ * 统一将请求的 token 放到接下来的 header authz 中
  */
 @Configuration
 @Order(-200)

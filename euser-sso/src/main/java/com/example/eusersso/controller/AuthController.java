@@ -1,5 +1,7 @@
 package com.example.eusersso.controller;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.dev33.satoken.stp.StpUtil;
 import com.example.eusersso.dto.request.LoginParam;
 import com.example.eusersso.dto.response.LoginResp;
 import com.example.eusersso.dto.response.R;
@@ -44,5 +46,17 @@ public class AuthController {
         return R.ok(resp);
     }
 
+    @GetMapping("/isLogin")
+    @Operation(summary = "判断当前是否登录")
+    public R<Boolean> isLogin() {
+        return R.ok(StpUtil.isLogin());
+    }
 
+    @PostMapping("/doLogout")
+    @SaCheckLogin
+    @Operation(summary = "登出")
+    public R<String> logout() {
+        StpUtil.logout();
+        return R.ok("success");
+    }
 }

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.eusersso.mapper.AvueRoleMapper">
+
+    <resultMap id="AvueRoleMapping" type="AvueRole">
+        <id property="roleId" column="role_id" jdbcType="INTEGER" />
+        <result property="permissions" column="permissions" jdbcType="OTHER" typeHandler="AvuePermissionsTypeHandler" />
+    </resultMap>
+
+    <sql id="AvueRole-BaseColumn">
+        role_id, name, permissions
+    </sql>
+
+    <select id="selectBatchById" resultMap="AvueRoleMapping">
+        SELECT <include refid="AvueRole-BaseColumn"></include>
+        FROM avue_role
+        WHERE role_id IN
+        <foreach collection="roleIds" item="roleId" separator="," open="(" close=")">
+              #{roleId,jdbcType=INTEGER}
+        </foreach>
+    </select>
+
+    <insert id="insertOne" parameterType="AvueRole" useGeneratedKeys="true" keyProperty="roleId">
+        INSERT INTO avue_role (name, permissions)
+        VALUES (#{name}, #{permissions,typeHandler=AvuePermissionsTypeHandler})
+    </insert>
+
+    <update id="updateOne" parameterType="com.example.eusersso.entity.AvueRole">
+        UPDATE avue_role
+        <set>
+            <if test="name != null">name=#{name},</if>
+            <if test="permissions != null">permissions=#{permissions,typeHandler=AvuePermissionsTypeHandler},</if>
+        </set>
+        WHERE role_id = #{roleId,jdbcType=roleId}
+    </update>
+
+    <select id="selectByCond" resultMap="AvueRoleMapping"
+            parameterType="com.example.eusersso.dao.param.AvueRoleSelectCond">
+        SELECT <include refid="AvueRole-BaseColumn"></include>
+        FROM avue_role
+        <where>
+            <if test="roleId != null">role_id=#{roleId,jdbcType=INTEGER}</if>
+            <if test="name != null">AND name LIKE #{name}</if>
+        </where>
+    </select>
+
+    <delete id="deleteById" parameterType="int">
+        DELETE FROM avue_role
+        WHERE role_id = #{roleId,jdbcType=INTEGER}
+    </delete>
+
+</mapper>

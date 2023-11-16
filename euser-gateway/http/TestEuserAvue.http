@@ -1,0 +1,7 @@
+### login
+GET http://{{BASE_URL}}/euser-sso/auth/doLogin?username=inet&pwd=inet_store@2018
+Accept: application/json
+
+### visual detail
+GET http://{{BASE_URL}}/avue/visual/detail?id=1
+Accept: application/json

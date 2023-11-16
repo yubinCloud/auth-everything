@@ -14,6 +14,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * 用于在 MyBatis 中解析 `List<Integer>` 类型
+ */
 
 @MappedJdbcTypes({JdbcType.OTHER})
 @MappedTypes(value = {List.class})
@@ -26,24 +29,22 @@ public class IntegerListTypeHandler extends BaseTypeHandler<List<Integer>> {
     @Override
     public List<Integer> getNullableResult(ResultSet rs, String columnName) throws SQLException {
         String value = rs.getString(columnName);
-        if (Objects.isNull(value)) {
-            return Collections.emptyList();
-        }
-        return JSONUtil.parseArray(value).toList(Integer.class);
+        return parseValue(value);
     }
 
     @Override
     public List<Integer> getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
         String value = rs.getString(columnIndex);
-        if (Objects.isNull(value)) {
-            return Collections.emptyList();
-        }
-        return JSONUtil.parseArray(value).toList(Integer.class);
+        return parseValue(value);
     }
 
     @Override
     public List<Integer> getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
         String value = cs.getString(columnIndex);
+        return parseValue(value);
+    }
+
+    private List<Integer> parseValue(String value) {
         if (Objects.isNull(value)) {
             return Collections.emptyList();
         }

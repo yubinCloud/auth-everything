@@ -3,11 +3,10 @@ import path from 'path'
 import fs from 'fs';
 import visualDao from '../dao/visual.js';
 import config from '../db/config.js';
-import { getLoginId } from '../util/utils.js';
 import OSS from 'ali-oss';
 import multer from 'multer';
 import bodyParser from 'body-parser';
-import { getUserInfo, addVisualForUser, addVisualForRole } from '../exchange/ssoauth.js';
+import euserSSOExchange from '../exchange/eusersso.js';
 const filePath = path.resolve(".") + '/file'
 var jsonParser = bodyParser.json({ limit: '1000mb' });
 let url = '/visual'
@@ -22,14 +21,49 @@ export default (app) => {
   })
   // 查看大屏的详情
   // 不校验 loginid，权限的校验放在了 gateway 中
-  app.get(url + '/detail', jsonParser, function (req, res) {
+  // app.get(url + '/detail', jsonParser, function (req, res) {
+  //   const id = req.query.id;
+  //   visualDao.detail(id).then(data => {
+  //     res.json(resbody.getSuccessResult(data));
+  //   }).catch(error => {
+  //     res.json(resbody.getFailResult(error));
+  //   });
+  // })
+  app.get(url + '/detail', jsonParser, resbody.asyncHandler(async (req, res, next) => {
     const id = req.query.id;
-    visualDao.detail(id).then(data => {
-      res.json(resbody.getSuccessResult(data));
-    }).catch(error => {
-      res.json(resbody.getFailResult(error));
-    });
-  })
+    const visualDetail = await visualDao.detail(id);
+    const euser = req.get("X-Euser");
+    if (euser === undefined) {
+      res.json(resbody.getSuccessResult(visualDetail));
+      return
+    }
+    const rawComponents = visualDetail.config.component;
+    const objComponents = JSON.parse(rawComponents);
+    const avuePermissions = await euserSSOExchange.getPersonalAvuePermission(euser);
+    /** 找到该大屏的权限信息 */
+    let perm;
+    for (let i = 0; i < avuePermissions.length; i++) {
+      if (avuePermissions[i].visualId == id) {
+        perm = avuePermissions[i];
+      }
+    }
+    /** 根据权限信息，过滤出可返回的组件信息并返回 */
+    if (perm === undefined) {
+      visualDetail.config.component = "";
+      res.json(resbody.getSuccessResult(visualDetail));
+      return
+    }
+    const filteratedComponents = [];
+    const whitelist = new Set(perm.whitelist);
+    for (let i = 0; i < objComponents.length; i++) {
+      let component = objComponents[i];
+      if (whitelist.has(component['index'])) {
+        filteratedComponents.push(component)
+      }
+    }
+    visualDetail.config.component = JSON.stringify(filteratedComponents);
+    res.json(resbody.getSuccessResult(visualDetail));
+  }));
   //图片获取
   app.get('/oss/:name', function (req, res) {
     var name = req.params.name

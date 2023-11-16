@@ -27,6 +27,11 @@ export default {
     this.config.success = false
     this.init(data.toString(), msg);
     return this.config;
+  },
+  asyncHandler: fn => (req, res, next) => {
+    Promise.resolve()
+    .then(() => fn(req, res, next))
+    .catch(next);
   }
 
 }

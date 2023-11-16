@@ -1,8 +1,16 @@
 import axios from "axios";
 import { conf } from "./config.js";
 
+let BASE_URL;
+
+if (process.env.NODE_ENV === 'production') {
+    BASE_URL = `http://${conf.SIDECAR_HOST}:${conf.SIDECAR_PORT}/ds-worker/ds-worker`
+} else {
+    BASE_URL = 'http://127.0.0.1:9300/ds-worker';
+}
+
 const dsWorkerClient = axios.create({
-    baseURL: `http://${conf.SIDECAR_HOST}:${conf.SIDECAR_PORT}/ds-worker/ds-worker`
+    baseURL: BASE_URL
 })
 
 

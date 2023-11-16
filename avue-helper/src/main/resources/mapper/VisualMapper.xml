@@ -26,6 +26,11 @@
         <result property="variable" column="variable" jdbcType="OTHER" typeHandler="com.example.avuehelper.mybatis.JsonTypeHandler" />
     </resultMap>
 
+    <resultMap id="VisualNameMapping" type="com.example.avuehelper.dto.response.VisualName">
+        <result property="visualName" column="visual_name" jdbcType="VARCHAR"/>
+        <result property="categoryName" column="category_name" jdbcType="VARCHAR" />
+    </resultMap>
+
     <sql id="Base_Column_List">
         id,title,background_url,
         category,password,create_user,
@@ -39,11 +44,18 @@
         FROM blade_visual
         WHERE id = #{visualId,jdbcType=BIGINT}
     </select>
-    
+
     <update id="updateVariable" parameterType="com.example.avuehelper.entity.VisualVariable">
         UPDATE blade_visual
         SET variable = #{variable,typeHandler=com.example.avuehelper.mybatis.JsonTypeHandler}
         WHERE id = #{id,jdbcType=BIGINT}
     </update>
+
+    <select id="queryVisualName" resultMap="VisualNameMapping"
+            parameterType="long">
+        SELECT bv.title AS visual_name, bvc.category_key AS category_name
+        FROM blade_visual as bv, blade_visual_category as bvc
+        WHERE bv.id = CAST(bvc.category_value AS SIGNED) AND bv.id = #{visualId,jdbcType=BIGINT}
+    </select>
 
 </mapper>

@@ -3,6 +3,7 @@ package com.example.eusersso.entity;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Map;
 
 @Data
 public class Euser {
@@ -22,6 +23,8 @@ public class Euser {
     private long createTime;
 
     private String note;
+
+    private Map<String, Object> labels;
 
     /** avue 的权限信息 */
     private List<AvuePermission> avueAccessList;

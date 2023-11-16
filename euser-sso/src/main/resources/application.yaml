@@ -6,16 +6,35 @@ server:
 spring:
   application:
     name: @artifactId@
+  data:
+    redis:
+      database: ${EUSER_SSO_REDIS_DB:2}
+      host: ${EUSER_SSO_REDIS_HOST:127.0.0.1}
+      port: ${EUSER_SSO_REDIS_PORT:6379}
+      timeout: 10s
+      lettuce:
+        pool:
+          max-active: 200
+          max-wait: -1ms
+          max-idle: 10
+          min-idle: 0
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://${EUSERSSO_PG_HOST:127.0.0.1}:${EUSERSSO_PG_PORT:5432}/euser_sso
-    username: ${EUSERSSO_PG_USER:postgres}
-    password: ${EUSERSSO_PG_PASSWORD:postgres}
+    url: jdbc:postgresql://${EUSER_SSO_PG_HOST:127.0.0.1}:${EUSER_SSO_PG_PORT:5432}/euser_sso
+    username: ${EUSER_SSO_PG_USER:postgres}
+    password: ${EUSER_SSO_PG_PASSWORD:postgres}
 
   cloud:
     nacos:
       discovery:
         server-addr: http://${NACOS_HOST:127.0.0.1}:${NACOS_PORT:8848}
+
+memcached:
+  host: ${EUSER_SSO_MEMCACHED_HOST:127.0.0.1}
+  port: ${EUSER_SSO_MEMCACHED_PORT:11211}
+  username: ${EUSER_SSO_MEMCACHED_USERNAME:admin}
+  password: ${EUSER_SSO_MEMCACHED_PASSWORD:inet_store@2018}
+
 
 sa-token:
   token-name: eauth
@@ -30,3 +49,13 @@ sa-token:
 mybatis:
   mapper-locations: classpath:mapper/*.xml
   config-location: classpath:mybatis-config.xml
+
+logging:
+  level:
+    com.example.eusersso.mapper: DEBUG
+
+
+management:
+  endpoint:
+    health:
+      enabled: true

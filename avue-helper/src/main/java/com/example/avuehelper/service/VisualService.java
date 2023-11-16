@@ -2,6 +2,7 @@ package com.example.avuehelper.service;
 
 import com.example.avuehelper.dao.VisualDao;
 import com.example.avuehelper.dao.VisualVariableDao;
+import com.example.avuehelper.dto.response.VisualName;
 import com.example.avuehelper.entity.VisualVariable;
 import com.example.avuehelper.mapper.VisualMapper;
 import lombok.RequiredArgsConstructor;
@@ -28,5 +29,9 @@ public class VisualService {
 
     public int updateVariable(VisualVariable variable) {
         return visualMapper.updateVariable(variable);
+    }
+
+    public VisualName queryVisualName(long visualId) {
+        return visualMapper.queryVisualName(visualId);
     }
 }

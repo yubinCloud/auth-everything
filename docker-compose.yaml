@@ -5,11 +5,9 @@ services:
   #################### Basic infrastructure ########################
   ##################################################################
   mysql8:
-    build:
-      context: ./mysql8
     container_name: ${PROJECT_PREFIX}-${MYSQL_HOST}
     hostname: ${MYSQL_HOST}
-    image: ${PROJECT_PREFIX}-${MYSQL_HOST}
+    image: aet-mysql8
     expose:
       - "3306"
     # ports:
@@ -25,11 +23,9 @@ services:
       - platform-net
   
   xxl-job-mysql:
-    build:
-      context: ./xxl-job-mysql
     container_name: ${PROJECT_PREFIX}-${XXL_JOB_MYSQL_HOST}
     hostname: ${XXL_JOB_MYSQL_HOST}
-    image: ${PROJECT_PREFIX}-${XXL_JOB_MYSQL_HOST}
+    image: aet-xxl-job-mysql
     expose:
       - ${XXL_JOB_MYSQL_PORT}
     # ports:
@@ -45,11 +41,9 @@ services:
       - platform-net
 
   redis6:
-    build:
-      context: ./redis6
     container_name: ${PROJECT_PREFIX}-${REDIS_HOST}
     hostname: ${REDIS_HOST}
-    image: ${PROJECT_PREFIX}-${REDIS_HOST}
+    image: aet-redis6
     privileged: true
     expose:
       - "6379"
@@ -106,13 +100,45 @@ services:
     restart: ${DOCKER_RESTART_POLICY}
     networks:
       - platform-net
+    
+  euser-memcached:
+    container_name: aet-euser-memcached
+    hostname: euser-memcached
+    image: bitnami/memcached:1.6.22
+    expose:
+      - 11211
+    environment:
+      - MEMCACHED_USERNAME=${EUSER_MEMCACHED_USERNAME}
+      - MEMCACHED_PASSWORD=${EUSER_MEMCACHED_PASSWORD}
+    restart: ${DOCKER_RESTART_POLICY}
+    networks:
+      - platform-net
+  
+  euser-postgresql:
+    image: aet-euser-postgresql
+    container_name: aet-euser-postgresql
+    hostname: euser-postgresql
+    environment:
+      - POSTGRES_USER=${EUSER_POSTGRESQL_USER}
+      - POSTGRES_PASSWORD=${EUSER_POSTGRESQL_PASSWORD}
+    volumes:
+      - euser-postgresql-data:/var/lib/postgresql/data
+    expose:
+      - 5432
+    networks:
+      - platform-net
+    privileged: true
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres | grep accepting || exit 1; echo healthy"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
   
   sentinel-dashboard:
-    build:
-      context: ./sentinel-dashboard
     container_name: ${PROJECT_PREFIX}-${SENTINEL_HOST}
     hostname: ${SENTINEL_HOST}
-    image: ${PROJECT_PREFIX}-${SENTINEL_HOST}
+    image: aet-sentinel-dashboard
     command: ["/wait-for-it.sh", "mysql8:3306", "-t", "0", "--", "sh", "-c", "java -Dauth.enabled=false -jar app.jar --server.servlet.context-path=/sentinel"]
     expose:
       - 8080
@@ -127,11 +153,9 @@ services:
       - platform-net
   
   nacos:
-    build:
-      context: ./nacos
     container_name: ${PROJECT_PREFIX}-${NACOS_HOST}
     hostname: ${NACOS_HOST}
-    image: ${PROJECT_PREFIX}-${NACOS_HOST}
+    image: aet-nacos
     env_file:
       - ./nacos/nacos.env
     environment:
@@ -170,7 +194,7 @@ services:
       context: ./gateway
     container_name: ${PROJECT_PREFIX}-${GATEWAY_HOST}
     hostname: ${GATEWAY_HOST}
-    image: ${PROJECT_PREFIX}-${GATEWAY_HOST}
+    image: aet-gateway
     command: ["/wait-for-it.sh", "nacos:8848", "-t", "0", "--", "sh", "-c", "java -jar app.jar"]
     ports:
       - 10010:${GATEWAY_PORT}
@@ -195,7 +219,7 @@ services:
       context: ./sso-auth
     container_name: ${PROJECT_PREFIX}-${AUTH_SERVICE_HOST}
     hostname: ${AUTH_SERVICE_HOST}
-    image: ${PROJECT_PREFIX}-${AUTH_SERVICE_HOST}
+    image: aet-sso-auth
     expose:
       - ${AUTH_SERVICE_PORT}
     environment:
@@ -222,7 +246,7 @@ services:
       context: ./xxl-job/xxl-job-admin
     container_name: ${PROJECT_PREFIX}-${XXLJOB_ADMIN_HOST}
     hostname: ${XXLJOB_ADMIN_HOST}
-    image: ${PROJECT_PREFIX}-${XXLJOB_ADMIN_HOST}
+    image: aet-xxljob-admin
     expose:
       - 8090
     environment:
@@ -270,7 +294,7 @@ services:
       context: ./avue-nginx
     container_name: ${PROJECT_PREFIX}-${AVUE_NGINX_HOST}
     hostname: ${AVUE_NGINX_HOST}
-    image: ${PROJECT_PREFIX}-${AVUE_NGINX_HOST}
+    image: aet-avue-nginx
     expose:
       - 8095
     volumes:
@@ -291,10 +315,11 @@ services:
   avue-data-server:
     container_name: ${PROJECT_PREFIX}-${AVUE_DATA_SERVER_HOST}
     hostname: ${AVUE_DATA_SERVER_HOST}
-    image: ${PROJECT_PREFIX}-${AVUE_DATA_SERVER_HOST}
+    image: aet-avue-data-server
     expose:
       - 10002
     environment:
+      - NODE_ENV=production
       - MYSQL_HOST=${MYSQL_HOST}
       - MYSQL_USER=root
       - MYSQL_PWD=${MYSQL_PWD}
@@ -322,7 +347,7 @@ services:
       context: ./avue-helper
     container_name: ${PROJECT_PREFIX}-${AVUE_HELPER_HOST}
     hostname: ${AVUE_HELPER_HOST}
-    image: ${PROJECT_PREFIX}-${AVUE_HELPER_HOST}
+    image: aet-avue-helper
     expose:
       - 9620
     env_file:
@@ -356,7 +381,7 @@ services:
       context: ./ds-coordinator
     container_name: ${PROJECT_PREFIX}-${DS_COORDINATOR_HOST}
     hostname: ${DS_COORDINATOR_HOST}
-    image: ${PROJECT_PREFIX}-${DS_COORDINATOR_HOST}
+    image: aet-ds-coordinator
     expose:
       - 15530
     env_file:
@@ -406,6 +431,73 @@ services:
     networks:
       - platform-net
 
+  euser-gateway:
+    build:
+      context: ./euser-gateway
+    image: aet-euser-gateway
+    container_name: aet-euser-gateway
+    hostname: euser-gateway
+    ports:
+      - 13000:13000
+    env_file:
+      - ./.env
+    environment:
+      - EUSER_GATEWAY_REDIS_HOST=${REDIS_HOST}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f localhost:13000/actuator/health | grep UP || exit 1; echo healthy"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 70s
+    depends_on:
+      euser-postgresql:
+        condition: service_healthy
+      redis6:
+        condition: service_started
+      gateway:
+        condition: service_healthy
+    restart: ${DOCKER_RESTART_POLICY}
+    networks:
+      - platform-net
+  
+  euser-sso:
+    build:
+      context: ./euser-sso
+    image: aet-euser-sso
+    container_name: aet-euser-sso
+    hostname: euser-sso
+    expose:
+      - 9592
+    env_file:
+      - ./.env
+    environment:
+      - EUSER_SSO_REDIS_HOST=${REDIS_HOST}
+      - EUSER_SSO_PG_HOST=euser-postgresql
+      - EUSER_SSO_PG_USER=${EUSER_POSTGRESQL_USER}
+      - EUSER_SSO_PG_PASSWORD=${EUSER_POSTGRESQL_PASSWORD}
+      - EUSER_SSO_MEMCACHED_HOST=euser-memcached
+      - EUSER_SSO_MEMCACHED_USERNAME=${EUSER_MEMCACHED_USERNAME}
+      - EUSER_SSO_MEMCACHED_PASSWORD=${EUSER_MEMCACHED_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f localhost:9592/actuator/health | grep UP || exit 1; echo healthy"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 70s
+    depends_on:
+      euser-postgresql:
+        condition: service_healthy
+      redis6:
+        condition: service_started
+      euser-memcached:
+        condition: service_started
+      gateway:
+        condition: service_healthy
+    restart: ${DOCKER_RESTART_POLICY}
+    networks:
+      - platform-net
+
+
   ##################################################################
   #################### Alibaba Sidecars ############################
   ##################################################################
@@ -414,7 +506,7 @@ services:
       context: ./alibaba-sidecars/jupyter-service
     container_name: ${PROJECT_PREFIX}-${SIDECAR_JUPYTER_SERVICE_HOST}
     hostname: ${SIDECAR_JUPYTER_SERVICE_HOST}
-    image: ${PROJECT_PREFIX}-${SIDECAR_JUPYTER_SERVICE_HOST}
+    image: aet-sidecar-jupyter-service
     expose:
       - ${SIDECAR_JUPYTER_SERVICE_PORT}
     env_file:
@@ -573,3 +665,8 @@ services:
 networks:
   platform-net:
     external: true
+
+volumes:
+  euser-postgresql-data:
+    external: true
+    name: aet-euser-postgresql-data

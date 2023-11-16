@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.eusersso.mapper.EuserMapper">
+
+
+    <resultMap id="EuserMapping" type="com.example.eusersso.dao.EuserDao">
+        <id property="uid" column="uid" jdbcType="INTEGER"/>
+        <result property="username" column="username" jdbcType="VARCHAR"/>
+        <result property="password" column="password" jdbcType="VARCHAR"/>
+        <result property="checked" column="checked" jdbcType="BOOLEAN"/>
+        <result property="screenName" column="screen_name" jdbcType="VARCHAR"/>
+        <result property="createdBy" column="created_by" jdbcType="VARCHAR"/>
+        <result property="createTime" column="create_time" jdbcType="BIGINT"/>
+        <result property="note" column="note" jdbcType="VARCHAR"/>
+        <result property="labels" column="labels" jdbcType="OTHER" typeHandler="StringMapTypeHandler"/>
+        <result property="lastUpdatedIuser" column="last_updated_iuser" jdbcType="VARCHAR" />
+        <result property="lastUpdatedTime" column="last_updated_time" jdbcType="BIGINT" />
+        <result property="avueRoles" column="avue_roles" jdbcType="OTHER" typeHandler="IntegerListTypeHandler"/>
+        <result property="publicApiIds" column="publicapi_ids" jdbcType="OTHER" typeHandler="IntegerListTypeHandler"/>
+    </resultMap>
+
+    <sql id="Euser-ColumnList">
+        uid, username, password, checked, screen_name, created_by, create_time, note, labels, last_updated_iuser, last_updated_time, avue_roles, publicapi_ids
+    </sql>
+
+    <select id="selectByUsername" parameterType="java.lang.String" resultMap="EuserMapping">
+        SELECT <include refid="Euser-ColumnList"/>
+        FROM euser
+        WHERE username = #{username}
+    </select>
+
+    <select id="userTotalOfAvue" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM euser
+        WHERE labels @> '{"access-avue": true}'
+    </select>
+
+    <select id="userTotalOfPublicAPI" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM euser
+        WHERE labels @> '{"access-pa": true}'
+    </select>
+
+    <select id="selectByCond" resultMap="EuserMapping"
+            parameterType="com.example.eusersso.dao.param.EuserSelectCond">
+        SELECT <include refid="Euser-ColumnList"/>
+        FROM euser
+        <where>
+            labels ->> #{dbAccessLabel} = 'true'
+            <if test="username != null">AND username LIKE #{username}</if>
+            <if test="screenName != null">AND screen_name LIKE #{screenName}</if>
+            <if test="avueRoleId != null">AND #{avueRoleId,jdbcType=INTEGER} = ANY(avue_roles)</if>
+            <if test="apiId != null">AND #{apiId,jdbcType=INTEGER} = ANY(publicapi_ids)</if>
+        </where>
+        LIMIT #{pageSize,jdbcType=INTEGER}
+        OFFSET #{pageSize,jdbcType=INTEGER} * (#{pageNum,jdbcType=INTEGER} - 1)
+    </select>
+
+    <select id="countByCond" resultType="java.lang.Integer"
+            parameterType="com.example.eusersso.dao.param.EuserSelectCond">
+        SELECT COUNT(*)
+        FROM euser
+        <where>
+            labels ->> #{dbAccessLabel} = 'true'
+            <if test="username != null">AND username LIKE #{username}</if>
+            <if test="screenName != null">AND screen_name LIKE #{screenName}</if>
+            <if test="roleId != null">AND #{roleId,jdbcType=INTEGER} = ANY(avue_roles)</if>
+            <if test="apiId != null">AND #{apiId,jdbcType=INTEGER} = ANY(publicapi_ids)</if>
+        </where>
+    </select>
+
+    <insert id="insertOne" parameterType="EuserDao">
+        INSERT INTO euser
+        (username, password, checked, screen_name, created_by, create_time, note, avue_roles, labels)
+        VALUES
+        (#{username}, #{password}, #{checked,jdbcType=BOOLEAN}, #{screenName}, #{createdBy,jdbcType=VARCHAR}, #{createTime,jdbcType=BIGINT}, #{note}, #{avueRoles,typeHandler=IntegerListTypeHandler}::jsonb, #{labels,typeHandler=StringMapTypeHandler}::jsonb)
+    </insert>
+
+    <update id="updateUser" parameterType="EuserDao">
+        UPDATE euser
+        <set>
+            <if test="password != null">password=#{password},</if>
+            <if test="checked != null">checked=#{checked,jdbcType=BOOLEAN},</if>
+            <if test="screenName != null">screen_name=#{screenName},</if>
+            <if test="note != null">note=#{note},</if>
+            last_updated_iuser=#{lastUpdatedIuser},last_updated_time=#{lastUpdatedTime,jdbcType=BIGINT}
+        </set>
+        WHERE username=#{username}
+    </update>
+
+    <delete id="deleteByUsername" parameterType="java.lang.String">
+        DELETE FROM euser
+        WHERE username=#{username}
+    </delete>
+
+
+</mapper>

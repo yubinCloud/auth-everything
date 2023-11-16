@@ -1,0 +1,65 @@
+server:
+  port: ${APP_PORT:13000}
+
+
+spring:
+  application:
+    name: @artifactId@
+  data:
+    redis:
+      database: ${EUSER_GATEWAY_REDIS_DB:2}
+      host: ${EUSER_GATEWAY_REDIS_HOST:127.0.0.1}
+      port: ${EUSER_GATEWAY_REDIS_PORT:6379}
+      timeout: 10s
+      lettuce:
+        pool:
+          max-active: 200
+          max-wait: -1ms
+          max-idle: 10
+          min-idle: 0
+  cloud:
+    nacos:
+      server-addr: http://${NACOS_HOST:127.0.0.1}:${NACOS_PORT:8848}
+    gateway:
+      routes:
+        - id: euser-sso
+          uri: lb://euser-sso
+          predicates:
+            - Path=/euser-sso/**
+
+        - id: avue-data-server
+          uri: lb://avue-data-server
+          predicates:
+            - Path=/avue/**
+          filters:
+            - StripPrefix=1
+
+        - id: public-api
+          uri: lb://euser-encryption-gateway
+          predicates:
+            - Path=/public-api/**
+
+
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOriginPatterns: "*"
+            allowed-methods: "*"
+            allowed-headers: "*"
+            allow-credentials: true
+            exposedHeaders: "Content-Disposition,Content-Type,Cache-Control"
+
+sa-token:
+  token-name: eauth
+  timeout: 259200
+  activity-timeout: -1
+  is-concurrent: true
+  is-share: true
+  token-style: random-128
+  is-print: false
+
+
+management:
+  endpoint:
+    health:
+      enabled: true
