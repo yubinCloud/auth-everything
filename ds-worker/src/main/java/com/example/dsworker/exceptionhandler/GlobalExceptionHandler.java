@@ -2,6 +2,7 @@ package com.example.dsworker.exceptionhandler;
 
 import com.example.dsworker.dto.response.R;
 import com.example.dsworker.exception.DatabaseDriverFoundException;
+import com.example.dsworker.exception.InputSlotException;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -39,4 +40,12 @@ public class GlobalExceptionHandler {
     public R<Object> handleClassNotFoundException(@NotNull Exception e) {
         return R.badRequest("数据库驱动未找到，请更换驱动或联系管理员进行系统升级");
     }
+
+    @ResponseBody
+    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
+    @ExceptionHandler({ InputSlotException.class })
+    public R<Object> handleInputSlotException(@NotNull Exception e) {
+        return R.badRequest("输入的 SQL 参数与 SQL 不匹配，请检查");
+    }
+
 }

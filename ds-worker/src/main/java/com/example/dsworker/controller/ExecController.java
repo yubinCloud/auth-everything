@@ -3,7 +3,7 @@ package com.example.dsworker.controller;
 import com.example.dsworker.dto.request.ExecuteSQLRequest;
 import com.example.dsworker.dto.response.R;
 import com.example.dsworker.service.DataSourceService;
-import com.example.dsworker.utils.ResultSetConverter;
+import com.example.dsworker.service.ExecuteService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -14,12 +14,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/exec")
@@ -32,19 +30,18 @@ public class ExecController {
 
     private final DataSourceService dataSourceService;
 
+    private final ExecuteService executeService;
+
     @PostMapping("/select")
     @Operation(summary = "执行 SQL 查询语句")
     public R<List<Map<String, Object>>> executeSelectSQL(
             @RequestBody @Valid ExecuteSQLRequest body
     ) throws SQLException {
         List<Map<String, Object>> list;
-        try (
-                Connection conn = dataSourceService.getConnection(body.getDataSourceConf());
-                Statement statement = conn.createStatement();
-                ResultSet rs = statement.executeQuery(body.getSql())
-                ) {
-            list = ResultSetConverter.toList(rs);
-            conn.commit();
+        if (Objects.isNull(body.getSlots()) || body.getSlots().size() == 0) {
+            list = executeService.execQueryWithoutSlots(body);
+        } else {
+            list = executeService.execQueryWithSlots(body);
         }
         return R.ok(list);
     }
@@ -54,13 +51,11 @@ public class ExecController {
     public R<Integer> executeUpdateSQL(
             @RequestBody @Valid ExecuteSQLRequest body
     ) throws SQLException {
-        int count = 0;
-        try (
-                Connection conn = dataSourceService.getConnection(body.getDataSourceConf());
-                Statement statement = conn.createStatement()
-                ) {
-            count = statement.executeUpdate(body.getSql());
-            conn.commit();
+        int count;
+        if (Objects.isNull(body.getSlots()) || body.getSlots().size() == 0) {
+            count = executeService.execUpdateWithoutSlots(body);
+        } else {
+            
         }
         return R.ok(count);
     }

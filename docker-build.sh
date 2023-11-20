@@ -7,6 +7,9 @@
 # 
 # 指定镜像版本号：
 # - 使用 -v：sh docker-build.sh -v v1.0
+#
+# 构建后保存镜像：
+# - 使用 -s：sh docker-build.sh -s
 # ***********************************************************************
 
 FILE_NAME=$0
@@ -25,6 +28,12 @@ function print() {
 VERSION="latest"
 
 NET_MODE="online"
+SAVE_IMAGE="false"
+
+function initSaveDir() {
+    SAVE_IMAGE="true"
+    mkdir -p ./build/image
+}
 
 function build() {
     MUST_ONLINE=$3
@@ -37,13 +46,18 @@ function build() {
         print "$2"
         docker build "$1" -t "$2":"${VERSION}"
     fi
+
+    if [ ${SAVE_IMAGE} = "true" ]; then
+        docker save -o ./build/image/"$2"-"${VERSION}".tar "$2":"${VERSION}"
+    fi
 }
 
 
-while getopts 't:oh' OPT; do
+while getopts 't:ohs' OPT; do
     case $OPT in
         t) VERSION="$OPTARG";;
         o) NET_MODE="offline";;
+        s) initSaveDir;;
         h) help;;
         ?) help;;
     esac

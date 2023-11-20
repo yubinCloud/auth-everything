@@ -19,7 +19,10 @@ public class EuserSSOAuthorityRule implements AuthorityRule {
 
     @Override
     public SaRouterStaff authInfo() {
-        return SaRouter.match("/euser-sso/**", "/euser-sso/auth/doLogin", r -> StpUtil.checkRole("it:FORBIDDEN"));
+        return SaRouter.match("/euser-sso/**").notMatch("/euser-sso/auth/doLogin").free(r -> {
+            SaRouter.match("/euser-sso/user/**", "/euser-sso/auth/**").check(rq -> StpUtil.checkLogin()).stop();
+            SaRouter.match("/euser-sso/**", rq -> StpUtil.checkRole("it:FORBIDDEN")).stop();
+        }).stop();
     }
 
 }

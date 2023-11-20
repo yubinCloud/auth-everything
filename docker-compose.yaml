@@ -125,8 +125,6 @@ services:
       - euser-postgresql-data:/var/lib/postgresql/data
     expose:
       - 5432
-    networks:
-      - platform-net
     privileged: true
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres | grep accepting || exit 1; echo healthy"]
@@ -134,6 +132,53 @@ services:
       timeout: 5s
       retries: 5
       start_period: 60s
+    restart: ${DOCKER_RESTART_POLICY}
+    networks:
+      - platform-net
+
+  af-postgresql:
+    image: aet-af-postgresql
+    container_name: aet-af-postgresql
+    hostname: af-postgresql
+    environment:
+      - POSTGRES_USER=${AF_POSTGRESQL_USER}
+      - POSTGRES_PASSWORD=${AF_POSTGRESQL_PASSWORD}
+    volumes:
+      - af-postgresql-data:/var/lib/postgresql/data
+    expose:
+      - 5432
+    privileged: true
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres | grep accepting || exit 1; echo healthy"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    restart: ${DOCKER_RESTART_POLICY}
+    networks:
+      - platform-net
+  
+  af-zookeeper:
+    image: bitnami/zookeeper:3.9
+    container_name: aet-af-zookeeper
+    hostname: af-zookeeper
+    volumes:
+      - af-zookeeper-data:/binami/zookeeper
+    expose:
+      - 2181  # for client
+      - 3888  # leader election
+      - 2888  # cluster rpc
+    environment:
+      - ZOO_4LW_COMMANDS_WHITELIST=ruok
+    healthcheck:
+      test: "echo ruok | nc localhost 2181 | grep imok || exit 1; echo healthy"
+      interval: 5s
+      timeout: 7s
+      retries: 3
+      start_period: 30s
+    restart: ${DOCKER_RESTART_POLICY}
+    networks:
+      - platform-net
   
   sentinel-dashboard:
     container_name: ${PROJECT_PREFIX}-${SENTINEL_HOST}
@@ -479,7 +524,7 @@ services:
       - EUSER_SSO_MEMCACHED_USERNAME=${EUSER_MEMCACHED_USERNAME}
       - EUSER_SSO_MEMCACHED_PASSWORD=${EUSER_MEMCACHED_PASSWORD}
     healthcheck:
-      test: ["CMD-SHELL", "curl -f localhost:9592/actuator/health | grep UP || exit 1; echo healthy"]
+      test: ["CMD-SHELL", "curl -f localhost:9592/euser-sso/actuator/health | grep UP || exit 1; echo healthy"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -621,7 +666,7 @@ services:
       - SERVICE_PORT=9660
       - SERVICE_HEALTH_CHECK_URL=http://simulator:9660/health
     healthcheck:
-      test: ["CMD-SHELL", "curl -f localhost:10014/actuator/health | grep UP || exit 1; echo healthy"]
+      test: ["CMD-SHELL", "curl -f localhost:10017/actuator/health | grep UP || exit 1; echo healthy"]
       interval: 5s
       timeout: 5s
       retries: 5

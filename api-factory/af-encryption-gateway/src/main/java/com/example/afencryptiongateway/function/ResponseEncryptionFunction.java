@@ -46,7 +46,6 @@ public class ResponseEncryptionFunction implements RewriteFunction<String, Strin
         return fetchResp.handle((resp, sink) -> {
             Map<String, Object> respJSON = new HashMap<>();
             String secretKey = resp.getData().getSecretKey();  // 字符串密钥
-//            String secretKey = "iQ3DuGokIVmH9qDGzdLl7Q==";
             byte[] keyBytes = Base64.decode(secretKey);
             AES aes = SecureUtil.aes(keyBytes);
             String encryptHex;

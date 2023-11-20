@@ -66,7 +66,7 @@
             labels ->> #{dbAccessLabel} = 'true'
             <if test="username != null">AND username LIKE #{username}</if>
             <if test="screenName != null">AND screen_name LIKE #{screenName}</if>
-            <if test="roleId != null">AND #{roleId,jdbcType=INTEGER} = ANY(avue_roles)</if>
+            <if test="avueRoleId != null">AND #{avueRoleId,jdbcType=INTEGER} = ANY(avue_roles)</if>
             <if test="apiId != null">AND #{apiId,jdbcType=INTEGER} = ANY(publicapi_ids)</if>
         </where>
     </select>
@@ -85,6 +85,7 @@
             <if test="checked != null">checked=#{checked,jdbcType=BOOLEAN},</if>
             <if test="screenName != null">screen_name=#{screenName},</if>
             <if test="note != null">note=#{note},</if>
+            <if test="avueRoles != null">avue_roles=#{avueRoles,typeHandler=IntegerListTypeHandler}::jsonb,</if>
             last_updated_iuser=#{lastUpdatedIuser},last_updated_time=#{lastUpdatedTime,jdbcType=BIGINT}
         </set>
         WHERE username=#{username}

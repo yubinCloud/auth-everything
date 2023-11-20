@@ -1,10 +1,10 @@
 #!/bin/bash
 
-mkdir ./backup
+mkdir -p ./build/backup
 
 # *************************************
 # 备份 mysql8
 # *************************************
 
-mdkir ./backup/mysql8
+mdkir ./build/backup/mysql8
 docker exec -it aet-mysql8 /bin/bash

@@ -22,6 +22,7 @@ public class SaTokenConfiguration {
     public SaReactorFilter getSaReactorFilter() {
         var filter = new SaReactorFilter()
                 .addInclude("/**")
+                .addExclude("/actuator/health")
                 .setAuth(obj -> {
                     // ********** 登录校验：除登录接口外，均需要登录 ***********
                     SaRouter.match("/**", "/euser-sso/auth/doLogin", r -> StpUtil.checkLogin());

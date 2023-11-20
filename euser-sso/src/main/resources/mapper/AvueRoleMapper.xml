@@ -33,7 +33,7 @@
             <if test="name != null">name=#{name},</if>
             <if test="permissions != null">permissions=#{permissions,typeHandler=AvuePermissionsTypeHandler}::jsonb,</if>
         </set>
-        WHERE role_id = #{roleId,jdbcType=roleId}
+        WHERE role_id = #{roleId,jdbcType=INTEGER}
     </update>
 
     <select id="selectByCond" resultMap="AvueRoleMapping"

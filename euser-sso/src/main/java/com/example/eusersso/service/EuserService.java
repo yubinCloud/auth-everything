@@ -69,7 +69,6 @@ public class EuserService {
     }
 
     public List<EuserListItem> selectByCond(EuserSelectCond cond) {
-        System.out.println(euserMapper.selectByCond(cond));
         return euserMapper.selectByCond(cond).stream().map(euserDao -> {
             EuserListItem item = euserConverter.toEuserListItem(euserDao);
             item.setAvueRoles(avueRoleRepository.getRoleNames(euserDao.getAvueRoles()));
