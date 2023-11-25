@@ -11,6 +11,8 @@ public class EuserListItem {
 
     private String screenName;
 
+    private String mobile;
+
     private String createdBy;
 
     private boolean checked;

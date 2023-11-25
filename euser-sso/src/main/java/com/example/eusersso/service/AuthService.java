@@ -2,6 +2,7 @@ package com.example.eusersso.service;
 
 import cn.dev33.satoken.stp.StpUtil;
 import com.example.eusersso.converter.EuserConverter;
+import com.example.eusersso.dao.EuserDao;
 import com.example.eusersso.dto.response.LoginResp;
 import com.example.eusersso.exception.LoginException;
 import com.example.eusersso.mapper.EuserMapper;
@@ -32,10 +33,14 @@ public class AuthService {
         if (!userInDb.isChecked()) {
             throw new LoginException(LoginException.ACCOUNT_UNCHECKED);
         }
+        return loginEuser(userInDb);
+    }
+
+    public LoginResp loginEuser(EuserDao euserDao) {
         // 登录
-        StpUtil.login(username);
+        StpUtil.login(euserDao.getUsername());
         // 构造 resp
-        LoginResp resp = euserConverter.toLoginResp(userInDb);
+        LoginResp resp = euserConverter.toLoginResp(euserDao);
         resp.setToken(StpUtil.getTokenValue());
         return resp;
     }

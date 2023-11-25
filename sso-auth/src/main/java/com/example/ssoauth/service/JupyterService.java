@@ -26,20 +26,17 @@ public class JupyterService {
     @Value("${sa-token.timeout}")
     private Long REDIS_TIMEOUT;
 
-    public List<String> loginJupyter(String username) {
-        var loginResp = jupyterExchange.jupyterLogin(username);
+    public void loginJupyter(String username) {
+        var loginResp = jupyterExchange.jupyterLogin(username);  // 远程调用 jupyter 的登录接口
+        // 解析 response 获取 token
         var respBody = loginResp.getBody();
         if (respBody == null || respBody.getCode() != JR.SUCCESS) {
             throw new BaseBusinessException("Jupyter 登录失败");
         }
         String token = respBody.getData().getToken();
-        var cookies = loginResp.getHeaders().get("set-cookie");
-        if (cookies == null) {
-            throw new BaseBusinessException("登录 jupyter 未获取到 Cookie 数据");
-        }
+        // 将 token 存入 redis
         String keyInRedis = redisKeyFactory(username);
         redisJackson.set(keyInRedis, token, REDIS_TIMEOUT);
-        return cookies;
     }
 
     public String findCtx(String username) {

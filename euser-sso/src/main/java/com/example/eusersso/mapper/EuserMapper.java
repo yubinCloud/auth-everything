@@ -14,6 +14,8 @@ public interface EuserMapper {
 
     EuserDao selectByUsername(String username);
 
+    EuserDao selectByMobile(String mobile);
+
     int insertOne(EuserDao euser);
 
     int userTotalOfAvue();

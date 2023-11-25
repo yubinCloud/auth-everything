@@ -36,4 +36,6 @@ public class UserDao {
     private String note;
 
     private Long createTime;
+
+    private String mobile;
 }

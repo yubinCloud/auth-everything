@@ -88,6 +88,10 @@ public class EuserService {
         return euserMapper.selectByUsername(username);
     }
 
+    public EuserDao selectByMobile(String mobile) {
+        return euserMapper.selectByMobile(mobile);
+    }
+
     public List<AvuePermission> getAvuePermission(List<Integer> avueRoleIds) {
         List<AvueRole> roles =  avueRoleMapper.selectBatchById(avueRoleIds);
         return roles.stream().map(AvueRole::getPermissions).flatMap(Collection::stream).toList();

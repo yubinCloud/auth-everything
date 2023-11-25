@@ -23,6 +23,8 @@ public class EuserDao implements Serializable {
 
     private String password;
 
+    private String mobile;
+
     private boolean checked;
 
     private String screenName;

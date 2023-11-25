@@ -12,4 +12,6 @@ public class UpdateUserParam {
     private String screenName;
 
     private String note;
+
+    private String mobile;
 }

@@ -13,8 +13,12 @@ import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 @Configuration
 public class ExchangeClientConfig {
 
-    @Autowired
     private ReactorLoadBalancerExchangeFilterFunction reactorLoadBalancerExchangeFilterFunction;
+
+    @Autowired
+    public void setReactorLoadBalancerExchangeFilterFunction(ReactorLoadBalancerExchangeFilterFunction reactorLoadBalancerExchangeFilterFunction) {
+        this.reactorLoadBalancerExchangeFilterFunction = reactorLoadBalancerExchangeFilterFunction;
+    }
 
     @Bean
     @LoadBalanced

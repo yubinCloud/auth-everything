@@ -13,11 +13,12 @@
             <result property="permissionList" column="permission_list" jdbcType="OTHER" javaType="cn.hutool.json.JSONArray" typeHandler="com.example.ssoauth.mybatis.JsonTypeHandler"/>
             <result property="note" column="note" jdbcType="VARCHAR"/>
             <result property="createTime" column="create_time" jdbcType="BIGINT"/>
+            <result property="mobile" column="mobile" jdbcType="VARCHAR"/>
     </resultMap>
 
     <sql id="UserDao_ColumnList">
         id,username,password,
-        screen_name,role_list,permission_list, note, create_time
+        screen_name,role_list,permission_list, note, create_time, mobile
     </sql>
 
 
@@ -25,12 +26,12 @@
         insert into user
         ( id,username,password
         ,screen_name
-        ,role_list,permission_list,note,create_time
+        ,role_list,permission_list,note,create_time,mobile
         )
         values (#{id,jdbcType=BIGINT},#{username,jdbcType=VARCHAR},#{password,jdbcType=VARCHAR},
                 #{screenName,jdbcType=VARCHAR},
                 #{roleList,jdbcType=VARCHAR},#{permissionList,jdbcType=VARCHAR},#{note,jdbcType=VARCHAR},
-                UNIX_TIMESTAMP()
+                UNIX_TIMESTAMP(),#{mobile,jdbcType=VARCHAR}
                )
     </insert>
 
@@ -47,6 +48,9 @@
             </if>
             <if test="note != null">
                 and note like #{note}
+            </if>
+            <if test="mobile != null">
+                and mobile = #{mobile}
             </if>
         </where>
     </select>
@@ -75,6 +79,9 @@
             </if>
             <if test="note != null">
                 note = #{note},
+            </if>
+            <if test="mobile != null">
+                mobile = #{mobile}
             </if>
         </set>
         where username = #{username,jdbcType=VARCHAR}

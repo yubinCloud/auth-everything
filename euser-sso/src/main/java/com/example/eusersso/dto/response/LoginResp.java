@@ -11,5 +11,7 @@ public class LoginResp {
 
     private String screenName;
 
+    private String mobile;
+
     private String token;
 }

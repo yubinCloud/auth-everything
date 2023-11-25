@@ -1,0 +1,18 @@
+default:
+  mode: default
+  app:
+    host: 127.0.0.1
+    port: 8989
+  sidecar:
+    host: 127.0.0.1
+    port: 10017
+
+
+prod:
+  mode: prod
+  app:
+    host: 0.0.0.0
+    port: 8989
+  sidecar:
+    host: "@format {env[AF_WORKER_SIDECAR_HOST]}"
+    port: "@format {env[AF_WORKER_SIDECAR_PORT]}"

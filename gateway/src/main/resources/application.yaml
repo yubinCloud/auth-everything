@@ -5,6 +5,10 @@ server:
 spring:
   application:
     name: @artifactId@
+  servlet:
+    multipart:
+      max-file-size: 30MB
+      max-request-size: 50MB
   profiles:
     active: dev
   data:
@@ -149,13 +153,6 @@ spring:
           uri: lb://euser-gateway
           predicates:
             - Path=/euser-gateway/**
-          filters:
-            - StripPrefix=1
-
-        - id: af-askari
-          uri: lb://askari
-          predicates:
-            - Path=/af-askari/**
           filters:
             - StripPrefix=1
 

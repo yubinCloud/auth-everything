@@ -9,6 +9,7 @@
         <id property="uid" column="uid" jdbcType="INTEGER"/>
         <result property="username" column="username" jdbcType="VARCHAR"/>
         <result property="password" column="password" jdbcType="VARCHAR"/>
+        <result property="mobile" column="mobile" jdbcType="VARCHAR" />
         <result property="checked" column="checked" jdbcType="BOOLEAN"/>
         <result property="screenName" column="screen_name" jdbcType="VARCHAR"/>
         <result property="createdBy" column="created_by" jdbcType="VARCHAR"/>
@@ -22,13 +23,19 @@
     </resultMap>
 
     <sql id="Euser-ColumnList">
-        uid, username, password, checked, screen_name, created_by, create_time, note, labels, last_updated_iuser, last_updated_time, avue_roles, publicapi_ids
+        uid, username, password, mobile, checked, screen_name, created_by, create_time, note, labels, last_updated_iuser, last_updated_time, avue_roles, publicapi_ids
     </sql>
 
     <select id="selectByUsername" parameterType="java.lang.String" resultMap="EuserMapping">
         SELECT <include refid="Euser-ColumnList"/>
         FROM euser
         WHERE username = #{username}
+    </select>
+
+    <select id="selectByMobile" parameterType="java.lang.String" resultMap="EuserMapping">
+        SELECT <include refid="Euser-ColumnList"/>
+        FROM euser
+        WHERE mobile = #{mobile}
     </select>
 
     <select id="userTotalOfAvue" resultType="java.lang.Integer">
@@ -51,6 +58,7 @@
             labels ->> #{dbAccessLabel} = 'true'
             <if test="username != null">AND username LIKE #{username}</if>
             <if test="screenName != null">AND screen_name LIKE #{screenName}</if>
+            <if test="mobile != null">AND mobile = #{mobile}</if>
             <if test="avueRoleId != null">AND #{avueRoleId,jdbcType=INTEGER} = ANY(avue_roles)</if>
             <if test="apiId != null">AND #{apiId,jdbcType=INTEGER} = ANY(publicapi_ids)</if>
         </where>
@@ -66,6 +74,7 @@
             labels ->> #{dbAccessLabel} = 'true'
             <if test="username != null">AND username LIKE #{username}</if>
             <if test="screenName != null">AND screen_name LIKE #{screenName}</if>
+            <if test="mobile != null">AND mobile = #{mobile}</if>
             <if test="avueRoleId != null">AND #{avueRoleId,jdbcType=INTEGER} = ANY(avue_roles)</if>
             <if test="apiId != null">AND #{apiId,jdbcType=INTEGER} = ANY(publicapi_ids)</if>
         </where>
@@ -73,15 +82,16 @@
 
     <insert id="insertOne" parameterType="EuserDao">
         INSERT INTO euser
-        (username, password, checked, screen_name, created_by, create_time, note, avue_roles, labels)
+        (username, password, mobile, checked, screen_name, created_by, create_time, note, avue_roles, labels)
         VALUES
-        (#{username}, #{password}, #{checked,jdbcType=BOOLEAN}, #{screenName}, #{createdBy,jdbcType=VARCHAR}, #{createTime,jdbcType=BIGINT}, #{note}, #{avueRoles,typeHandler=IntegerListTypeHandler}::jsonb, #{labels,typeHandler=StringMapTypeHandler}::jsonb)
+        (#{username}, #{password}, #{mobile}, #{checked,jdbcType=BOOLEAN}, #{screenName}, #{createdBy,jdbcType=VARCHAR}, #{createTime,jdbcType=BIGINT}, #{note}, #{avueRoles,typeHandler=IntegerListTypeHandler}::jsonb, #{labels,typeHandler=StringMapTypeHandler}::jsonb)
     </insert>
 
     <update id="updateUser" parameterType="EuserDao">
         UPDATE euser
         <set>
             <if test="password != null">password=#{password},</if>
+            <if test="mobile != null">mobile=#{mobile},</if>
             <if test="checked != null">checked=#{checked,jdbcType=BOOLEAN},</if>
             <if test="screenName != null">screen_name=#{screenName},</if>
             <if test="note != null">note=#{note},</if>

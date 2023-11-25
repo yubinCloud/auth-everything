@@ -5,8 +5,8 @@ services:
   #################### Basic infrastructure ########################
   ##################################################################
   mysql8:
-    container_name: ${PROJECT_PREFIX}-${MYSQL_HOST}
-    hostname: ${MYSQL_HOST}
+    container_name: aet-mysql8
+    hostname: mysql8
     image: aet-mysql8
     expose:
       - "3306"
@@ -397,8 +397,20 @@ services:
       - 9620
     env_file:
       - ./.env
+    environment:
+      - AVUE_HELPER_MINIO_HOST=http://minio-server:9000
+      - AVUE_HELPER_MINIO_ACCESS_KEY=${MINIO_ROOT_USER}
+      - AVUE_HELPER_MINIO_SECRET_KEY=${MINIO_ROOT_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f localhost:9620/avue-helper/actuator/health | grep UP || exit 1; echo healthy"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
     depends_on:
       avue-data-server:
+        condition: service_healthy
+      minio-server:
         condition: service_healthy
     restart: ${DOCKER_RESTART_POLICY}
     networks:

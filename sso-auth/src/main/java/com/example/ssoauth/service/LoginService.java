@@ -22,8 +22,6 @@ public class LoginService {
 
     private final UserConverter userConverter;
 
-    private final UserConverterUtil userConverterUtil;
-
     private final PasswordEncoder passwordEncoder;
 
     private final JupyterService jupyterService;
@@ -35,7 +33,7 @@ public class LoginService {
      * @return
      */
     @Transactional
-    public LoginResp doLogin(String username, String pwd, HttpServletResponse response) {
+    public LoginResp doLogin(String username, String pwd) {
         // 1. 根据账号id，查询用户数据并校验
         var userInDb = userService.findByUsername(username);
         if (userInDb == null || !passwordEncoder.match(pwd, userInDb.getPassword())) {
@@ -44,10 +42,7 @@ public class LoginService {
         // 2. 根据账号id，进行登录
         StpUtil.login(username);
         // 3. 登录 jupyter
-        var cookies = jupyterService.loginJupyter(username);
-        for (String cookie: cookies) {
-            response.addHeader(HttpHeaders.SET_COOKIE, cookie);
-        }
+        jupyterService.loginJupyter(username);
         // 构造 resp
         LoginResp resp = userConverter.toLoginResp(userInDb);
         resp.setToken(StpUtil.getTokenValue());

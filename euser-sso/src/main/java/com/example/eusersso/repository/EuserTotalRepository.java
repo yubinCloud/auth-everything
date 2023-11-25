@@ -19,7 +19,10 @@ public class EuserTotalRepository {
 
     private final EuserMapper euserMapper;
 
-    // 在 memcached 中缓存用户总量的 key
+    /**
+     * 在 memcached 中缓存用户总量的 key
+     * "ut": User Total
+     */
     public static final Map<SubsystemEnum, String> EUSER_TOTAL_KEY_IN_MEMCACHED = new HashMap<>() {{
         put(SubsystemEnum.AVUE, "ut:avue");
         put(SubsystemEnum.PUBLIC_API, "ut:pa");

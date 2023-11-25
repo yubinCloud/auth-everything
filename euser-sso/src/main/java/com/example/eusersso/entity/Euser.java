@@ -14,6 +14,8 @@ public class Euser {
 
     private String password;
 
+    private String mobile;
+
     private boolean checked;
 
     private String screenName;
@@ -31,4 +33,5 @@ public class Euser {
 
     /** 用户可访问的 API 的列表 */
     private List<PublicApiPermission> apiAccessList;
+
 }

@@ -50,7 +50,6 @@ public class GlobalExceptionHandler {
     @ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(BaseBusinessException.class)
     public R<Object> handleBusinessException(BaseBusinessException businessException) {
-        log.error(businessException.getLocalizedMessage(), businessException);
         return R.error(businessException.getMessage());
     }
 

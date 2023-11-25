@@ -14,4 +14,5 @@ public class User {
     private List<String> permissionList;
     private String note;
     private Long createTime;
+    private String mobile;
 }

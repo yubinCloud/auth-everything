@@ -13,6 +13,8 @@ public class EuserSelectCond {
 
     private String screenName;
 
+    private String mobile;
+
     private Integer avueRoleId;
 
     private Integer apiId;

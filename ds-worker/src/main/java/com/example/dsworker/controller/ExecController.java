@@ -28,8 +28,6 @@ import java.util.Objects;
 )
 public class ExecController {
 
-    private final DataSourceService dataSourceService;
-
     private final ExecuteService executeService;
 
     @PostMapping("/select")
@@ -55,7 +53,7 @@ public class ExecController {
         if (Objects.isNull(body.getSlots()) || body.getSlots().size() == 0) {
             count = executeService.execUpdateWithoutSlots(body);
         } else {
-            
+            count = executeService.execUpdateWithoutSlots(body);
         }
         return R.ok(count);
     }

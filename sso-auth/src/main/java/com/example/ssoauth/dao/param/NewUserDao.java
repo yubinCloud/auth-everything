@@ -18,4 +18,6 @@ public class NewUserDao {
     private String permissionList;
 
     private String note;
+
+    private String mobile;
 }

@@ -39,4 +39,8 @@ public class NewUserDto {
 
     @Schema(description = "用户描述/备注")
     private String note;
+
+    @Schema(description = "手机号")
+    @Size(max = 25, message = "手机号最长 30 字符")
+    private String mobile;
 }

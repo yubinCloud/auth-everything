@@ -15,6 +15,9 @@ public class UpdateEuserDto {
     @Schema(description = "更新的密码")
     private String password;
 
+    @Schema(description = "更新的手机号")
+    private String mobile;
+
     @Schema(description = "更新的 checked")
     private Boolean checked;
 
@@ -29,4 +32,5 @@ public class UpdateEuserDto {
 
     @Schema(description = "新的 public api 的 ID 列表")
     private List<Integer> publicApiIds;
+
 }

@@ -24,4 +24,7 @@ public class UpdateUserReq {
 
     @Schema(description = "用户的描述/备注")
     private String note;
+
+    @Schema(description = "修改的手机号")
+    private String mobile;
 }

@@ -1,5 +1,6 @@
 package com.example.ssoauth.controller;
 
+import com.alibaba.cloud.commons.lang.StringUtils;
 import com.example.ssoauth.dao.param.UserSelectCond;
 import com.example.ssoauth.dto.request.*;
 import com.example.ssoauth.dto.response.PageResp;
@@ -17,7 +18,6 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -71,12 +71,13 @@ public class AdminController {
             @Min(1) @Parameter(description = "页大小", example = "10") @RequestParam(required = false, defaultValue = "10") int pageSize,
             @Parameter(description = "过滤条件：用户名") @RequestParam(required = false) String username,
             @Parameter(description = "过滤条件：screen name") @RequestParam(required = false) String screenName,
-            @Parameter(description = "过滤条件：description，支持模糊搜索") @RequestParam(required = false) String note
+            @Parameter(description = "过滤条件：description，支持模糊搜索") @RequestParam(required = false) String note,
+            @Parameter(description = "手机号") @RequestParam(required = false) String mobile
     ) {
         username = prepostParam(username);
         screenName = prepostParam(screenName);
         note = prepostParam(note);
-        var userSelectCond = new UserSelectCond(username, screenName, note);
+        var userSelectCond = new UserSelectCond(username, screenName, note, mobile);
         var pageInfo = userService.selectByPage(userSelectCond, pageNum, pageSize);
 
         PageResp<User> pageResp = new PageResp<>();
