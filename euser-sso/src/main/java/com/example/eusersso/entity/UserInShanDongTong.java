@@ -23,6 +23,7 @@ public class UserInShanDongTong {
         UserInShanDongTong user = new UserInShanDongTong();
         user.setUserId((String) resp.get("userid"));
         user.setName((String) resp.get("name"));
+        user.setMobile((String) resp.get("mobile"));
         user.setDepartment((List<Integer>) resp.get("department"));
         Integer hideMobile = (Integer) resp.get("hide_mobile");
         user.setHideMobile((Objects.nonNull(hideMobile)) && hideMobile.equals(1));

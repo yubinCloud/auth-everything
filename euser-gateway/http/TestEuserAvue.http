@@ -5,3 +5,4 @@ Accept: application/json
 ### visual detail
 GET http://{{BASE_URL}}/avue/visual/detail?id=1
 Accept: application/json
+

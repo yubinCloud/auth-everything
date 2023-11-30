@@ -5,7 +5,6 @@
 -- Dumped from database version 16.0 (Debian 16.0-1.pgdg110+1)
 -- Dumped by pg_dump version 16.0 (Debian 16.0-1.pgdg110+1)
 
-
 CREATE DATABASE euser_sso;
 
 \c euser_sso;
@@ -97,7 +96,8 @@ CREATE TABLE public.euser (
     publicapi_ids jsonb DEFAULT '[]'::jsonb NOT NULL,
     labels jsonb DEFAULT '{}'::jsonb NOT NULL,
     last_updated_iuser character varying(20),
-    last_updated_time bigint
+    last_updated_time bigint,
+    mobile character varying(30)
 );
 
 
@@ -185,6 +185,13 @@ COMMENT ON COLUMN public.euser.last_updated_iuser IS '最近被哪个内部用�
 --
 
 COMMENT ON COLUMN public.euser.last_updated_time IS '最近被更新的时间';
+
+
+--
+-- Name: COLUMN euser.mobile; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON COLUMN public.euser.mobile IS '用户手机号';
 
 
 --
@@ -291,9 +298,10 @@ COPY public.avue_role (role_id, permissions, name) FROM stdin;
 -- Data for Name: euser; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.euser (username, password, created_by, checked, screen_name, note, create_time, uid, avue_roles, publicapi_ids, labels, last_updated_iuser, last_updated_time) FROM stdin;
-inet	b6b94ebacd050b469e0d64596df6a08d453ba2c6d01a6cc2bfb8d7ecde9c58f1	admin	t	INET		1699596721	9	[0, 1]	[]	{"access-avue": true}	\N	\N
-hit	b6b94ebacd050b469e0d64596df6a08d453ba2c6d01a6cc2bfb8d7ecde9c58f1	admin	f	HIT2	哈尔滨工业大学	1699339435	7	[0]	[]	{"access-avue": true}	admin	1699606900
+COPY public.euser (username, password, created_by, checked, screen_name, note, create_time, uid, avue_roles, publicapi_ids, labels, last_updated_iuser, last_updated_time, mobile) FROM stdin;
+hit	b6b94ebacd050b469e0d64596df6a08d453ba2c6d01a6cc2bfb8d7ecde9c58f1	admin	f	HIT2	哈尔滨工业大学	1699339435	7	[0]	[]	{"access-avue": true}	admin	1699606900	\N
+inet	b6b94ebacd050b469e0d64596df6a08d453ba2c6d01a6cc2bfb8d7ecde9c58f1	admin	t	INET		1699596721	9	[0, 1]	[]	{"access-avue": true}	\N	\N	17863116898
+sdt	b6b94ebacd050b469e0d64596df6a08d453ba2c6d01a6cc2bfb8d7ecde9c58f1	admin	t	yubin		1700630898	10	[]	[]	{"access-pa": true}	\N	\N	\N
 \.
 
 
@@ -316,7 +324,7 @@ SELECT pg_catalog.setval('public.avue_role_role_id_seq', 0, true);
 -- Name: euser_uid_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.euser_uid_seq', 9, true);
+SELECT pg_catalog.setval('public.euser_uid_seq', 14, true);
 
 
 --

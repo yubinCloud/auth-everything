@@ -1,0 +1,7 @@
+### 山东通单点登录接口
+POST http://localhost:13000/euser-sso/sdt/sso
+Content-Type: application/json
+
+{
+  "code": "test-code"
+}

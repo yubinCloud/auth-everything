@@ -12,14 +12,14 @@ class DatasourceConf(TypedDict):
 
 
 class SQLSlot(TypedDict):
-    type_: str
+    type: str
     value: Any
 
 
 class DsWorkerExchange:
     
     def __init__(self) -> None:
-        self.base_url = 'http://localhost:10015/ds-worker'
+        self.base_url = 'http://localhost:9300/ds-worker'
         if settings.mode == 'prod':
             self.base_url = f'http://{settings.sidecar.host}:{settings.sidecar.port}/ds-worker/ds-worker'
     
@@ -32,8 +32,11 @@ class DsWorkerExchange:
                 'password': ds_conf['password']
             },
             'sql': sql,
-            'slots': {k: {'type': v['type_'], 'value': v['value']} for k, v in slots.items()}
+            'slots': {k: {'type': v['type'], 'value': v['value']} for k, v in slots.items()}
         }
         async with httpx.AsyncClient(base_url=self.base_url) as client:
             r = await client.post('/exec/select', json=request_body)
         return r.json().get('data')
+
+
+ds_worker_exchange = DsWorkerExchange()
