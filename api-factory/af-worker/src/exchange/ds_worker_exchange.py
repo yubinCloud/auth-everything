@@ -24,7 +24,19 @@ class DsWorkerExchange:
             self.base_url = f'http://{settings.sidecar.host}:{settings.sidecar.port}/ds-worker/ds-worker'
     
     async def exec_select(self, ds_conf: DatasourceConf, sql: str, slots: Dict[str, SQLSlot]) -> List[Dict[str, Any]]:
-        request_body = {
+        request_body = self._parepare_body(ds_conf, sql, slots)
+        async with httpx.AsyncClient(base_url=self.base_url) as client:
+            r = await client.post('/exec/select', json=request_body)
+        return r.json().get('data')
+    
+    async def exec_update(self, ds_conf: DatasourceConf, sql: str, slots: Dict[str, SQLSlot]) -> int:
+        request_body = self._parepare_body(ds_conf, sql, slots)
+        async with httpx.AsyncClient(base_url=self.base_url) as client:
+            r = await client.post('/exec/update', json=request_body)
+        return r.json().get('data')
+
+    def _parepare_body(self, ds_conf: DatasourceConf, sql: str, slots: Dict[str, SQLSlot]):
+        return {
             'dataSourceConf': {
                 'driverClass': ds_conf['driver_class'],
                 'url': ds_conf['url'],
@@ -34,9 +46,5 @@ class DsWorkerExchange:
             'sql': sql,
             'slots': {k: {'type': v['type'], 'value': v['value']} for k, v in slots.items()}
         }
-        async with httpx.AsyncClient(base_url=self.base_url) as client:
-            r = await client.post('/exec/select', json=request_body)
-        return r.json().get('data')
-
 
 ds_worker_exchange = DsWorkerExchange()

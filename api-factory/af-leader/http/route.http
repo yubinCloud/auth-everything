@@ -1,0 +1,33 @@
+### create route
+POST {{URL_PREFIX}}/dynamic-route/create/sql
+Content-Type: application/json
+
+{
+  "path": "/local-pg",
+  "name": "local-pg",
+  "encrypt": true,
+  "sql": "SELECT * FROM euser;",
+  "dsConf": {
+    "driverClass": "org.postgresql.Driver",
+    "url": "jdbc:postgresql://127.0.0.1:5432/euser_sso",
+    "username": "postgres",
+    "password": "postgres"
+  }
+}
+
+### 开启 route
+POST {{URL_PREFIX}}/dynamic-route/enable
+Content-Type: application/json
+
+{
+  "enable": true,
+  "routePath": "/local-pg"
+}
+
+### 删除 route
+DELETE {{URL_PREFIX}}/dynamic-route/delete
+Content-Type: application/json
+
+{
+  "path": "/local-pg"
+}

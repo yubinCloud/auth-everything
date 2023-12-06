@@ -1,18 +1,18 @@
 from typing import Dict
 
-from dynamic_route import DynamicRoute, RouteId
+from dynamic_route import DynamicRoute
 
-ROUTE_TABLE: Dict[RouteId, DynamicRoute] = {}
-
-
-def put_route(route_id: RouteId, route: DynamicRoute):
-    ROUTE_TABLE[route_id] = route
+ROUTE_TABLE: Dict[str, DynamicRoute] = {}
 
 
-def delete_route(route_id: RouteId):
-    if route_id in ROUTE_TABLE:
-        del ROUTE_TABLE[route_id]
+def put_route(path: str, route: DynamicRoute):
+    ROUTE_TABLE[path] = route
 
 
-def get_route(route_id: RouteId) -> DynamicRoute:
-    return ROUTE_TABLE.get(route_id)
+def delete_route(path: str):
+    if path in ROUTE_TABLE:
+        del ROUTE_TABLE[path]
+
+
+def get_route(path: str) -> DynamicRoute:
+    return ROUTE_TABLE.get(path)

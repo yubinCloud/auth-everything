@@ -4,3 +4,6 @@ uvicorn
 uuid==1.30
 pydantic==2.5.1
 httpx==0.25.1
+kazoo==2.8.0
+orjson==3.9.10
+loguru==0.7.2

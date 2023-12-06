@@ -727,3 +727,10 @@ volumes:
   euser-postgresql-data:
     external: true
     name: aet-euser-postgresql-data
+  af-postgresql-data:
+    external: true
+    name: aet-af-postgresql-data
+  af-zookeeper-data:
+    external: true
+    name: aet-af-zookeeper-data
+      

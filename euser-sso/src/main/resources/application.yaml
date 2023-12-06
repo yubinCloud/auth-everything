@@ -38,7 +38,6 @@ memcached:
 # 山东通对接参数
 sdt:
   enabled: ${EUSER_SSO_SDT_ENABLED:true}
-#  endpoint-url: ${EUSER_SSO_SDT_ENDPOINT_URL:http://59.206.205.195:80}
   endpoint-url: ${EUSER_SSO_SDT_ENDPOINT_URL:http://15.209.0.3:80}
   corp-id: ${EUSER_SSO_SDT_CORPID:wwafa1a3005a15a672}
   agent-id: ${EUSER_SSO_SDT_AGENTID:1004649}

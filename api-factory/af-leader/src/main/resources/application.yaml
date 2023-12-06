@@ -1,0 +1,22 @@
+server:
+  port: ${APP_PORT:8979}
+  servlet:
+    context-path: /af-leader
+
+spring:
+  application:
+    name: af-leader
+
+  cloud:
+    nacos:
+      discovery:
+        server-addr: http://${NACOS_HOST:127.0.0.1}:${NACOS_PORT:8848}
+
+
+zookeeper:
+  connect-string: ${AF_LEADER_ZOOKEEPER_CONNECT_STRING:localhost:2181}
+  session-timout: 5000
+  connection-timeout: 5000
+  sleep-ms-between-retry: 1000
+  max-retries: 3
+  namespace: af

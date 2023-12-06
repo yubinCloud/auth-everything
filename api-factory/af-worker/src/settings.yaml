@@ -6,6 +6,8 @@ default:
   sidecar:
     host: 127.0.0.1
     port: 10017
+  zookeeper:
+    hosts: 127.0.0.1:2181
 
 
 prod:
@@ -16,3 +18,5 @@ prod:
   sidecar:
     host: "@format {env[AF_WORKER_SIDECAR_HOST]}"
     port: "@format {env[AF_WORKER_SIDECAR_PORT]}"
+  zookeeper:
+    hosts: "@format {env[AF_WORKER_ZOOKEEPER_HOSTS]}"
