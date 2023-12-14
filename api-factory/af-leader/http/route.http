@@ -1,22 +1,35 @@
+### admin 登录
+POST {{URL_PREFIX}}/auth/login/doLogin
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "pwd": "123456"
+}
+
+### 测试连通性
+GET {{URL_PREFIX}}/af-leader/actuator/health
+
 ### create route
-POST {{URL_PREFIX}}/dynamic-route/create/sql
+POST {{URL_PREFIX}}/af-leader/dynamic-route/create/sql
 Content-Type: application/json
 
 {
   "path": "/local-pg",
   "name": "local-pg",
+  "description": "测试本地 PostgreSQL",
   "encrypt": true,
-  "sql": "SELECT * FROM euser;",
+  "sql": "SELECT * FROM euser WHERE username = #{username, type=string};",
   "dsConf": {
     "driverClass": "org.postgresql.Driver",
-    "url": "jdbc:postgresql://127.0.0.1:5432/euser_sso",
+    "url": "jdbc:postgresql://euser-postgresql:5432/euser_sso",
     "username": "postgres",
-    "password": "postgres"
+    "password": "root"
   }
 }
 
 ### 开启 route
-POST {{URL_PREFIX}}/dynamic-route/enable
+POST {{URL_PREFIX}}/af-leader/dynamic-route/enable
 Content-Type: application/json
 
 {
@@ -24,10 +37,23 @@ Content-Type: application/json
   "routePath": "/local-pg"
 }
 
+### 查看 route OpenAPI
+GET {{URL_PREFIX}}/af-leader/dynamic-route/openapi?path=/local-pg
+
 ### 删除 route
-DELETE {{URL_PREFIX}}/dynamic-route/delete
+DELETE {{URL_PREFIX}}/af-leader/dynamic-route/delete
 Content-Type: application/json
 
 {
   "path": "/local-pg"
+}
+
+### 更新 route
+POST {{URL_PREFIX}}/af-leader/dynamic-route/update
+Content-Type: application/json
+
+{
+  "routePath": "/local-pg",
+  "methods": ["POST"],
+  "code": "class Endpoint_e4b267c0e4124a838cc4b3a81af8e686(HTTPEndpoint):\n    class Body(BaseModel):\n        username: str\n\n    async def post(self, request):\n        body = self.Body.model_validate(await request.json())\n        print('HELLO')\n        data_source_conf = {\n            'driver_class': 'org.postgresql.Driver',\n            'url': 'jdbc:postgresql://127.0.0.1:5432/euser_sso',\n            'username': 'postgres',\n            'password': 'postgres'\n        }\n        sql = r\"\"\"SELECT * FROM euser WHERE username = #{username, type=string};\"\"\"\n        result = await database_exchange.exec_select(data_source_conf, sql, body)\n        return JSONResponse(R.success(result).model_dump())\n"
 }

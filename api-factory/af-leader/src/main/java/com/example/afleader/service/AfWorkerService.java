@@ -1,31 +1,23 @@
 package com.example.afleader.service;
 
-import com.alibaba.nacos.api.naming.pojo.Instance;
 import com.example.afleader.entity.DatasourceConf;
-import com.example.afleader.exception.DynamicRouteCreateException;
-import com.example.afleader.feign.AfWorkerFeignClient;
-import com.example.afleader.feign.request.afworker.HandlerCodeForSQLReq;
-import com.example.afleader.feign.response.afworker.HandlerCodeForSQLResp;
-import com.example.afleader.feign.response.afworker.R;
+import com.example.afleader.exception.DynamicRouteOpsException;
+import com.example.afleader.exchange.AfWorkerExchange;
+import com.example.afleader.exchange.request.afworker.HandlerCodeForSQLReq;
+import com.example.afleader.exchange.response.afworker.HandlerCodeForSQLResp;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class AfWorkerService {
 
-    private final AfWorkerFeignClient afWorkerFeignClient;
-
-    private final RestTemplate restTemplate;
-
-    private final NacosService nacosService;
+    private final AfWorkerExchange afWorkerExchange;
 
     /**
      * 调用 af-worker 来获取 SQL Route 的 handler code
@@ -44,29 +36,17 @@ public class AfWorkerService {
         req.setRouteId(routeId);
         req.setSql(sql);
         req.setDsConf(dsConf);
-        var handlerCodeResp = afWorkerFeignClient.getHandlerCodeForSQL(req);
+        log.info("prepare to request af-worker");
+        var handlerCodeResp = afWorkerExchange.getHandlerCodeForSQL(req);
+        log.info("recv af-worker response");
         if (handlerCodeResp.getCode() != 0) {
-            throw new DynamicRouteCreateException("获取 handler code 失败");
+            throw new DynamicRouteOpsException("获取 handler code 失败");
         }
         return handlerCodeResp.getData();
     }
 
-    void createRouteForAllWorkers(String znode) {
-        Map<String, String> requestBody = new HashMap<>();
-        requestBody.put("znode", znode);
-        List<Instance> workers;
-        try {
-            workers = nacosService.getWorkerInstances();
-        } catch (Exception e) {
-            log.error("NACOS 异常" + e.getMessage());
-            throw new DynamicRouteCreateException("NACOS 发生异常，创建路由失败");
-        }
-        // 逐个 worker 调用 add route 接口
-        workers.forEach(worker -> {
-            String url = String.format("http://%s:%d/meta/route/add", worker.getIp(), worker.getPort());
-            System.out.println("URL: " + url);
-            var resp = restTemplate.postForObject(url, requestBody, R.class);
-        });
+    public Map<String, Object> getOpenAPI(String routePath) {
+        return afWorkerExchange.getOpenAPI(routePath);
     }
 
 }

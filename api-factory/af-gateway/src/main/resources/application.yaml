@@ -1,0 +1,13 @@
+server:
+  port: ${APP_PORT:10500}
+
+spring:
+  application:
+    name: af-gateway
+  threads:
+    virtual:
+      enabled: true
+  cloud:
+    nacos:
+      discovery:
+        server-addr: http://${NACOS_HOST:127.0.0.1}:${NACOS_PORT:8848}

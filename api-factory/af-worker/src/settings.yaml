@@ -3,20 +3,27 @@ default:
   app:
     host: 127.0.0.1
     port: 8989
+    enabled_af_access_log: false
   sidecar:
     host: 127.0.0.1
     port: 10017
   zookeeper:
     hosts: 127.0.0.1:2181
-
+  kafka:
+    servers: localhost:9092
+    topic: af-access-log
 
 prod:
   mode: prod
   app:
     host: 0.0.0.0
     port: 8989
+    enabled_af_access_log: "@bool @format {env[AF_WORKER_ENABLED_AF_ACCESS_LOG]}"
   sidecar:
     host: "@format {env[AF_WORKER_SIDECAR_HOST]}"
     port: "@format {env[AF_WORKER_SIDECAR_PORT]}"
   zookeeper:
     hosts: "@format {env[AF_WORKER_ZOOKEEPER_HOSTS]}"
+  kafka:
+    servers: "@format {env[AF_WORKER_KAFKA_SERVERS]}"
+    

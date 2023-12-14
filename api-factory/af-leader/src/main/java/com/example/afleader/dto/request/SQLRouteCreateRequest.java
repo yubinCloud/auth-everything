@@ -19,8 +19,12 @@ public class SQLRouteCreateRequest {
     private String path;
 
     @Schema(description = "API 名称")
-    @Size(max = 20, message = "API 名称最长 20 个字符")
+    @Size(max = 30, message = "API 名称最长 30 个字符")
     private String name;
+
+    @Schema(description = "对该 API 的描述")
+    @Size(max = 300, message = "描述内容最多 300 个字符")
+    private String description;
 
     @Schema(description = "是否加密")
     private Boolean encrypt;

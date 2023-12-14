@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Set
 
 from dynamic_route import DynamicRoute
 
@@ -16,3 +16,7 @@ def delete_route(path: str):
 
 def get_route(path: str) -> DynamicRoute:
     return ROUTE_TABLE.get(path)
+
+
+def route_path_list() -> Set[str]:
+    return set(ROUTE_TABLE.keys())
