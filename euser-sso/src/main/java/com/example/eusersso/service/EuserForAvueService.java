@@ -40,7 +40,7 @@ public class EuserForAvueService {
         var euserDao = euserConverter.toEuserDao(newUser);
         euserDao.setCreatedBy(createdBy);
         euserDao.setLabels(new HashMap<>() {{
-            put("access-avue", true);
+            put(SubsystemEnum.AVUE.getDbAccessLabel(), true);
         }});
         return euserService.insertOne(euserDao);
     }

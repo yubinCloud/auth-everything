@@ -6,9 +6,6 @@ server:
 spring:
   application:
     name: af-leader
-#  threads:
-#    virtual:
-#      enabled: true
   mvc:
     static-path-pattern: /static/**
   thymeleaf:

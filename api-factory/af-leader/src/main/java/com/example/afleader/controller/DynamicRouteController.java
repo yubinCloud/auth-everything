@@ -17,8 +17,11 @@ import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 import java.util.Objects;
+
 
 @RestController
 @RequestMapping("/dynamic-route")
@@ -67,13 +70,33 @@ public class DynamicRouteController {
         return success? R.ok("success"): R.error("该路由不存在", "fail");
     }
 
-    @GetMapping("/info")
+    @GetMapping("/list")
+    @Operation(summary = "查询所有的路由")
+    public R<List<String>> getRouteList() {
+        var routes = dynamicRouteService.getRouteList();
+        return Objects.nonNull(routes)? R.ok(routes): R.error("路由信息读取出错", null);
+    }
+
+    @GetMapping("/query/one")
     @Operation(summary = "查看一个 route 的信息")
     public R<RouteInfoResponse> getRouteInfo(
             @NotBlank(message = "路由路径不允许为空") @Parameter(description = "路由路径", required = true) @RequestParam String routePath
     ) {
         var resp = dynamicRouteService.getRouteInfo(routePath);
         return Objects.nonNull(resp)? R.ok(resp): R.error("路由信息读取出错", null);
+    }
+
+    @PostMapping("/query/batch")
+    @Operation(summary = "查看批量 route 的信息")
+    public R<Map<String, RouteInfoResponse>> getBatchRouteInfo(@RequestBody @Valid QueryBatchRouteInfoRequest body) {
+        Map<String, RouteInfoResponse> batch = new HashMap<>();
+        body.getPaths().forEach(path -> {
+            var routeInfo = dynamicRouteService.getRouteInfo(path);
+            if (Objects.nonNull(routeInfo)) {
+                batch.put(path, routeInfo);
+            }
+        });
+        return R.ok(batch);
     }
 
     @PostMapping("/update")
@@ -118,6 +141,13 @@ public class DynamicRouteController {
     public R<Object> getRouteAccessLogByRid(
             @NotBlank(message = "路由 ID 不允许为空") @Parameter(description = "路由 ID", required = true) @RequestParam String rid
     ) {
+        throw new NotImplementedException();
+    }
+
+    @GetMapping("/secret-key")
+    @Operation(summary = "获取一个 Route 的 key")
+    public R<String> querySecretKey(@RequestParam("route") @Parameter(required = true) @NotBlank String routePath) {
+        // TODO
         throw new NotImplementedException();
     }
 }

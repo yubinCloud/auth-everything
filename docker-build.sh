@@ -83,6 +83,8 @@ build "./ds-coordinator" "aet-ds-coordinator"
 build "./simulator" "aet-simulator" 1
 build "./euser-gateway" "aet-euser-gateway"
 build "./euser-sso" "aet-euser-sso"
+build "./api-factory/af-leader" "aet-af-leader"
+build "./api-factory/af-worker" "aet-af-worker"
 build "./alibaba-sidecars/jupyter-service" "aet-sidecar-jupyter-service"
 build "./alibaba-sidecars/avue-data-server" "aet-sidecar-avue-data-server"
 build "./alibaba-sidecars/avue-nginx" "aet-sidecar-avue-nginx"

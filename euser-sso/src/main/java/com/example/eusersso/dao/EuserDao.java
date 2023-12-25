@@ -43,5 +43,5 @@ public class EuserDao implements Serializable {
 
     private List<Integer> avueRoles;
 
-    private List<Integer> publicApiIds;
+    private List<String> publicApiIds;
 }

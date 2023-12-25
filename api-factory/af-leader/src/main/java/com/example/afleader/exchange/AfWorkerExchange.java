@@ -3,8 +3,6 @@ package com.example.afleader.exchange;
 import com.example.afleader.exchange.request.afworker.HandlerCodeForSQLReq;
 import com.example.afleader.exchange.response.afworker.HandlerCodeForSQLResp;
 import com.example.afleader.exchange.response.afworker.R;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.service.annotation.GetExchange;

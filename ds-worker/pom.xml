@@ -63,6 +63,14 @@
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
         </dependency>
+        <!--- 星环 Inceptor 驱动 -->
+        <dependency>
+            <groupId>io.transwarp</groupId>
+            <artifactId>jdbc</artifactId>
+            <version>1.2</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/src/main/resources/libs/inceptor/inceptor-sdk-studio-1.2.jar</systemPath>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>

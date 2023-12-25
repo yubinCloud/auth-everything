@@ -1,6 +1,7 @@
 package com.example.eusersso.repository;
 
 import cn.hutool.json.JSONUtil;
+import com.example.eusersso.dto.request.UpdateAddPublicAPIPermissionRequest;
 import com.example.eusersso.entity.Euser;
 import com.example.eusersso.mapper.EuserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,9 +12,8 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 管理 api-factory 模块中可访问 API 的权限信息
@@ -37,30 +37,23 @@ public class AfRoutePermRepository {
         redisTemplate.setHashKeySerializer(new StringRedisSerializer());
         redisTemplate.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
         redisTemplate.setConnectionFactory(afRedisConnectionFactory);
+        redisTemplate.afterPropertiesSet();
         this.euserMapper = euserMapper;
     }
 
     /**
-     * 设置用户可访问的 public-api 列表
+     * 从 DB 中获取用户的 API 权限列表
+     * 同时会重置缓存
      * @param username
-     * @param routes
+     * @return
      */
-    public void setEuserRoutes(String username, List<String> routes) {
-        redisTemplate.multi();  // mini-transaction
-        final String key = KEY_PREFIX + username;
-        redisTemplate.delete(key);
-        redisTemplate.opsForSet().add(key, routes.toArray());
-        redisTemplate.expire(key, Duration.ofSeconds(EXPIRE_TIME));
-        redisTemplate.exec();
-    }
-    // TODO
-
     public List<String> getPermList(String username) {
         String permListInDb = euserMapper.queryAfRoutePerms(username);
         if (Objects.isNull(permListInDb)) {
             return Collections.emptyList();
         }
         var permList = JSONUtil.parseArray(permListInDb).toList(String.class);
+        permList = permList.parallelStream().collect(Collectors.toSet()).stream().toList();
         final String key = KEY_PREFIX + username;
         redisTemplate.multi();
         redisTemplate.delete(key);
@@ -70,10 +63,17 @@ public class AfRoutePermRepository {
         return permList;
     }
 
-    public boolean checkPerm(String username, String routePath) {
-        final String key = KEY_PREFIX + username;
-        redisTemplate.multi();
-        redisTemplate.opsForSet().isMember(key, routePath);
+    public void addPermission(String username, List<String> routes) {
+        euserMapper.appendPublicAPI(username, routes);
+        clearCache(username);
+    }
 
+    public void deletePermission(String username, String apiId) {
+        euserMapper.deletePublicAPI(username, apiId);
+        clearCache(username);
+    }
+
+    public void clearCache(String username) {
+        redisTemplate.delete(KEY_PREFIX + username);
     }
 }

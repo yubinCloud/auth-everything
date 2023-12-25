@@ -17,7 +17,7 @@ public class EuserSelectCond {
 
     private Integer avueRoleId;
 
-    private Integer apiId;
+    private String apiId;
 
     private String dbAccessLabel;
 

@@ -44,8 +44,10 @@ async def lifespan(app: Starlette):
     app_register.register_kafka_startup(app)    # 注册 Kafka
     await database_exchange.init()
     # 设置 Zookeeper children 的监听
+    logger.info('Begin to watch zookeepr dir `/af/route`')
     @app.state.zk_client.ChildrenWatch("/af/route")
     def watch_children(children: List[str]):
+        logger.info('Find the changes of zookeeper dir `/af/route`.')
         align_routes_with_zookeeper(children)
     
     logger.info('Application startup complete.')
@@ -60,6 +62,7 @@ async def lifespan(app: Starlette):
 
 app = Starlette(routes=g_routes, lifespan=lifespan, middleware=MIDDLEWARES)
 app.state.APP_ID = str(uuid.uuid1())  # APP 唯一 ID
+
 
 
 async def health_check(request):
@@ -131,9 +134,13 @@ async def get_openapi_json(request):
     """
     route_path = request.query_params.get('path')
     if not route_path:
-        raise RequestParamsException()
+        raise RequestParamsException(500, "路由不存在")
     route = route_table_service.get_route('/dynamic' + route_path)
-    body_clz = getattr(route.endpoint, 'Body')
+    body_clz = None
+    try:
+        body_clz = getattr(route.endpoint, 'Body')
+    except AttributeError:
+        pass
     schema = {}
     if body_clz:
         schema = body_clz.model_json_schema()

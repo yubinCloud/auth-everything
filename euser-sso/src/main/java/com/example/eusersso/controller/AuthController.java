@@ -1,6 +1,7 @@
 package com.example.eusersso.controller;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.dev33.satoken.dao.SaTokenDaoRedisJackson;
 import cn.dev33.satoken.stp.StpUtil;
 import com.example.eusersso.dto.request.LoginParam;
 import com.example.eusersso.dto.response.LoginResp;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+
 
     @PostMapping("/doLogin")
     @Operation(summary = "登录（POST 方式）")

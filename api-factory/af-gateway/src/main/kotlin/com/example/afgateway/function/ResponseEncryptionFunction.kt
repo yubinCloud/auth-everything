@@ -11,7 +11,8 @@ import org.springframework.web.server.ServerWebExchange
 @RequiredArgsConstructor
 class ResponseEncryptionFunction : RewriteFunction<String?, String> {
     private val objectMapper: ObjectMapper? = null
-    override fun apply(exchange: ServerWebExchange, body: String): Publisher<String> {
+
+    override fun apply(exchange: ServerWebExchange?, u: String?): Publisher<String>? {
         return null
     }
 }

@@ -47,7 +47,7 @@ public class EuserService {
     }
 
     @Transactional
-    public PageResp<EuserListItem> selectPageByCond(String username, String screenName, Integer roleId, Integer apiId,
+    public PageResp<EuserListItem> selectPageByCond(String username, String screenName, Integer roleId, String routePath,
                                      Integer pageNum, Integer pageSize,
                                      SubsystemEnum subsystem
     ) {
@@ -55,7 +55,7 @@ public class EuserService {
         cond.setUsername(prepostParam(username));
         cond.setScreenName(prepostParam(screenName));
         cond.setAvueRoleId(roleId);
-        cond.setApiId(apiId);
+        cond.setApiId(routePath);
         cond.setDbAccessLabel(subsystem.getDbAccessLabel());
         cond.setPageSize(pageSize);
         cond.setPageNum(pageNum);

@@ -53,4 +53,12 @@ public class GlobalExceptionHandler {
         return R.error(businessException.getMessage());
     }
 
+//    @ResponseBody
+//    @ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR)
+//    @ExceptionHandler(org.postgresql.util.PSQLException.class)
+//    public R<Object> handlePSQLException(org.postgresql.util.PSQLException exception) {
+//        log.error("PSQLException: " + exception.getMessage());
+//        return R.error("数据库访问错误");
+//    }
+
 }

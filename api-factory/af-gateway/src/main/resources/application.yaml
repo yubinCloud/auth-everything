@@ -4,10 +4,11 @@ server:
 spring:
   application:
     name: af-gateway
-  threads:
-    virtual:
-      enabled: true
   cloud:
     nacos:
       discovery:
         server-addr: http://${NACOS_HOST:127.0.0.1}:${NACOS_PORT:8848}
+
+zookeeper:
+  connect-string: ${AF_GATEWAY_ZOOKEEPER_CONNECT_STRING:localhost:2181}
+  namespace: af

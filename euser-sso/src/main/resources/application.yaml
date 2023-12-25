@@ -7,17 +7,14 @@ spring:
   application:
     name: @artifactId@
   data:
-    redis:
+    redis:  # used for sa-token
       database: ${EUSER_SSO_REDIS_DB:2}
       host: ${EUSER_SSO_REDIS_HOST:127.0.0.1}
       port: ${EUSER_SSO_REDIS_PORT:6379}
-      timeout: 10s
-      lettuce:
-        pool:
-          max-active: 200
-          max-wait: -1ms
-          max-idle: 10
-          min-idle: 0
+    af-redis:  # used for cache public-api permission
+      database: ${EUSER_SSO_AF_REDIS_DB:1}
+      host: ${EUSER_SSO_AF_REDIS_HOST:127.0.0.1}
+      port: ${EUSER_SSO_AF_REDIS_PORT:6379}
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://${EUSER_SSO_PG_HOST:127.0.0.1}:${EUSER_SSO_PG_PORT:5432}/euser_sso
@@ -37,7 +34,7 @@ memcached:
 
 # 山东通对接参数
 sdt:
-  enabled: ${EUSER_SSO_SDT_ENABLED:true}
+  enabled: ${EUSER_SSO_SDT_ENABLED:false}
   endpoint-url: ${EUSER_SSO_SDT_ENDPOINT_URL:http://15.209.0.3:80}
   corp-id: ${EUSER_SSO_SDT_CORPID:wwafa1a3005a15a672}
   agent-id: ${EUSER_SSO_SDT_AGENTID:1004649}

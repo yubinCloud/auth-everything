@@ -156,15 +156,22 @@ spring:
           filters:
             - StripPrefix=1
 
-        - id: public-api
-          uri: lb://af-encryption-gateway
+        - id: af-leader
+          uri: lb://af-leader
+          predicates:
+            - Path=/af-leader/**
+
+        - id: af-worker
+          uri: lb://af-worker
+          predicates:
+            - Path=/af-worker/**
+          filters:
+            - StripPrefix=1
+
+        - id: af-gateway
+          uri: lb://af-gateway
           predicates:
             - Path=/public-api/**
-
-        - id: af-dynamic-api
-          uri: lb://dynamic-api
-          predicates:
-            - Path=/dynamic-api/**
 
       globalcors:
         cors-configurations:

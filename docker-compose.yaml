@@ -135,41 +135,20 @@ services:
     restart: ${DOCKER_RESTART_POLICY}
     networks:
       - platform-net
-
-  af-postgresql:
-    image: aet-af-postgresql
-    container_name: aet-af-postgresql
-    hostname: af-postgresql
-    environment:
-      - POSTGRES_USER=${AF_POSTGRESQL_USER}
-      - POSTGRES_PASSWORD=${AF_POSTGRESQL_PASSWORD}
-    volumes:
-      - af-postgresql-data:/var/lib/postgresql/data
-    expose:
-      - 5432
-    privileged: true
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres | grep accepting || exit 1; echo healthy"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-      start_period: 60s
-    restart: ${DOCKER_RESTART_POLICY}
-    networks:
-      - platform-net
   
   af-zookeeper:
     image: bitnami/zookeeper:3.9
     container_name: aet-af-zookeeper
     hostname: af-zookeeper
     volumes:
-      - af-zookeeper-data:/binami/zookeeper
+      - af-zookeeper-data:/bitnami/zookeeper
     expose:
       - 2181  # for client
       - 3888  # leader election
       - 2888  # cluster rpc
     environment:
       - ZOO_4LW_COMMANDS_WHITELIST=ruok
+      - ALLOW_ANONYMOUS_LOGIN=yes
     healthcheck:
       test: "echo ruok | nc localhost 2181 | grep imok || exit 1; echo healthy"
       interval: 5s
@@ -553,7 +532,75 @@ services:
     restart: ${DOCKER_RESTART_POLICY}
     networks:
       - platform-net
-
+  
+  af-leader:
+    build:
+      context: ./api-factory/af-leader
+    image: aet-af-leader
+    container_name: aet-af-leader
+    hostname: af-leader
+    expose:
+      - 8979
+    environment:
+      - NACOS_HOST=${NACOS_HOST}
+      - NACOS_PORT=${NACOS_PORT}
+      - AF_LEADER_ZOOKEEPER_CONNECT_STRING=af-zookeeper:2181
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f localhost:8979/af-leader/actuator/health | grep UP || exit 1; echo healthy"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    depends_on:
+      sso-auth:
+        condition: service_healthy
+      af-zookeeper:
+        condition: service_healthy
+    restart: ${DOCKER_RESTART_POLICY}
+    networks:
+      - platform-net
+  
+  af-worker:
+    image: aet-af-worker
+    container_name: aet-af-worker
+    hostname: af-worker
+    expose:
+      - 8989
+    environment:
+      - ENV_FOR_DYNACONF=prod
+      - AF_WORKER_ENABLED_AF_ACCESS_LOG=false
+      - AF_WORKER_SIDECAR_HOST=sidecar-af-worker
+      - AF_WORKER_SIDECAR_PORT=10019
+      - AF_WORKER_ZOOKEEPER_HOSTS=af-zookeeper:2181
+      - AF_WORKER_KAFKA_SERVERS=localhost:9092
+    depends_on:
+      af-zookeeper:
+        condition: service_healthy
+      af-leader:
+        condition: service_healthy
+    restart: ${DOCKER_RESTART_POLICY}
+    networks:
+      - platform-net
+  
+  # af-worker-2:
+  #   image: aet-af-worker
+  #   container_name: aet-af-worker-2
+  #   hostname: af-worker-2
+  #   expose:
+  #     - 8989
+  #   environment:
+  #     - ENV_FOR_DYNACONF=prod
+  #     - AF_WORKER_ENABLED_AF_ACCESS_LOG=false
+  #     - AF_WORKER_SIDECAR_HOST=sidecar-af-worker-2
+  #     - AF_WORKER_SIDECAR_PORT=10019
+  #     - AF_WORKER_ZOOKEEPER_HOSTS=af-zookeeper:2181
+  #     - AF_WORKER_KAFKA_SERVERS=localhost:9092
+  #   depends_on:
+  #     af-zookeeper:
+  #       condition: service_healthy
+  #   restart: ${DOCKER_RESTART_POLICY}
+  #   networks:
+  #     - platform-net
 
   ##################################################################
   #################### Alibaba Sidecars ############################
@@ -718,6 +765,62 @@ services:
     restart: ${DOCKER_RESTART_POLICY}
     networks:
       - platform-net
+  
+  sidecar-af-worker:
+    image: aet-nacos-sidecar
+    container_name: aet-sidecar-af-worker
+    hostname: sidecar-af-worker
+    expose:
+      - 10019
+    env_file:
+      - ./.env
+    environment:
+      - APP_PORT=10019
+      - APP_NAME=af-worker
+      - SERVICE_IP=af-worker
+      - SERVICE_PORT=8989
+      - SERVICE_HEALTH_CHECK_URL=http://af-worker:8989/health
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f localhost:10019/actuator/health | grep UP || exit 1; echo healthy"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 300s
+    depends_on:
+      gateway:
+        condition: service_healthy
+      af-leader:
+        condition: service_healthy
+    restart: ${DOCKER_RESTART_POLICY}
+    networks:
+      - platform-net
+
+  # sidecar-af-worker-2:
+  #   image: aet-nacos-sidecar
+  #   container_name: aet-sidecar-af-worker-2
+  #   hostname: sidecar-af-worker-2
+  #   expose:
+  #     - 10019
+  #   env_file:
+  #     - ./.env
+  #   environment:
+  #     - APP_PORT=10019
+  #     - APP_NAME=af-worker
+  #     - SERVICE_IP=af-worker-2
+  #     - SERVICE_PORT=8989
+  #     - SERVICE_HEALTH_CHECK_URL=http://af-worker-2:8989/health
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "curl -f localhost:10019/actuator/health | grep UP || exit 1; echo healthy"]
+  #     interval: 5s
+  #     timeout: 5s
+  #     retries: 5
+  #     start_period: 300s
+  #   depends_on:
+  #     gateway:
+  #       condition: service_healthy
+  #   restart: ${DOCKER_RESTART_POLICY}
+  #   networks:
+  #     - platform-net
 
 networks:
   platform-net:
@@ -727,10 +830,8 @@ volumes:
   euser-postgresql-data:
     external: true
     name: aet-euser-postgresql-data
-  af-postgresql-data:
-    external: true
-    name: aet-af-postgresql-data
+  
   af-zookeeper-data:
     external: true
     name: aet-af-zookeeper-data
-      
+  

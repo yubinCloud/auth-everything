@@ -2,6 +2,9 @@ package com.example.afleader.service;
 
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.crypto.SecureUtil;
+import cn.hutool.crypto.symmetric.SymmetricAlgorithm;
+import cn.hutool.json.JSONObject;
 import com.example.afleader.config.ConstantConfig;
 import com.example.afleader.dto.request.CommonRouteCreateRequest;
 import com.example.afleader.dto.request.SQLRouteCreateRequest;
@@ -76,7 +79,7 @@ public class DynamicRouteService {
      * @throws Exception
      */
     public boolean enableRoute(String routePath, boolean enableFlag) throws Exception {
-        return setRouteFlag(routePath, enableFlag, ConstantConfig.ENABLED_FLAG_ZNODE);
+        return setRouteFlag(routePath, enableFlag, ConstantConfig.ENABLED_FLAG_ZNODE, null);
     }
 
     /**
@@ -87,7 +90,21 @@ public class DynamicRouteService {
      * @throws Exception
      */
     public boolean encryptRoute(String routePath, boolean encryptFlag) throws Exception {
-        return setRouteFlag(routePath, encryptFlag, ConstantConfig.ENCRYPT_FLAG_ZNODE);
+        byte[] secretKey = null;
+        if (encryptFlag) {
+            secretKey = SecureUtil.generateKey(SymmetricAlgorithm.AES.getValue()).getEncoded();
+        }
+        return setRouteFlag(routePath, encryptFlag, ConstantConfig.ENCRYPT_FLAG_ZNODE, secretKey);
+    }
+
+    public List<String> getRouteList() {
+        List<String> routes = null;
+        try {
+            routes = curatorClient.getChildren().forPath(ConstantConfig.ROUTE_ZK_NS);
+            routes = routes.parallelStream().map(routePathService::toRoutePath).toList();
+        } catch (Exception ignored) {
+        }
+        return routes;
     }
 
     /**
@@ -99,7 +116,11 @@ public class DynamicRouteService {
         String znodePath = routePathService.toZnodePath(routePath);
         RouteInfoResponse result = new RouteInfoResponse();
         try {
-            result.setBasic(routeZnodeRepository.getRouteZnodeData(znodePath));
+            var znodeData = routeZnodeRepository.getRouteZnodeData(znodePath);
+            if (Objects.isNull(znodeData)) {
+                return null;
+            }
+            result.setBasic(znodeData);
             result.setEnabled(routeZnodeRepository.isEnabled(znodePath));
             result.setEncrypted(routeZnodeRepository.isEncrypted(znodePath));
         } catch (Exception e) {
@@ -160,7 +181,7 @@ public class DynamicRouteService {
      * @return
      * @throws Exception
      */
-    private boolean setRouteFlag(String routePath, boolean flag, String flagZnode) throws Exception {
+    private boolean setRouteFlag(String routePath, boolean flag, String flagZnode, byte[] flagData) throws Exception {
         String znodePath = routePathService.toZnodePath(routePath);
         // 检查路由是否存在
         if (Objects.isNull(curatorClient.checkExists().forPath(znodePath))) {
@@ -170,7 +191,11 @@ public class DynamicRouteService {
         // 开启 or 关闭
         if (flag) {
             try {
-                curatorClient.create().forPath(encryptPth);
+                if (Objects.nonNull(flagData)) {
+                    curatorClient.create().forPath(encryptPth, flagData);
+                } else {
+                    curatorClient.create().forPath(encryptPth);
+                }
             } catch (Exception e) {
                 return true;
             }

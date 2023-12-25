@@ -19,7 +19,7 @@
         <result property="lastUpdatedIuser" column="last_updated_iuser" jdbcType="VARCHAR" />
         <result property="lastUpdatedTime" column="last_updated_time" jdbcType="BIGINT" />
         <result property="avueRoles" column="avue_roles" jdbcType="OTHER" typeHandler="IntegerListTypeHandler"/>
-        <result property="publicApiIds" column="publicapi_ids" jdbcType="OTHER" typeHandler="IntegerListTypeHandler"/>
+        <result property="publicApiIds" column="publicapi_ids" jdbcType="OTHER" typeHandler="StringListTypeHandler"/>
     </resultMap>
 
     <sql id="Euser-ColumnList">
@@ -60,7 +60,7 @@
             <if test="screenName != null">AND screen_name LIKE #{screenName}</if>
             <if test="mobile != null">AND mobile = #{mobile}</if>
             <if test="avueRoleId != null">AND #{avueRoleId,jdbcType=INTEGER} = ANY(avue_roles)</if>
-            <if test="apiId != null">AND #{apiId,jdbcType=INTEGER} = ANY(publicapi_ids)</if>
+            <if test="apiId != null">AND #{apiId,jdbcType=VARCHAR} = ANY(publicapi_ids)</if>
         </where>
         LIMIT #{pageSize,jdbcType=INTEGER}
         OFFSET #{pageSize,jdbcType=INTEGER} * (#{pageNum,jdbcType=INTEGER} - 1)
@@ -76,7 +76,7 @@
             <if test="screenName != null">AND screen_name LIKE #{screenName}</if>
             <if test="mobile != null">AND mobile = #{mobile}</if>
             <if test="avueRoleId != null">AND #{avueRoleId,jdbcType=INTEGER} = ANY(avue_roles)</if>
-            <if test="apiId != null">AND #{apiId,jdbcType=INTEGER} = ANY(publicapi_ids)</if>
+            <if test="apiId != null">AND #{apiId,jdbcType=VARCHAR} = ANY(publicapi_ids)</if>
         </where>
     </select>
 
@@ -106,5 +106,30 @@
         WHERE username=#{username}
     </delete>
 
+    <select id="queryAfRoutePerms" parameterType="java.lang.String" resultType="java.lang.String">
+        SELECT publicapi_ids
+        FROM euser
+        WHERE username = #{username}
+    </select>
 
+    <update id="appendPublicAPI">
+        UPDATE euser
+        SET publicapi_ids = publicapi_ids || #{routes,typeHandler=StringListTypeHandler}::jsonb
+        WHERE username = #{username}
+    </update>
+
+    <update id="deletePublicAPI">
+        UPDATE euser
+        SET publicapi_ids = jsonb_delete(publicapi_ids, #{apiId})
+        WHERE username = #{username}
+    </update>
+
+    <select id="queryCheckedByUsernameInPublicAPI" resultMap="EuserMapping"
+            parameterType="java.lang.String">
+        SELECT <include refid="Euser-ColumnList"/>
+        FROM euser
+        <where>
+            username = #{username} AND checked = true AND labels @> '{"access-pa": true}'
+        </where>
+    </select>
 </mapper>

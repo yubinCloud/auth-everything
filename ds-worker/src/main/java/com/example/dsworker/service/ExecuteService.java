@@ -36,6 +36,7 @@ public class ExecuteService {
     public List<Map<String, Object>> execQueryWithSlots(ExecuteSQLRequest body) throws SQLException {
         List<SQLSlot> slots = new ArrayList<>();
         String slottedSQL = fillSlots(body.getSql(), body.getSlots(), slots);
+        System.out.println(slottedSQL);
         List<Map<String, Object>> list;
         try (
                 Connection conn = dataSourceService.getConnection(body.getDataSourceConf());
@@ -69,6 +70,7 @@ public class ExecuteService {
             switch (slotType.toUpperCase()) {
                 case "STRING" -> preparedStatement.setString(i + 1, (String) slotValue);
                 case "INTEGER", "INT" -> preparedStatement.setInt(i + 1, (Integer) slotValue);
+                case  "DOUBLE", "FLOAT", "NUMBER" -> preparedStatement.setDouble(i + 1, (Double) slotValue);
                 default -> throw new InputSlotException();
             }
         }
@@ -81,7 +83,7 @@ public class ExecuteService {
         Matcher m = SQL_SLOT_PATTERN.matcher(sql);
         while (m.find()) {
             String slot = m.group();
-            String slotKey = slot.substring(2, slot.length() - 1);
+            String slotKey = slot.substring(2, slot.length() - 1).split(",")[0];
             SQLSlot sqlSlot = slots.get(slotKey);
             if (Objects.isNull(sqlSlot)) {
                 throw new InputSlotException();

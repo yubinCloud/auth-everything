@@ -18,4 +18,8 @@ public class RoutePathService {
     public String toZnodePath(String routePath) {
         return ConstantConfig.ROUTE_ZK_NS + "/" + toInternal(routePath);
     }
+
+    public String toRoutePath(String znodeName) {
+        return znodeName.replaceAll("\\.", "/");
+    }
 }

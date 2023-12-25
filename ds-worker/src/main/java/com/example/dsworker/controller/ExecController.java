@@ -2,7 +2,6 @@ package com.example.dsworker.controller;
 
 import com.example.dsworker.dto.request.ExecuteSQLRequest;
 import com.example.dsworker.dto.response.R;
-import com.example.dsworker.service.DataSourceService;
 import com.example.dsworker.service.ExecuteService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
