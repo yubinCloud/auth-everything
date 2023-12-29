@@ -36,5 +36,5 @@ public interface EuserMapper {
 
     int deletePublicAPI(String username, String route);
 
-    EuserDao queryCheckedByUsernameInPublicAPI(String username);
+    String queryCheckedByUsernameInPublicAPI(String username);
 }

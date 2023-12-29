@@ -13,7 +13,10 @@ let url = '/visual'
 export default (app) => {
   app.get(url + '/list', jsonParser, function (req, res) {
     const query = req.query;
-    visualDao.list(query).then(data => {
+    const order = {
+      key: 'id',
+    };
+    visualDao.descList(query, order).then(data => {
       res.json(resbody.getSuccessResult(data));
     }).catch(error => {
       res.json(resbody.getFailResult(error));
@@ -82,7 +85,6 @@ export default (app) => {
 
   app.get(url + '/test-put', function (req, res) {
     const path = filePath + "/";
-    console.log(path);
     res.json(resbody.getSuccessResult({
       p: path
     }))

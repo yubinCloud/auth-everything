@@ -4,6 +4,11 @@ server:
 spring:
   application:
     name: af-gateway
+  data:
+    af-redis: # used for cache public-api permission
+      database: ${AF_GATEWAY_AF_REDIS_DB:1}
+      host: ${AF_GATEWAY_AF_REDIS_HOST:127.0.0.1}
+      port: ${AF_GATEWAY_AF_REDIS_PORT:6379}
   cloud:
     nacos:
       discovery:

@@ -1,0 +1,71 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
+plugins {
+	id 'org.springframework.boot' version '3.2.1'
+	id 'io.spring.dependency-management' version '1.1.4'
+	id 'org.graalvm.buildtools.native' version '0.9.28'
+	id 'org.jetbrains.kotlin.jvm' version '1.9.21'
+	id 'org.jetbrains.kotlin.plugin.spring' version '1.9.21'
+}
+
+group = 'org.inet.aet'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	sourceCompatibility = '21'
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenLocal()
+	maven { url 'https://maven.aliyun.com/repository/public' }
+	mavenCentral()
+}
+
+ext {
+	set('springCloudVersion', "2023.0.0")
+	set('springCloudAlibabaVersion',"2022.0.0.0")
+	set('hutoolVersion', "5.8.22")
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	implementation 'io.projectreactor.kotlin:reactor-kotlin-extensions'
+	implementation 'org.jetbrains.kotlin:kotlin-reflect'
+	implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-reactor'
+	implementation 'org.springframework.cloud:spring-cloud-starter-gateway'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springframework.cloud:spring-cloud-starter-loadbalancer'
+	implementation 'com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-discovery'
+	implementation 'com.github.ben-manes.caffeine:caffeine'
+	implementation 'cn.hutool:hutool-json'
+	implementation 'cn.hutool:hutool-jwt'
+	implementation 'org.apache.curator:curator-recipes:5.5.0'
+	compileOnly 'org.projectlombok:lombok'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'io.projectreactor:reactor-test'
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+		mavenBom "com.alibaba.cloud:spring-cloud-alibaba-dependencies:${springCloudAlibabaVersion}"
+		mavenBom "cn.hutool:hutool-bom:${hutoolVersion}"
+	}
+}
+
+tasks.withType(KotlinCompile).configureEach {
+
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}

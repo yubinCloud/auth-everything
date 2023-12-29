@@ -120,13 +120,12 @@
 
     <update id="deletePublicAPI">
         UPDATE euser
-        SET publicapi_ids = jsonb_delete(publicapi_ids, #{apiId})
+        SET publicapi_ids = jsonb_delete(publicapi_ids, #{route})
         WHERE username = #{username}
     </update>
 
-    <select id="queryCheckedByUsernameInPublicAPI" resultMap="EuserMapping"
-            parameterType="java.lang.String">
-        SELECT <include refid="Euser-ColumnList"/>
+    <select id="queryCheckedByUsernameInPublicAPI" parameterType="java.lang.String" resultType="java.lang.String">
+        SELECT publicapi_ids
         FROM euser
         <where>
             username = #{username} AND checked = true AND labels @> '{"access-pa": true}'

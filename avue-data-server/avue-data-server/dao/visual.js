@@ -34,6 +34,7 @@ function save (data) {
 }
 export default {
   list: (data) => list({ table, data, hump: true }),
+  descList: (data, order) => list({ table, data, hump: true }, order),
   update: (data) => {
     return new Promise(resolve => {
       update({

@@ -191,10 +191,7 @@ export const list = ({ table, data, parent, hump, column }, order) => {
       total: 0,
       records: []
     }
-    console.log(data.id)
-    console.log(Array.isArray(data.id))
     let params = deepClone(data);
-    console.log(Array.isArray(params.id))
     let sql = `SELECT ${column ? column : '*'} FROM ${table}`;
     let page = data.current;
     let size = data.size;

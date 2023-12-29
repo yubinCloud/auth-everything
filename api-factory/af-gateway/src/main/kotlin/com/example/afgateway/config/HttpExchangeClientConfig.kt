@@ -19,7 +19,7 @@ class HttpExchangeClientConfig(
     fun euserSSOExchange(): EuserSSOExchange {
         val client = WebClient.builder()
             .filter(reactorLoadBalancerExchangeFilterFunction)
-            .baseUrl("http://euser-sso/euser-sso")
+            .baseUrl("http://euser-sso")
             .build()
         val factory = HttpServiceProxyFactory.builderFor(WebClientAdapter.create(client)).build()
         return factory.createClient(EuserSSOExchange::class.java)

@@ -41,7 +41,7 @@ public class EuserForPublicApiService {
     }
 
     public List<String> queryPermissionList(String username) {
-        return afRoutePermRepository.getPermList(username);
+        return afRoutePermRepository.queryPermListInDB(username);
     }
 
     public void addPublicAPIPermission(String username, List<String> routes) {
@@ -52,8 +52,8 @@ public class EuserForPublicApiService {
         afRoutePermRepository.deletePermission(username, apiId);
     }
 
-    public EuserDao queryCheckedByUsername(String username) {
-        return euserMapper.queryCheckedByUsernameInPublicAPI(username);
+    public List<String> queryCheckedByUsername(String username) {
+        return afRoutePermRepository.queryCheckedPermList(username);
     }
 
 }

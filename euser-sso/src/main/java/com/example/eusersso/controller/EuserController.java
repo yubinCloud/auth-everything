@@ -37,7 +37,6 @@ public class EuserController {
         EuserDao euser = euserService.selectOneSimple(username);
         PersonalPermissionInfo permissionInfo = new PersonalPermissionInfo();
         permissionInfo.setAvuePermissions(euserService.getAvuePermission(euser.getAvueRoles()));
-        // TODO: 获取 public api 权限
         return R.ok(permissionInfo);
     }
 

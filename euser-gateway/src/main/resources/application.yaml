@@ -35,7 +35,7 @@ spring:
             - StripPrefix=1
 
         - id: public-api
-          uri: lb://euser-encryption-gateway
+          uri: lb://af-security-gateway
           predicates:
             - Path=/public-api/**
 

@@ -16,7 +16,7 @@ public class GlobalExceptionHandler {
 
     @ResponseBody
     @ResponseStatus(code = HttpStatus.NOT_FOUND)
-    @ExceptionHandler
+    @ExceptionHandler(IllegalAccessException.class)
     public R<Object> handleConnectException(ConnectException e) {
         return R.error(e.getMessage());
     }

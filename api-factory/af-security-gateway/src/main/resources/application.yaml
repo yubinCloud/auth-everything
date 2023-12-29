@@ -1,0 +1,19 @@
+server:
+  port: ${APP_PORT:10500}
+
+spring:
+  application:
+    name: af-security-gateway
+  data:
+    af-redis: # used for cache public-api permission
+      database: ${AF_GATEWAY_AF_REDIS_DB:1}
+      host: ${AF_GATEWAY_AF_REDIS_HOST:127.0.0.1}
+      port: ${AF_GATEWAY_AF_REDIS_PORT:6379}
+  cloud:
+    nacos:
+      discovery:
+        server-addr: http://${NACOS_HOST:127.0.0.1}:${NACOS_PORT:8848}
+
+zookeeper:
+  connect-string: ${AF_GATEWAY_ZOOKEEPER_CONNECT_STRING:localhost:2181}
+  namespace: af

@@ -35,13 +35,14 @@ public class InternalMicroserviceController {
     public R<QueryPublicAPIPermissionResponse> queryPublicAPIPerms(
             @RequestParam("un") @NotBlank @Parameter(required = true) String username
     ) {
-        var euser = euserService.queryCheckedByUsername(username);
-        QueryPublicAPIPermissionResponse response = new QueryPublicAPIPermissionResponse();
-        if (Objects.nonNull(euser)) {
-            response.setRoutes(euser.getPublicApiIds());
+        var permissions = euserService.queryCheckedByUsername(username);
+        var response = new QueryPublicAPIPermissionResponse();
+        if (Objects.nonNull(permissions)) {
+            response.setRoutes(permissions);
         } else {
             response.setRoutes(Collections.emptyList());
         }
+        log.info("internal resp: " + response.getRoutes());
         return R.ok(response);
     }
 
