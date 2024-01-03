@@ -508,6 +508,7 @@ services:
       - ./.env
     environment:
       - EUSER_SSO_REDIS_HOST=${REDIS_HOST}
+      - EUSER_SSO_AF_REDIS_HOST=${REDIS_HOST}
       - EUSER_SSO_PG_HOST=euser-postgresql
       - EUSER_SSO_PG_USER=${EUSER_POSTGRESQL_USER}
       - EUSER_SSO_PG_PASSWORD=${EUSER_POSTGRESQL_PASSWORD}
@@ -533,6 +534,34 @@ services:
     networks:
       - platform-net
   
+  af-security-gateway:
+    build:
+      context: ./api-factory/af-security-gateway
+    image: aet-af-security-gateway
+    container_name: aet-af-security-gateway
+    hostname: af-security-gateway
+    expose:
+      - 10500
+    environment:
+      - NACOS_HOST=${NACOS_HOST}
+      - NACOS_PORT=${NACOS_PORT}
+      - AF_GATEWAY_AF_REDIS_HOST=${REDIS_HOST}
+      - AF_GATEWAY_ZOOKEEPER_CONNECT_STRING=af-zookeeper:2181
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f localhost:10500/actuator/health | grep UP || exit 1; echo healthy"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 80s
+    depends_on:
+      af-zookeeper:
+        condition: service_healthy
+      euser-sso:
+        condition: service_healthy
+    restart: ${DOCKER_RESTART_POLICY}
+    networks:
+      - platform-net
+  
   af-leader:
     build:
       context: ./api-factory/af-leader
@@ -550,11 +579,9 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-      start_period: 30s
+      start_period: 80s
     depends_on:
-      sso-auth:
-        condition: service_healthy
-      af-zookeeper:
+      af-security-gateway:
         condition: service_healthy
     restart: ${DOCKER_RESTART_POLICY}
     networks:

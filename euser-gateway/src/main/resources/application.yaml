@@ -39,6 +39,13 @@ spring:
           predicates:
             - Path=/public-api/**
 
+        - id: af-secret-key
+          uri: lb://af-security-gateway
+          predicates:
+            - Path=/af-secret-key/**
+          filters:
+            - StripPrefix=1
+
 
       globalcors:
         cors-configurations:

@@ -36,6 +36,6 @@ fun <T> R_SUCCESS(data: T): R<T> {
 }
 
 
-fun R_FORBIIDEN(msg: String): R<Any> {
-    return R(R.FORBIDDEN, "fail", null)
+fun <T> R_FORBIIDEN(msg: String, data: T): R<T> {
+    return R(R.FORBIDDEN, msg, data)
 }

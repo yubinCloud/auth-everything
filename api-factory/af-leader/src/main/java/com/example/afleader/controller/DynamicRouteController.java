@@ -147,7 +147,10 @@ public class DynamicRouteController {
     @GetMapping("/secret-key")
     @Operation(summary = "获取一个 Route 的 key")
     public R<String> querySecretKey(@RequestParam("route") @Parameter(required = true) @NotBlank String routePath) {
-        // TODO
-        throw new NotImplementedException();
+        var secretKey = dynamicRouteService.querySecretKey(routePath);
+        if (Objects.isNull(secretKey)) {
+            return R.error("API 加密信息不存在", null);
+        }
+        return R.ok(dynamicRouteService.querySecretKey(routePath));
     }
 }

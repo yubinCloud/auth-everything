@@ -15,7 +15,7 @@ class GlobalExceptionHandler {
     @ResponseBody
     @ResponseStatus(code = HttpStatus.FORBIDDEN)
     @ExceptionHandler(AbsentPermissionException::class)
-    fun handleAbsentPermissionException(e: AbsentPermissionException): R<Any> {
-        return R_FORBIIDEN("权限不足，禁止访问")
+    fun handleAbsentPermissionException(e: AbsentPermissionException): R<Any?> {
+        return R_FORBIIDEN("权限不足，禁止访问", null)
     }
 }

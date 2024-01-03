@@ -16,4 +16,14 @@ spring:
 
 zookeeper:
   connect-string: ${AF_GATEWAY_ZOOKEEPER_CONNECT_STRING:localhost:2181}
+  session-timeout: 5000
+  connection-timeout: 5000
+  sleep-ms-between-retry: 1000
+  max-retries: 3
   namespace: af
+
+
+management:
+  endpoint:
+    health:
+      enabled: true
