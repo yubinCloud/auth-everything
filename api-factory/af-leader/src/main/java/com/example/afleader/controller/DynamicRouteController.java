@@ -1,11 +1,16 @@
 package com.example.afleader.controller;
 
+import cn.hutool.crypto.SecureUtil;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import com.example.afleader.dto.request.*;
 import com.example.afleader.dto.response.RouteCreateResponse;
 import com.example.afleader.dto.response.RouteInfoResponse;
 import com.example.afleader.service.AfWorkerService;
 import com.example.afleader.service.DynamicRouteService;
 import com.example.afleader.dto.response.R;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -17,10 +22,7 @@ import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 
 @RestController
@@ -34,6 +36,8 @@ public class DynamicRouteController {
     private final DynamicRouteService dynamicRouteService;
 
     private final AfWorkerService afWorkerService;
+
+    private final ObjectMapper objectMapper;
 
     @PostMapping("/create/sql")
     @Operation(summary = "创建 SQL 类型的动态路由")
@@ -152,5 +156,41 @@ public class DynamicRouteController {
             return R.error("API 加密信息不存在", null);
         }
         return R.ok(dynamicRouteService.querySecretKey(routePath));
+    }
+
+    @PostMapping("/debug/encryption")
+    @Operation(summary = "（用于调试）对请求体进行加密")
+    public R<String> encryptBody(
+            @RequestParam("route") @Parameter(required = true) @NotBlank String routePath,
+            @RequestBody Map<String, Object> body) {
+        String bodyString;
+        try {
+            bodyString = objectMapper.writeValueAsString(body);
+        } catch (JsonProcessingException e) {
+            return R.error("请求体无法处理", null);
+        }
+        var secretKey = dynamicRouteService.queryRawSecretKey(routePath);
+        if (Objects.isNull(secretKey)) {
+            return R.error("无法获取密钥", null);
+        }
+        final var aesAlg = SecureUtil.aes(secretKey);
+        String encryptedString = aesAlg.encryptBase64(bodyString);
+        return R.ok(encryptedString);
+    }
+
+    @PostMapping("/debug/decryption")
+    @Operation(summary = "（用于调试）对响应结果进行解密")
+    public R<JSONObject> decryptBody(
+            @RequestParam("route") @Parameter(required = true) @NotBlank String routePath,
+            @RequestBody DebugDecryptionRequest body
+    ) {
+        var secretKey = dynamicRouteService.queryRawSecretKey(routePath);
+        if (Objects.isNull(secretKey)) {
+            return R.error("无法获取密钥", null);
+        }
+        final var aesAlg = SecureUtil.aes(secretKey);
+        var bodyString = aesAlg.decryptStr(Base64.getDecoder().decode(body.getResponse()));
+        final var bodyJSON = JSONUtil.parseObj(bodyString);
+        return R.ok(bodyJSON);
     }
 }

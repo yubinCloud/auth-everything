@@ -156,7 +156,7 @@ public class DynamicRouteService {
         return true;
     }
 
-    public String querySecretKey(String routePath) {
+    public byte[] queryRawSecretKey(String routePath) {
         String znodePath = routePathService.toZnodePath(routePath) + ConstantConfig.ENCRYPT_FLAG_ZNODE;
         byte[] data;
         try {
@@ -164,7 +164,12 @@ public class DynamicRouteService {
         } catch (Exception exception) {
             return null;
         }
-        return Base64.getEncoder().encodeToString(data);
+        return data;
+    }
+
+    public String querySecretKey(String routePath) {
+        byte[] data = queryRawSecretKey(routePath);
+        return data != null? Base64.getEncoder().encodeToString(data): null;
     }
 
     private RouteCreateResponse createRoute(String routePath, String routeName, String desc, String rid, Boolean encrypt, HandlerCode handlerCode) throws Exception {

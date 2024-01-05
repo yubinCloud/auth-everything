@@ -82,10 +82,10 @@ class EncryptService(val objectMapper: ObjectMapper, val curatorFramework: Curat
             return body
         }
         val aesAlg = SecureUtil.aes(routeLocal.secretKey)
-        val encryptHex = aesAlg.encryptHex(body)
-        val magic = aesAlg.encryptHex(ENCRYPTION_MAGIC_NUMBER)
+        val encryptedString = aesAlg.encryptBase64(body)
+        val magic = aesAlg.encryptBase64(ENCRYPTION_MAGIC_NUMBER)
         val respJSON = HashMap<String, Any>()
-        respJSON["data"] = encryptHex
+        respJSON["data"] = encryptedString
         respJSON["magic"] = magic
         return objectMapper.writeValueAsString(respJSON)
     }
