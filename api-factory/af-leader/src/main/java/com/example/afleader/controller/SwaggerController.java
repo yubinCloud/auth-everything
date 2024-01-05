@@ -4,9 +4,11 @@ import com.example.afleader.config.ConstantConfig;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.net.URI;
 import java.util.Objects;
 
 @Controller
@@ -30,11 +33,12 @@ public class SwaggerController {
     public String getSwaggerUI(
             Model model,
             @RequestParam @NotBlank @Parameter(description = "路由路径", required = true) String routePath,
-            @RequestHeader(value = "x-forwarded-proto") String proto,
-            @RequestHeader(value = "x-forwarded-host") String host,
+            @RequestHeader(value = "referer") String referer,
             @RequestHeader(value = ConstantConfig.IUSER_TOKEN_HEADER) String token
+
     ) {
-        String openapiURL = String.format("%s://%s/af-leader/dynamic-route/openapi?path=%s", proto, host, routePath);
+        var originURI = URI.create(referer);
+        String openapiURL = String.format("%s://%s:%d/api/af-leader/dynamic-route/openapi?path=%s", originURI.getScheme(), originURI.getHost(), originURI.getPort(), routePath);
         if (Objects.nonNull(token)) {
             model.addAttribute("token", token);
         }

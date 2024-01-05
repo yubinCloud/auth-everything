@@ -15,9 +15,7 @@ class AfRoutePermissionCheckGatewayFilter(private val afRoutePermRepository: AfR
     override fun filter(exchange: ServerWebExchange, chain: GatewayFilterChain): Mono<Void> {
         val request = exchange.request
         val routePath = parseAfRoutePath(request.path.value())
-        println(routePath)
         val username = request.headers.getFirst("X-Euser")
-        println("username: $username")
         return afRoutePermRepository.queryPermissions(username)
             .any(routePath::equals)
             .flatMap { valid: Boolean ->  if (valid) chain.filter(exchange) else Mono.error(AbsentPermissionException()) }

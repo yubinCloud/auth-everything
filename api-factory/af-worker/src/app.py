@@ -149,7 +149,7 @@ async def get_openapi_json(request):
         'openapi': '3.1.0',
         'info': {'title': f"API 调试界面: {route.name}", 'version': 'v0.0.1', 'description': f"API path: {route_path}"},
         "servers": [
-            { 'url': '/af-worker/dynamic', 'description': '内部用户访问' },
+            { 'url': '/api/af-worker/dynamic', 'description': '内部用户访问' },
             { 'url': '/public-api', 'description': '外部用户访问' }
         ],
         'schemes': ['http'],

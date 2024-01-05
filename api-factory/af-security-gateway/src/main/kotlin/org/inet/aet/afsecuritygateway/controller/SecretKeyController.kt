@@ -16,8 +16,14 @@ import reactor.core.publisher.Mono
 @RequestMapping("/secret")
 class SecretKeyController(val encryptService: EncryptService, val afRoutePermRepository: AfRoutePermRepository) {
 
+    /**
+     * 外部用户用于获取某个 route 的 secret key
+     */
     @GetMapping("/key")
-    fun querySecretKey(@RequestParam("routePath") routePath: String, @RequestHeader("X-Euser") username: String): Mono<R<String?>> {
+    fun querySecretKey(
+        @RequestParam("routePath") routePath: String,
+        @RequestHeader("X-Euser") username: String
+    ): Mono<R<String?>> {
         return afRoutePermRepository.queryPermissions(username)
             .any(routePath::equals)
             .flatMap { valid: Boolean -> run {

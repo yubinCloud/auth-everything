@@ -4,10 +4,10 @@
   <head>
     <meta charset="UTF-8">
     <title>Swagger UI</title>
-    <link rel="stylesheet" type="text/css" th:href="@{/static/swagger-ui/swagger-ui.css}" />
-    <link rel="stylesheet" type="text/css" th:href="@{/static/swagger-ui/index.css}" />
-    <link rel="icon" type="image/png" th:href="@{/static/swagger-ui/favicon-32x32.png}" sizes="32x32" />
-    <link rel="icon" type="image/png" th:href="@{/static/swagger-ui/favicon-16x16.png}" sizes="16x16" />
+    <link rel="stylesheet" type="text/css" href="/api/af-leader/static/swagger-ui/swagger-ui.css" />
+    <link rel="stylesheet" type="text/css" href="/api/af-leader/static/swagger-ui/index.css" />
+    <link rel="icon" type="image/png" href="/api/af-leader/static/swagger-ui/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="/api/af-leader/static/swagger-ui/favicon-16x16.png" sizes="16x16" />
   </head>
 
   <body>
@@ -38,7 +38,7 @@
         return await originalFetch(body, config);
       }
     </script>
-    <script th:src="@{/static/swagger-ui/swagger-ui-bundle.js}" charset="UTF-8"> </script>
-    <script th:src="@{/static/swagger-ui/swagger-ui-standalone-preset.js}" charset="UTF-8"> </script>
+    <script src="/api/af-leader/static/swagger-ui/swagger-ui-bundle.js" charset="UTF-8"> </script>
+    <script src="/api/af-leader/static/swagger-ui/swagger-ui-standalone-preset.js" charset="UTF-8"> </script>
   </body>
 </html>
