@@ -42,7 +42,6 @@ public class DynamicRouteController {
     @PostMapping("/create/sql")
     @Operation(summary = "创建 SQL 类型的动态路由")
     public R<RouteCreateResponse> createSQLRoute(@RequestBody @Valid SQLRouteCreateRequest body) throws Exception {
-        log.info("recv request");
         var resp = dynamicRouteService.createSQLRoute(body);
         return R.ok(resp);
     }

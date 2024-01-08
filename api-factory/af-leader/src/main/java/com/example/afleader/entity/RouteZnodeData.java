@@ -3,6 +3,7 @@ package com.example.afleader.entity;
 import lombok.Builder;
 import lombok.Data;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Zookeeper 中 Route 节点的数据
@@ -42,4 +43,9 @@ public class RouteZnodeData {
      * handler code
      */
     private String code;
+
+    /**
+     * 创建这个 route znode 时的元信息
+     */
+    private RouteZnodeMeta meta;
 }

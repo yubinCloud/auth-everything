@@ -11,6 +11,7 @@ import com.example.afleader.dto.response.RouteCreateResponse;
 import com.example.afleader.dto.response.RouteInfoResponse;
 import com.example.afleader.entity.HandlerCode;
 import com.example.afleader.entity.RouteZnodeData;
+import com.example.afleader.entity.RouteZnodeMeta;
 import com.example.afleader.exception.DynamicRouteOpsException;
 import com.example.afleader.repository.RouteZnodeRepository;
 import jakarta.annotation.PostConstruct;
@@ -34,6 +35,8 @@ import java.util.regex.Pattern;
 public class DynamicRouteService {
 
     private final RouteCodeService routeCodeService;
+
+    private final RouteZnodeService routeZnodeService;
 
     private final CuratorFramework curatorClient;
 
@@ -64,7 +67,8 @@ public class DynamicRouteService {
     public RouteCreateResponse createSQLRoute(SQLRouteCreateRequest request) throws Exception {
         String routeId = IdUtil.fastSimpleUUID();
         HandlerCode handlerCode = routeCodeService.buildSQLRouteCode(routeId, request);
-        return createRoute(request.getPath(), request.getName(), request.getDescription(), routeId, request.getEncrypt(), handlerCode);
+        var meta = routeZnodeService.createSQLRouteMeta(request);
+        return createRoute(request.getPath(), request.getName(), request.getDescription(), routeId, request.getEncrypt(), handlerCode, meta);
     }
 
     /**
@@ -76,7 +80,7 @@ public class DynamicRouteService {
     public RouteCreateResponse createCommonRoute(CommonRouteCreateRequest request) throws Exception {
         String routeId = IdUtil.fastSimpleUUID();
         HandlerCode handlerCode = routeCodeService.buildCommonRouteCode(routeId, request);
-        return createRoute(request.getPath(), request.getName(), request.getDescription(), routeId, request.getEncrypt(), handlerCode);
+        return createRoute(request.getPath(), request.getName(), request.getDescription(), routeId, request.getEncrypt(), handlerCode, null);
     }
 
     /**
@@ -180,7 +184,7 @@ public class DynamicRouteService {
         return data != null? Base64.getEncoder().encodeToString(data): null;
     }
 
-    private RouteCreateResponse createRoute(String routePath, String routeName, String desc, String rid, Boolean encrypt, HandlerCode handlerCode) throws Exception {
+    private RouteCreateResponse createRoute(String routePath, String routeName, String desc, String rid, Boolean encrypt, HandlerCode handlerCode, RouteZnodeMeta meta) throws Exception {
         final String znodeName = routePathService.toInternal(routePath);
         final String znodePath = ConstantConfig.ROUTE_ZK_NS + "/" + znodeName;
         var isExists = curatorClient.checkExists().forPath(znodePath);
@@ -188,7 +192,7 @@ public class DynamicRouteService {
             throw new DynamicRouteOpsException("API 路径已存在，创建路由失败");
         }
         byte[] znodeData = routeZnodeRepository.convertRouteZnodeData(
-                RouteZnodeData.builder().path(routePath).rid(rid).name(routeName).desc(desc).methods(List.of("POST")).handler(handlerCode.getName()).code(handlerCode.getCode()).build()
+                RouteZnodeData.builder().path(routePath).rid(rid).name(routeName).desc(desc).methods(List.of("POST")).handler(handlerCode.getName()).code(handlerCode.getCode()).meta(meta).build()
         );
         curatorClient.create().forPath(znodePath, znodeData);
         if (Objects.nonNull(encrypt) && encrypt.equals(true)) {
