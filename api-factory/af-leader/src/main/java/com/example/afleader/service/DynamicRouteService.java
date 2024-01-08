@@ -24,6 +24,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Objects;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 @Service
@@ -38,6 +40,11 @@ public class DynamicRouteService {
     private final RoutePathService routePathService;
 
     private final RouteZnodeRepository routeZnodeRepository;
+
+    /**
+     * 用于在 code 中找到 Endpoint name 的正则表达式
+     */
+    private static final Pattern ENDPOINT_CLASS_NAME_PATTERN = Pattern.compile("(?<=class\\s)Endpoint_.*(?=\\(HTTPEndpoint)");
 
     @PostConstruct
     public void postConstructInit() throws Exception {
@@ -143,6 +150,7 @@ public class DynamicRouteService {
             znodeData.setMethods(methods);
         }
         if (!StrUtil.isBlank(code)) {
+            checkRouteCode(code, znodeData);
             znodeData.setCode(code);
         }
         byte[] znodeBytes = routeZnodeRepository.convertRouteZnodeData(znodeData);
@@ -221,5 +229,22 @@ public class DynamicRouteService {
             }
         }
         return true;
+    }
+
+    /**
+     * 校验修改的 code 是否合法
+     * @param code
+     * @param routeZnodeData
+     */
+    private void checkRouteCode(String code, RouteZnodeData routeZnodeData) {
+        String handlerName = routeZnodeData.getHandler();
+        Matcher m = ENDPOINT_CLASS_NAME_PATTERN.matcher(code);
+        if (!m.find()) {
+            throw new DynamicRouteOpsException("未找到 Endpoint class 定义");
+        }
+        String endpoint = m.group(0);
+        if (!Objects.equals(endpoint, handlerName)) {
+            throw new DynamicRouteOpsException("不允许修改 Endpoint 类名");
+        }
     }
 }
