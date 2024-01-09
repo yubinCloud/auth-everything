@@ -80,7 +80,7 @@ def align_routes_with_zookeeper(route_znodes: List[str]):
     :param route_znodes: _description_
     """
     local_routes = route_table_service.route_path_list()
-    remote_routes = set(map(lambda zp: zp.replace('.', '/'), route_znodes))
+    remote_routes = set(map(lambda zp: '/dynamic' + zp.replace('.', '/'), route_znodes))
     logger.info('align local-routes and remote-routes')
     # 清理多余的 routes
     for rp in local_routes.difference(remote_routes):
@@ -91,7 +91,8 @@ def align_routes_with_zookeeper(route_znodes: List[str]):
             route_table_service.delete_route(rp)
     # 创建少的 routes
     for rp in remote_routes.difference(local_routes):
-        create_route('/af/route/' + rp.replace('/', '.'))
+        znode_path = route_path_service.to_znode_path(rp)
+        create_route(znode_path)
 
 
 async def inspect_routes(request):
@@ -189,6 +190,7 @@ async def get_route_code_for_sql(request):
 
 
 def create_route(zk_path: str):
+    print("zk_path: ", zk_path)
     znode_data, znode_stat = app.state.zk_client.get(zk_path)
     route_version = znode_stat.version
     route_info = orjson.loads(znode_data.decode("utf-8"))
@@ -269,6 +271,7 @@ def route_znode_deleted_event_handler(data: bytes, stat: ZnodeStat, event: Watch
     if route:
         app.routes.remove(route)  # 不用考虑并发真爽！
         route_table_service.delete_route(route_path)
+        del route.endpoint
         logger.info('dynamic-route delete: ' + route_path)
 
 

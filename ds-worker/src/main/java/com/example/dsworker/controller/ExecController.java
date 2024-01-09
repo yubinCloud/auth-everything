@@ -35,7 +35,7 @@ public class ExecController {
             @RequestBody @Valid ExecuteSQLRequest body
     ) throws SQLException {
         List<Map<String, Object>> list;
-        if (Objects.isNull(body.getSlots()) || body.getSlots().size() == 0) {
+        if (Objects.isNull(body.getSlots()) || body.getSlots().isEmpty()) {
             list = executeService.execQueryWithoutSlots(body);
         } else {
             list = executeService.execQueryWithSlots(body);
@@ -49,7 +49,7 @@ public class ExecController {
             @RequestBody @Valid ExecuteSQLRequest body
     ) throws SQLException {
         int count;
-        if (Objects.isNull(body.getSlots()) || body.getSlots().size() == 0) {
+        if (Objects.isNull(body.getSlots()) || body.getSlots().isEmpty()) {
             count = executeService.execUpdateWithoutSlots(body);
         } else {
             count = executeService.execUpdateWithoutSlots(body);
