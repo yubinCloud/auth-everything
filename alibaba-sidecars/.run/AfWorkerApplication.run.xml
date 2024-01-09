@@ -1,0 +1,18 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="AfWorkerApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <option name="ALTERNATIVE_JRE_PATH" value="corretto-17" />
+    <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+    <envs>
+      <env name="APP_PORT" value="10019" />
+      <env name="APP_NAME" value="af-worker" />
+      <env name="SERVICE_PORT" value="8989" />
+      <env name="SERVICE_HEALTH_CHECK_URL" value="http://127.0.0.1:8989/health" />
+    </envs>
+    <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
+    <module name="nacos-sidecar" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="org.inet.nacossidecar.NacosSidecarApplication" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

@@ -9,6 +9,7 @@ import com.example.afleader.dto.response.RouteInfoResponse;
 import com.example.afleader.service.AfWorkerService;
 import com.example.afleader.service.DynamicRouteService;
 import com.example.afleader.dto.response.R;
+import com.example.afleader.service.RouteZnodeService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,6 +35,8 @@ import java.util.*;
 public class DynamicRouteController {
 
     private final DynamicRouteService dynamicRouteService;
+
+    private final RouteZnodeService routeZnodeService;
 
     private final AfWorkerService afWorkerService;
 
@@ -85,8 +88,12 @@ public class DynamicRouteController {
     public R<RouteInfoResponse> getRouteInfo(
             @NotBlank(message = "路由路径不允许为空") @Parameter(description = "路由路径", required = true) @RequestParam String routePath
     ) {
-        var resp = dynamicRouteService.getRouteInfo(routePath);
-        return Objects.nonNull(resp)? R.ok(resp): R.error("路由信息读取出错", null);
+        var routeInfo = dynamicRouteService.getRouteInfo(routePath);
+        if (Objects.isNull(routeInfo)) {
+            return R.error("路由信息读取出错", null);
+        }
+        routeInfo.setBasic(routeZnodeService.originalHandlerName(routeInfo.getBasic()));
+        return R.ok(routeInfo);
     }
 
     @PostMapping("/query/batch")
@@ -96,6 +103,7 @@ public class DynamicRouteController {
         body.getPaths().forEach(path -> {
             var routeInfo = dynamicRouteService.getRouteInfo(path);
             if (Objects.nonNull(routeInfo)) {
+                routeInfo.setBasic(routeZnodeService.originalHandlerName(routeInfo.getBasic()));
                 batch.put(path, routeInfo);
             }
         });
