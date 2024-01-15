@@ -12,7 +12,11 @@ var jsonParser = bodyParser.json({ limit: '1000mb' });
 let url = '/visual'
 export default (app) => {
   app.get(url + '/list', jsonParser, function (req, res) {
-    const query = req.query;
+    const query = {
+      category: req.query.category,
+      current: req.query.current,
+      size: req.query.size
+    };
     const order = {
       key: 'id',
     };

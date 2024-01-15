@@ -13,8 +13,15 @@ let url = '/db'
 
 export default (app) => {
   app.get(url + '/list', jsonParser, function (req, res) {
-    const query = req.query;
-    dbDao.list(query).then(data => {
+    const query = {
+      current: req.query.current,
+      size: req.query.size
+    };
+    const order = {
+      "key": "id",
+      "order": "DESC",
+    }
+    dbDao.orderList(query, order).then(data => {
       res.json(resbody.getSuccessResult(data));
     }).catch(error => {
       res.json(resbody.getFailResult(error));

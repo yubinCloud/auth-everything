@@ -48,7 +48,6 @@ public class MetaController {
                     ) {
                 list = ResultSetConverter.toList(rs);
             }
-            conn.commit();
         }
         return R.ok(list);
     }
@@ -68,7 +67,6 @@ public class MetaController {
                     ) {
                 list = ResultSetConverter.toList(rs);
             }
-            conn.commit();
         }
         return R.ok(list);
     }

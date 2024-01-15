@@ -16,7 +16,6 @@ public class DataSourceConf {
     @NotBlank
     private String url;
 
-    @NotBlank
     private String username;
 
     private String password;

@@ -13,6 +13,8 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Objects;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -22,16 +24,24 @@ public class DataSourceService {
 
     private final DataSourceConfConverter dsConfConverter;
 
+    private final Set<String> supportedDrivers;
+
     public Connection getConnection(DataSourceConf conf) throws SQLException {
         String id = conf.getId();
         Connection conn;
         if (id == null) {
-            try {
-                Class.forName(conf.getDriverClass());
-            } catch (ClassNotFoundException e) {
+            if (Objects.equals(conf.getDriverClass(), "X-Inceptor")) {
+                conf.setDriverClass("org.apache.hive.jdbc.HiveDriver");
+            }
+            if (!supportedDrivers.contains(conf.getDriverClass())) {
                 throw new DatabaseDriverFoundException(conf.getDriverClass());
             }
-            conn = DriverManager.getConnection(conf.getUrl(), conf.getUsername(), conf.getPassword());
+            if (Objects.nonNull(conf.getUsername())) {
+                conn = DriverManager.getConnection(conf.getUrl(), conf.getUsername(), conf.getPassword());
+            }
+            else {
+                conn = DriverManager.getConnection(conf.getUrl());
+            }
         } else {
             var ds = dataSourceCache.getIfPresent(conf.getId());
             if (ds == null) {

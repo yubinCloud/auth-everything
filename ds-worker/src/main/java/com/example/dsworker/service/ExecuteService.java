@@ -28,7 +28,7 @@ public class ExecuteService {
                 ResultSet rs = statement.executeQuery(body.getSql())
         ) {
             list = ResultSetConverter.toList(rs);
-            conn.commit();
+//            conn.commit();
         }
         return list;
     }

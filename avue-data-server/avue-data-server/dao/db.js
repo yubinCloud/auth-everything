@@ -4,6 +4,7 @@ import dbMode from '../modules/db.js'
 let table = 'blade_visual_db'
 export default {
   list: (data) => list({ table, data, hump: true }),
+  orderList: (data, order) => list({ table, data, hump: true }, order),
   detail: (id) => list({ table, data: { id }, parent: true, hump: true }),
   update: (data) => update({
     table: table,

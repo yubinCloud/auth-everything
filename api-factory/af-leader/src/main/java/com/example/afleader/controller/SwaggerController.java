@@ -43,6 +43,7 @@ public class SwaggerController {
             model.addAttribute("token", token);
         }
         model.addAttribute("openapiURL", openapiURL);
+        model.addAttribute("title", "API 调试：" + routePath);
         return "swagger-ui/index";
     }
 }
