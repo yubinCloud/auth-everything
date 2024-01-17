@@ -44,8 +44,8 @@ public class MetaController {
         ) {
             String catalog = conn.getCatalog();
             try (
-                    ResultSet rs = conn.getMetaData().getTables(catalog, null, null, new String[]{"TABLE"});
-                    ) {
+                    ResultSet rs = conn.getMetaData().getTables(catalog, null, null, new String[]{"TABLE"})
+            ) {
                 list = ResultSetConverter.toList(rs);
             }
         }
@@ -63,8 +63,8 @@ public class MetaController {
         ) {
             String catalog = conn.getCatalog();
             try (
-                    ResultSet rs = conn.getMetaData().getColumns(catalog, "%", body.getTableName(), "%");
-                    ) {
+                    ResultSet rs = conn.getMetaData().getColumns(catalog, "%", body.getTableName(), "%")
+            ) {
                 list = ResultSetConverter.toList(rs);
             }
         }

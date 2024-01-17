@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import java.sql.*;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -46,7 +45,7 @@ public class ExecuteService {
         try (
                 Connection conn = dataSourceService.getConnection(body.getDataSourceConf());
                 PreparedStatement preparedStatement = createPreparedStatement(conn, slottedSQL, slots);
-                ResultSet rs = preparedStatement.executeQuery();
+                ResultSet rs = preparedStatement.executeQuery()
         ) {
             list = ResultSetConverter.toList(rs);
             conn.commit();
