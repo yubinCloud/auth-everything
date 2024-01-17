@@ -1,14 +1,19 @@
 package com.example.dsworker.service;
 
+import com.example.dsworker.dto.request.ExecuteMultiSQLRequest;
 import com.example.dsworker.dto.request.ExecuteSQLRequest;
 import com.example.dsworker.dto.request.SQLSlot;
+import com.example.dsworker.dto.response.ExecuteMultiSQLResponse;
+import com.example.dsworker.dto.response.ExecuteSQLResult;
 import com.example.dsworker.exception.InputSlotException;
+import com.example.dsworker.exception.SQLExecuteException;
 import com.example.dsworker.utils.ResultSetConverter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.sql.*;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -59,6 +64,48 @@ public class ExecuteService {
             conn.commit();
         }
         return count;
+    }
+
+    public ExecuteMultiSQLResponse execMultiSQL(ExecuteMultiSQLRequest body) {
+        List<ExecuteSQLResult> results;
+        var multi = body.getMulti();
+        try (Connection conn = dataSourceService.getConnection(body.getDataSourceConf())) {
+            results = multi.stream().map(sqlItem ->
+                 execSQL(conn, sqlItem.getSql(), sqlItem.getSlots())
+            ).toList();
+        } catch (SQLException e) {
+            throw new SQLExecuteException(e.getMessage());
+        }
+        var resp = new ExecuteMultiSQLResponse();
+        resp.setExecResults(results);
+        return resp;
+    }
+
+    /**
+     * 执行一条 SQL 语句，并获取结果
+     * @param conn
+     * @param SQL
+     * @param slots
+     * @return
+     */
+    private ExecuteSQLResult execSQL(Connection conn, String SQL, List<SQLSlot> slots) {
+        var execResult = new ExecuteSQLResult();
+        if (Objects.isNull(slots)) {
+            slots = Collections.emptyList();
+        }
+        try (var statement = createPreparedStatement(conn, SQL, slots)) {
+            boolean isQuery = statement.execute();
+            if (isQuery) {
+                execResult.setQuery(true);
+                execResult.setRows(ResultSetConverter.toList(statement.getResultSet()));
+            } else {
+                execResult.setQuery(false);
+                execResult.setCount(statement.getUpdateCount());
+            }
+        } catch (SQLException e) {
+            throw new SQLExecuteException(e.getMessage());
+        }
+        return execResult;
     }
 
     private PreparedStatement createPreparedStatement(Connection conn, String SQL, List<SQLSlot> slots) throws SQLException {

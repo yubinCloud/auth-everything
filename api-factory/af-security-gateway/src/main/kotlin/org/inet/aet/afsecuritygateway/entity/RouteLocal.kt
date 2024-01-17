@@ -3,7 +3,7 @@ package org.inet.aet.afsecuritygateway.entity
 import org.apache.curator.framework.recipes.cache.CuratorCache
 
 data class RouteLocal(
-    var curatorCache: CuratorCache,
+    var curatorCache: CuratorCache,  // route node 本身的 CuratorCache
     var encrypt: Boolean,
     var secretKey: ByteArray?
 ) {

@@ -1,7 +1,11 @@
 package com.example.dsworker.controller;
 
+import com.example.dsworker.dto.request.ExecuteMultiSQLRequest;
 import com.example.dsworker.dto.request.ExecuteSQLRequest;
+import com.example.dsworker.dto.request.SQLItem;
+import com.example.dsworker.dto.response.ExecuteMultiSQLResponse;
 import com.example.dsworker.dto.response.R;
+import com.example.dsworker.exception.SQLExecuteException;
 import com.example.dsworker.service.ExecuteService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -55,5 +59,14 @@ public class ExecController {
             count = executeService.execUpdateWithoutSlots(body);
         }
         return R.ok(count);
+    }
+
+    @PostMapping("/multi")
+    @Operation(summary = "执行多个 SQL 语句")
+    public R<ExecuteMultiSQLResponse> executeMultiSQL(
+            @RequestBody @Valid ExecuteMultiSQLRequest body
+    ) {
+        ExecuteMultiSQLResponse resp = executeService.execMultiSQL(body);
+        return R.ok(resp);
     }
 }

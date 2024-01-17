@@ -60,6 +60,10 @@ public class R<T> implements Serializable {
         return new R<>(BAD_REQUEST, msg, null);
     }
 
+    public static R<String> badRequest(String msg, String data) {
+        return new R<>(BAD_REQUEST, msg, data);
+    }
+
     public String toString() {
         return "{\"code\": " + this.getCode() + ", \"msg\": " + this.transValue(this.getMsg()) + ", \"data\": " + this.transValue(this.getData()) + "}";
     }

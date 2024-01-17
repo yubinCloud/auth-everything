@@ -3,6 +3,7 @@ package com.example.dsworker.exceptionhandler;
 import com.example.dsworker.dto.response.R;
 import com.example.dsworker.exception.DatabaseDriverFoundException;
 import com.example.dsworker.exception.InputSlotException;
+import com.example.dsworker.exception.SQLExecuteException;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -24,9 +25,9 @@ public class GlobalExceptionHandler {
      */
     @ResponseBody
     @ResponseStatus(code = HttpStatus.BAD_REQUEST)
-    @ExceptionHandler({ SQLException.class })
-    public R<Object> handleSqlException(@NotNull Exception e) {
-        return R.badRequest("SQL 异常，请重新检查相关配置。错误：" + e.getMessage());
+    @ExceptionHandler({ SQLException.class, SQLExecuteException.class })
+    public R<String> handleSqlException(@NotNull Exception e) {
+        return R.badRequest("SQL 异常，请重新检查相关配置。错误：" + e.getMessage(), e.getMessage());
     }
 
     /**
@@ -47,5 +48,4 @@ public class GlobalExceptionHandler {
     public R<Object> handleInputSlotException(@NotNull Exception e) {
         return R.badRequest("输入的 SQL 参数与 SQL 不匹配，请检查");
     }
-
 }
