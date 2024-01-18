@@ -15,4 +15,7 @@ public class NewAvueRoleDto {
 
     @Schema(description = "avue 大屏权限信息")
     private List<AvuePermission> permissions;
+
+    @Schema(description = "系统首页")
+    private List<Long> sysHomes;
 }

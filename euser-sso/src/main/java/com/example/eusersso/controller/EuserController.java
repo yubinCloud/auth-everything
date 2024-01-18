@@ -4,6 +4,7 @@ import com.example.eusersso.dao.EuserDao;
 import com.example.eusersso.dto.response.PersonalPermissionInfo;
 import com.example.eusersso.dto.response.R;
 import com.example.eusersso.entity.AvuePermission;
+import com.example.eusersso.entity.SysHome;
 import com.example.eusersso.service.EuserService;
 import com.example.eusersso.util.ConstantUtil;
 import io.swagger.v3.oas.annotations.Operation;
@@ -47,5 +48,12 @@ public class EuserController {
     ) {
         List<AvuePermission> permissions = euserService.getAvuePermission(username);
         return R.ok(permissions);
+    }
+
+    @GetMapping("/sys-homes/all")
+    @Operation(summary = "查看本用户所能看到的系统首页")
+    public R<List<SysHome>> getSysHomes(@RequestHeader(ConstantUtil.EUSER_WHOAMI_HEADER) String username) {
+        var sysHomes = euserService.getSysHomes(username);
+        return R.ok(sysHomes);
     }
 }

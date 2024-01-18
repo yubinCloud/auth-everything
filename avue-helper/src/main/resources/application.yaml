@@ -6,6 +6,9 @@ server:
 spring:
   application:
     name: @artifactId@
+  threads:
+    virtual:
+      enabled: true
   servlet:
     multipart:
       max-file-size: 30MB
@@ -14,7 +17,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://${MYSQL_HOST:127.0.0.1}:${MYSQL_PORT:3306}/${MYSQL_DB:antv_data_server}?serverTimezone=UTC&useSSL=false&useUnicode=true&characterEncoding=utf-8
     username: ${MYSQL_USERNAME:root}
-    password: ${MYSQL_PWD:yubin3869}
+    password: ${MYSQL_PWD:root}
 
   cloud:
     nacos:

@@ -12,6 +12,7 @@
         <typeAlias alias="EuserDao" type="com.example.eusersso.dao.EuserDao" />
         <typeAlias alias="AvueRole" type="com.example.eusersso.entity.AvueRole" />
         <typeAlias alias="IntegerListTypeHandler" type="com.example.eusersso.mybatis.IntegerListTypeHandler" />
+        <typeAlias alias="LongListTypeHandler" type="com.example.eusersso.mybatis.LongListTypeHandler" />
         <typeAlias alias="StringListTypeHandler" type="com.example.eusersso.mybatis.StringListTypeHandler" />
         <typeAlias alias="StringMapTypeHandler" type="com.example.eusersso.mybatis.StringMapTypeHandler" />
         <typeAlias alias="AvuePermissionsTypeHandler" type="com.example.eusersso.mybatis.AvuePermissionsTypeHandler" />

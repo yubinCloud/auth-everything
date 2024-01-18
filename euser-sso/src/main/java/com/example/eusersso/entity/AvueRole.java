@@ -13,4 +13,6 @@ public class AvueRole {
     private String name;
 
     private List<AvuePermission> permissions;
+
+    private List<Long> sysHomes;
 }

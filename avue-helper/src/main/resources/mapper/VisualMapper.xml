@@ -55,7 +55,15 @@
             parameterType="long">
         SELECT bv.title AS visual_name, bvc.category_key AS category_name
         FROM blade_visual as bv, blade_visual_category as bvc
-        WHERE bv.id = CAST(bvc.category_value AS SIGNED) AND bv.id = #{visualId,jdbcType=BIGINT}
+        WHERE bv.category = CAST(bvc.category_value AS SIGNED) AND bv.id = #{visualId,jdbcType=BIGINT}
     </select>
 
+    <select id="queryBatchVisualName" resultType="Map">
+        SELECT bv.id AS id, bv.title AS visualName, bvc.category_key AS categoryName
+        FROM blade_visual AS bv, blade_visual_category AS bvc
+        WHERE bv.category = CAST(bvc.category_value AS SIGNED) AND bv.id IN
+            <foreach collection="visualIds" item="visualId" separator="," open="(" close=")">
+                #{visualId,jdbcType=BIGINT}
+            </foreach>
+    </select>
 </mapper>

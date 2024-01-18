@@ -1,5 +1,6 @@
 package com.example.eusersso.service;
 
+import cn.hutool.json.JSONUtil;
 import com.example.eusersso.converter.EuserConverter;
 import com.example.eusersso.dao.EuserDao;
 import com.example.eusersso.dao.param.EuserSelectCond;
@@ -8,6 +9,10 @@ import com.example.eusersso.dto.response.EuserListItem;
 import com.example.eusersso.dto.response.PageResp;
 import com.example.eusersso.entity.AvuePermission;
 import com.example.eusersso.entity.AvueRole;
+import com.example.eusersso.entity.SysHome;
+import com.example.eusersso.exception.RemoteCallException;
+import com.example.eusersso.exchange.AvueHelperExchange;
+import com.example.eusersso.exchange.request.avuehelper.BatchQueryVisualNameRequest;
 import com.example.eusersso.mapper.AvueRoleMapper;
 import com.example.eusersso.mapper.EuserMapper;
 import com.example.eusersso.repository.AvueRoleRepository;
@@ -20,6 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.rmi.Remote;
 import java.util.Collection;
 import java.util.List;
 
@@ -38,6 +44,8 @@ public class EuserService {
     private final AvueRoleRepository avueRoleRepository;
 
     private final EuserTotalRepository euserTotalRepository;
+
+    private final AvueHelperExchange avueHelperExchange;
 
     @Transactional
     public int insertOne(EuserDao euserDao) {
@@ -100,6 +108,23 @@ public class EuserService {
     public List<AvuePermission> getAvuePermission(String username) {
         EuserDao euserDao = euserMapper.selectByUsername(username);
         return getAvuePermission(euserDao.getAvueRoles());
+    }
+
+    @Transactional
+    public List<SysHome> getSysHomes(String username) {
+        var euserDao = euserMapper.selectByUsername(username);
+        var homeIdsStringList = avueRoleMapper.selectBatchSysHomes(euserDao.getAvueRoles());
+        var homeIds = homeIdsStringList.stream().flatMap(ids -> JSONUtil.toList(ids, Long.class).stream()).toList();
+        var requestBody = new BatchQueryVisualNameRequest();
+        requestBody.setIds(homeIds);
+        var resp = avueHelperExchange.batchQueryVisualName(requestBody);
+        if (resp.getCode() != 0) {
+            throw new RemoteCallException("Error call avue-helper: " + resp.getMsg());
+        }
+        return resp.getData().entrySet().parallelStream().map(entry -> {
+            var visualName = entry.getValue();
+            return new SysHome(Long.valueOf(entry.getKey()), visualName.getVisualName(), visualName.getCategoryName());
+        }).toList();
     }
 
     private String prepostParam(String selectParam) {

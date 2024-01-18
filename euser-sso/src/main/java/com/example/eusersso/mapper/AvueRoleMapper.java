@@ -11,6 +11,8 @@ public interface AvueRoleMapper {
 
     List<AvueRole> selectBatchById(List<Integer> roleIds);
 
+    List<String> selectBatchSysHomes(List<Integer> roleIds);
+
     void insertOne(AvueRole role);
 
     int updateOne(AvueRole role);

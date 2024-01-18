@@ -6,6 +6,9 @@ server:
 spring:
   application:
     name: @artifactId@
+  threads:
+    virtual:
+      enabled: true
   data:
     redis:  # used for sa-token
       database: ${EUSER_SSO_REDIS_DB:2}

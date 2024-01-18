@@ -131,4 +131,5 @@
             username = #{username} AND checked = true AND labels @> '{"access-pa": true}'
         </where>
     </select>
+
 </mapper>

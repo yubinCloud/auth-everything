@@ -7,10 +7,11 @@
     <resultMap id="AvueRoleMapping" type="AvueRole">
         <id property="roleId" column="role_id" jdbcType="INTEGER" />
         <result property="permissions" column="permissions" jdbcType="OTHER" typeHandler="AvuePermissionsTypeHandler" />
+        <result property="sysHomes" column="sys_homes" jdbcType="OTHER" typeHandler="LongListTypeHandler" />
     </resultMap>
 
     <sql id="AvueRole-BaseColumn">
-        role_id, name, permissions
+        role_id, name, permissions, sys_homes
     </sql>
 
     <select id="selectBatchById" resultMap="AvueRoleMapping">
@@ -22,9 +23,18 @@
         </foreach>
     </select>
 
+    <select id="selectBatchSysHomes" resultType="java.lang.String">
+        SELECT sys_homes
+        FROM avue_role
+        WHERE role_id IN
+        <foreach collection="roleIds" item="roleId" separator="," open="(" close=")">
+            #{roleId,jdbcType=INTEGER}
+        </foreach>
+    </select>
+
     <insert id="insertOne" parameterType="AvueRole" useGeneratedKeys="true" keyProperty="roleId">
         INSERT INTO avue_role (name, permissions)
-        VALUES (#{name}, #{permissions,typeHandler=AvuePermissionsTypeHandler}::jsonb)
+        VALUES (#{name}, #{permissions,typeHandler=AvuePermissionsTypeHandler}::jsonb, #{sysHomes,typeHandler=LongListTypeHandler}::jsonb)
     </insert>
 
     <update id="updateOne" parameterType="com.example.eusersso.entity.AvueRole">
@@ -32,6 +42,7 @@
         <set>
             <if test="name != null">name=#{name},</if>
             <if test="permissions != null">permissions=#{permissions,typeHandler=AvuePermissionsTypeHandler}::jsonb,</if>
+            <if test="sysHomes != null">sys_homes=#{sysHomes,typeHandler=LongListTypeHandler}::jsonb,</if>
         </set>
         WHERE role_id = #{roleId,jdbcType=INTEGER}
     </update>
@@ -50,5 +61,4 @@
         DELETE FROM avue_role
         WHERE role_id = #{roleId,jdbcType=INTEGER}
     </delete>
-
 </mapper>
