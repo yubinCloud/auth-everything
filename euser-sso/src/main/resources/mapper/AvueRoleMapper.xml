@@ -33,7 +33,7 @@
     </select>
 
     <insert id="insertOne" parameterType="AvueRole" useGeneratedKeys="true" keyProperty="roleId">
-        INSERT INTO avue_role (name, permissions)
+        INSERT INTO avue_role (name, permissions, sys_homes)
         VALUES (#{name}, #{permissions,typeHandler=AvuePermissionsTypeHandler}::jsonb, #{sysHomes,typeHandler=LongListTypeHandler}::jsonb)
     </insert>
 

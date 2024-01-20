@@ -3,7 +3,6 @@ package com.example.eusersso.service;
 import com.example.eusersso.converter.AvueRoleConverter;
 import com.example.eusersso.converter.EuserConverter;
 import com.example.eusersso.dao.param.AvueRoleSelectCond;
-import com.example.eusersso.dao.param.EuserSelectCond;
 import com.example.eusersso.dto.request.NewAvueRoleDto;
 import com.example.eusersso.dto.request.NewUserDto;
 import com.example.eusersso.dto.response.EuserListItem;
@@ -19,8 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
