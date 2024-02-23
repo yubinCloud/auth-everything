@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.avuehelper.mapper.VisualDBMapper">
+
+    <resultMap id="VisualDBMapping" type="com.example.avuehelper.entity.VisualDB">
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="driverClass" column="driver_class" jdbcType="VARCHAR"/>
+        <result property="url" column="url" jdbcType="VARCHAR"/>
+        <result property="username" column="username" jdbcType="VARCHAR"/>
+        <result property="password" column="password" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="VisualDBEntityColums">
+        id, name, driver_class, url, username, password
+    </sql>
+
+    <select id="selectById" resultMap="VisualDBMapping">
+        SELECT <include refid="VisualDBEntityColums"/>
+        FROM blade_visual_db
+        WHERE id = #{id,jdbcType=BIGINT}
+    </select>
+</mapper>
