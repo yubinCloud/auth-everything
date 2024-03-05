@@ -46,6 +46,12 @@ spring:
           filters:
             - StripPrefix=1
 
+        - id: gen-reports
+          uri: lb://genreports
+          predicates:
+            - Path=/genreports/**
+          filters:
+            - StripPrefix=1
 
       globalcors:
         cors-configurations:

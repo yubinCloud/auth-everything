@@ -16,8 +16,13 @@ services:
       - MYSQL_ROOT_PASSWORD=${MYSQL_PWD}
     privileged: true
     volumes:
-      - ./mysql8/volume/conf/my.cnf:/etc/mysql/my.cnf
-      - ./mysql8/volume/data:/var/lib/mysql
+      - mysql8-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysql -uroot -proot -e \"SELECT 'UP';\" | grep UP || exit 1; echo healthy"]
+      interval: 8s
+      timeout: 5s
+      retries: 5
+      start_period: 200s
     restart: ${DOCKER_RESTART_POLICY}
     networks:
       - platform-net
@@ -34,8 +39,7 @@ services:
       - MYSQL_ROOT_PASSWORD=${XXL_JOB_MYSQL_PWD}
     privileged: true
     volumes:
-      - ./xxl-job-mysql/volume/conf/my.cnf:/etc/mysql/my.cnf
-      - ./xxl-job-mysql/volume/data:/var/lib/mysql
+      - xxl-job-mysql-data:/var/lib/mysql
     restart: ${DOCKER_RESTART_POLICY}
     networks:
       - platform-net
@@ -163,7 +167,7 @@ services:
     container_name: ${PROJECT_PREFIX}-${SENTINEL_HOST}
     hostname: ${SENTINEL_HOST}
     image: aet-sentinel-dashboard
-    command: ["/wait-for-it.sh", "mysql8:3306", "-t", "0", "--", "sh", "-c", "java -Dauth.enabled=false -jar app.jar --server.servlet.context-path=/sentinel"]
+    command: ["sh", "-c", "java -Dauth.enabled=false -jar app.jar --server.servlet.context-path=/sentinel"]
     expose:
       - 8080
     healthcheck:
@@ -172,6 +176,9 @@ services:
       timeout: 10s
       retries: 3
       start_period: 360s
+    depends_on:
+      mysql8:
+        condition: service_healthy
     restart: ${DOCKER_RESTART_POLICY}
     networks:
       - platform-net
@@ -219,7 +226,6 @@ services:
     container_name: ${PROJECT_PREFIX}-${GATEWAY_HOST}
     hostname: ${GATEWAY_HOST}
     image: aet-gateway
-    command: ["/wait-for-it.sh", "nacos:8848", "-t", "0", "--", "sh", "-c", "java -jar app.jar"]
     ports:
       - 10010:${GATEWAY_PORT}
     env_file:
@@ -231,9 +237,10 @@ services:
       retries: 5
       start_period: 300s
     depends_on:
-      - mysql8
-      - redis6
-      - nacos
+      nacos:
+        condition: service_healthy
+      redis6:
+        condition: service_started
     restart: ${DOCKER_RESTART_POLICY}
     networks:
       - platform-net
@@ -721,7 +728,7 @@ services:
       - APP_NAME=ds-coordinator
       - SERVICE_IP=ds-coordinator
       - SERVICE_PORT=15530
-      - SERVICE_HEALTH_CHECK_URL=http://ds-coordinator:15530/health
+      - SERVICE_HEALTH_CHECK_URL=http://aet-ds-coordinator:15530/health
     healthcheck:
       test: ["CMD-SHELL", "curl -f localhost:10014/actuator/health | grep UP || exit 1; echo healthy"]
       interval: 5s
@@ -854,6 +861,14 @@ networks:
     external: true
 
 volumes:
+  mysql8-data:
+    external: true
+    name: aet-mysql8-data
+  
+  xxl-job-mysql-data:
+    external: true
+    name: aet-xxl-job-mysql-data
+
   euser-postgresql-data:
     external: true
     name: aet-euser-postgresql-data
@@ -861,4 +876,3 @@ volumes:
   af-zookeeper-data:
     external: true
     name: aet-af-zookeeper-data
-  
