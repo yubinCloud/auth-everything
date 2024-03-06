@@ -42,7 +42,6 @@ public class InternalMicroserviceController {
         } else {
             response.setRoutes(Collections.emptyList());
         }
-        log.info("internal resp: " + response.getRoutes());
         return R.ok(response);
     }
 

@@ -10,7 +10,7 @@ import reactor.core.publisher.Mono;
 
 @Configuration
 @Slf4j
-@Order(0)
+@Order(100)
 public class UserHeaderFilter implements WebFilter {
 
     @Override
