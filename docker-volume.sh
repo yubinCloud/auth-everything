@@ -10,7 +10,7 @@ FILE_NAME=$0
 
 OPS=$1
 
-VOLUME_LIST=("aet-euser-postgresql-data" "mysql8-data")
+VOLUME_LIST=("aet-euser-postgresql-data" "aet-mysql8-data")
 
 function help() {
     echo -e "Usage: \033[33m $FILE_NAME <ops> \033[0m"

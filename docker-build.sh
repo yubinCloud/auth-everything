@@ -78,6 +78,7 @@ build "./xxl-job/xxl-job-admin" "aet-xxljob-admin"
 build "./avue-nginx" "aet-avue-nginx"
 build "./avue-data-server" "aet-avue-data-server" 1
 build "./avue-helper" "aet-avue-helper" 
+build "./uapp-maker" "aet-uapp-maker"
 build "./ds-worker" "aet-ds-worker"
 build "./ds-coordinator" "aet-ds-coordinator"
 build "./simulator" "aet-simulator" 1

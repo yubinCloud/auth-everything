@@ -16,6 +16,7 @@ services:
       - MYSQL_ROOT_PASSWORD=${MYSQL_PWD}
     privileged: true
     volumes:
+      - ./mysql8/volume/conf/my.cnf:/etc/mysql/my.cnf
       - mysql8-data:/var/lib/mysql
     healthcheck:
       test: ["CMD-SHELL", "mysql -uroot -proot -e \"SELECT 'UP';\" | grep UP || exit 1; echo healthy"]
@@ -39,6 +40,7 @@ services:
       - MYSQL_ROOT_PASSWORD=${XXL_JOB_MYSQL_PWD}
     privileged: true
     volumes:
+      - ./xxl-job-mysql/volume/conf/my.cnf:/etc/mysql/my.cnf
       - xxl-job-mysql-data:/var/lib/mysql
     restart: ${DOCKER_RESTART_POLICY}
     networks:
@@ -101,6 +103,21 @@ services:
       timeout: 10s
       retries: 3
     privileged: true
+    restart: ${DOCKER_RESTART_POLICY}
+    networks:
+      - platform-net
+  
+  mongodb:
+    image: mongo:5
+    container_name: aet-mongodb
+    hostname: mongodb
+    expose:
+      - 27017
+    volumes:
+      - mongodb-data:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGODB_ROOT_PWD}
     restart: ${DOCKER_RESTART_POLICY}
     networks:
       - platform-net
@@ -397,6 +414,28 @@ services:
       avue-data-server:
         condition: service_healthy
       minio-server:
+        condition: service_healthy
+    restart: ${DOCKER_RESTART_POLICY}
+    networks:
+      - platform-net
+  
+  uapp-maker:
+    container_name: aet-uapp-maker
+    hostname: uapp-maker
+    image: aet-uapp-maker
+    expose:
+      - 8228
+    env_file:
+      - ./.env
+    environment:
+      - UAPP_MONGODB_HOST=mongodb
+      - UAPP_MONGODB_PORT=27017
+      - UAPP_MONGODB_USERNAME=root
+      - UAPP_MONGODB_PASSWORD=${MONGODB_ROOT_PWD}
+    depends_on:
+      mongodb:
+        condition: service_started
+      avue-helper:
         condition: service_healthy
     restart: ${DOCKER_RESTART_POLICY}
     networks:
@@ -868,6 +907,10 @@ volumes:
   xxl-job-mysql-data:
     external: true
     name: aet-xxl-job-mysql-data
+
+  mongodb-data:
+    external: true
+    name: aet-mongodb-data
 
   euser-postgresql-data:
     external: true

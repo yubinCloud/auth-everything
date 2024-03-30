@@ -97,6 +97,11 @@ spring:
           predicates:
             - Path=/avue-helper/**
 
+        - id: uapp-maker
+          uri: lb://uapp-maker
+          predicates:
+            - Path=/uapp-maker/**
+
         - id: ds-worker
           uri: lb://ds-worker
           predicates:
