@@ -10,8 +10,9 @@ import (
 	"github.com/nacos-group/nacos-sdk-go/v2/common/constant"
 	"github.com/nacos-group/nacos-sdk-go/v2/model"
 	"github.com/nacos-group/nacos-sdk-go/v2/vo"
+	log "github.com/sirupsen/logrus"
+	"go.uber.org/atomic"
 	"io"
-	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -161,7 +162,6 @@ func checkHealthRespBody(resp *http.Response) bool {
 }
 
 func healthCheck() bool {
-	fmt.Println(healthCheckURL)
 	resp, err := http.Get(healthCheckURL)
 	if err != nil {
 		log.Println(err.Error())
@@ -190,12 +190,17 @@ func InitRegisterProxyParam() {
 	}
 }
 
+var needLogRegisterInfo = atomic.NewBool(true)
+
 func registerProxy() {
 	_, err := namingClient.RegisterInstance(*registerProxyParam)
 	if err != nil {
 		log.Fatal(err)
 	} else {
-		log.Println(fmt.Sprintf("register %s, address: %s:%d", proxyServiceName, proxyServiceIP, proxyServicePort))
+		if needLogRegisterInfo.Load() {
+			log.Println(fmt.Sprintf("register %s, address: %s:%d", proxyServiceName, proxyServiceIP, proxyServicePort))
+			needLogRegisterInfo.Store(false)
+		}
 	}
 }
 
@@ -215,6 +220,7 @@ func deregisterProxy() {
 		log.Fatal(err)
 	} else {
 		log.Println(fmt.Sprintf("deregister %s, address: %s:%d", proxyServiceName, proxyServiceIP, proxyServicePort))
+		needLogRegisterInfo.Store(true)
 	}
 }
 
@@ -279,8 +285,16 @@ func shutdownHook() {
 	deregisterProxy()
 }
 
+// InitLogger 初始化日志配置
+func InitLogger() {
+	log.SetFormatter(&log.TextFormatter{})
+	log.SetOutput(os.Stdout)
+	log.SetReportCaller(true)
+}
+
 func main() {
 	// 初始化相关配置和参数
+	InitLogger()
 	InitAppConfig()
 	InitRegisterProxyParam()
 	InitDeregisterProxyParam()
@@ -320,5 +334,5 @@ func main() {
 func printBanner() {
 	banner := "  _   _          _____ ____   _____     _____ _____ _____  ______ _____          _____  \n | \\ | |   /\\   / ____/ __ \\ / ____|   / ____|_   _|  __ \\|  ____/ ____|   /\\   |  __ \\ \n |  \\| |  /  \\ | |   | |  | | (___    | (___   | | | |  | | |__ | |       /  \\  | |__) |\n | . ` | / /\\ \\| |   | |  | |\\___ \\    \\___ \\  | | | |  | |  __|| |      / /\\ \\ |  _  / \n | |\\  |/ ____ \\ |___| |__| |____) |   ____) |_| |_| |__| | |___| |____ / ____ \\| | \\ \\ \n |_| \\_/_/    \\_\\_____\\____/|_____/   |_____/|_____|_____/|______\\_____/_/    \\_\\_|  \\_\\"
 	fmt.Println(banner)
-	log.Printf("sidecar <%s> successfully started on port %d\n", proxyServiceName, appPort)
+	log.Printf("sidecar <%s> successfully started on port %d", proxyServiceName, appPort)
 }
