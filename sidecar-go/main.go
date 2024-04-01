@@ -106,6 +106,8 @@ func parseTargetURL(rawURL *url.URL) (*url.URL, error) {
 	return targetURL, nil
 }
 
+var ExpectedHealthyRespBody = []byte("{\"status\":\"UP\"}")
+
 func forwardHandler(w http.ResponseWriter, r *http.Request) {
 	targetURL, err := parseTargetURL(r.URL)
 	if err != nil {
@@ -113,7 +115,7 @@ func forwardHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if targetURL.Host == "actuator" {
-		_, err = w.Write([]byte("{\"status\": \"UP\"}"))
+		_, err = w.Write(ExpectedHealthyRespBody)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
@@ -126,7 +128,7 @@ func forwardHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	targetReq.Header = r.Header
-	targetResp, err := http.DefaultClient.Do(targetReq)
+	targetResp, err := http.DefaultTransport.RoundTrip(targetReq)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadGateway)
 		return
@@ -147,8 +149,6 @@ func forwardHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
-
-var ExpectedHealthyRespBody = []byte("{\"status\":\"UP\"}")
 
 func checkHealthRespBody(resp *http.Response) bool {
 	if resp.StatusCode != http.StatusOK {

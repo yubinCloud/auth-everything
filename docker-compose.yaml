@@ -698,17 +698,18 @@ services:
   #################### Alibaba Sidecars ############################
   ##################################################################
   sidecar-jupyter-service:
-    build:
-      context: ./alibaba-sidecars/jupyter-service
-    container_name: ${PROJECT_PREFIX}-${SIDECAR_JUPYTER_SERVICE_HOST}
-    hostname: ${SIDECAR_JUPYTER_SERVICE_HOST}
-    image: aet-sidecar-jupyter-service
+    container_name: aet-sidecar-jupyter-service
+    hostname: sidecar-jupyter-service
+    image: aet-nacos-sidecar
     expose:
-      - ${SIDECAR_JUPYTER_SERVICE_PORT}
+      - 10011
     env_file:
       - ./.env
     environment:
-      - APP_PORT=${SIDECAR_JUPYTER_SERVICE_PORT}
+      - APP_PORT=10011
+      - APP_NAME=jupyter-service
+      - SERVICE_IP=dadp-api-unit
+      - SERVICE_PORT=8010
     healthcheck:
       test: ["CMD-SHELL", "curl -f localhost:10011/actuator/health | grep UP || exit 1; echo healthy"]
       interval: 5s
@@ -723,17 +724,19 @@ services:
       - platform-net
 
   sidecar-avue-data-server:
-    build:
-      context: ./alibaba-sidecars/avue-data-server
-    container_name: ${PROJECT_PREFIX}-${SIDECAR_AVUE_DATA_SERVER_HOST}
-    hostname: ${SIDECAR_AVUE_DATA_SERVER_HOST}
-    image: ${PROJECT_PREFIX}-${SIDECAR_AVUE_DATA_SERVER_HOST}
+    container_name: aet-sidecar-avue-data-server
+    hostname: sidecar-avue-data-server
+    image: aet-nacos-sidecar
     expose:
-      - ${SIDECAR_AVUE_DATA_SERVER_PORT}
+      - 10012
     env_file:
       - ./.env
     environment:
-      - APP_PORT=${SIDECAR_AVUE_DATA_SERVER_PORT}
+      - APP_PORT=10012
+      - APP_NAME=avue-data-server
+      - SERVICE_IP=avue-data-server
+      - SERVICE_PORT=10002
+      - SERVICE_HEALTH_CHECK_URL=http://avue-data-server:10002/health
     healthcheck:
       test: ["CMD-SHELL", "curl -f localhost:10012/actuator/health | grep UP || exit 1; echo healthy"]
       interval: 5s
@@ -747,17 +750,19 @@ services:
       - platform-net
   
   sidecar-avue-nginx:
-    build:
-      context: ./alibaba-sidecars/avue-nginx
-    container_name: ${PROJECT_PREFIX}-${SIDECAR_AVUE_NGINX_HOST}
-    hostname: ${SIDECAR_AVUE_NGINX_HOST}
-    image: ${PROJECT_PREFIX}-${SIDECAR_AVUE_NGINX_HOST}
+    container_name: aet-sidecar-avue-nginx
+    hostname: sidecar-avue-nginx
+    image: aet-nacos-sidecar
     expose:
-      - ${SIDECAR_AVUE_NGINX_PORT}
+      - 10013
     env_file:
       - ./.env
     environment:
-      - APP_PORT=${SIDECAR_AVUE_NGINX_PORT}
+      - APP_PORT=10013
+      - APP_NAME=avue-nginx
+      - SERVICE_IP=avue-nginx
+      - SERVICE_PORT=8095
+      - SERVICE_HEALTH_CHECK_URL=http://avue-nginx:8095/health
     healthcheck:
       test: ["CMD-SHELL", "curl -f localhost:10013/actuator/health | grep UP || exit 1; echo healthy"]
       interval: 5s
