@@ -19,6 +19,7 @@ import (
 	"os/signal"
 	"strconv"
 	"strings"
+	"sync"
 	"syscall"
 	"time"
 )
@@ -32,6 +33,7 @@ var (
 
 var appPort int
 var namingClient naming_client.INamingClient // nacos 客户端
+var clientMutex sync.Mutex                   // nacos client 的 mutex
 var healthCheckURL string
 var proxyServiceName string
 var proxyServiceIP string
@@ -77,9 +79,11 @@ func InitAppConfig() {
 // 1. 加入 serviceName -> Instance 的缓存，减少对 Nacos 服务中心的请求
 // 2. 缓存后，通过订阅 nacos 的方式来更新缓存，从而延长缓存时间
 func discoveryService(serviceName string) *model.Instance {
+	clientMutex.Lock()
 	instance, err := namingClient.SelectOneHealthyInstance(vo.SelectOneHealthInstanceParam{
 		ServiceName: serviceName,
 	})
+	clientMutex.Unlock()
 	if err != nil {
 		log.Fatal(err)
 		return nil
@@ -193,7 +197,9 @@ func InitRegisterProxyParam() {
 var needLogRegisterInfo = atomic.NewBool(true)
 
 func registerProxy() {
+	clientMutex.Lock()
 	_, err := namingClient.RegisterInstance(*registerProxyParam)
+	clientMutex.Unlock()
 	if err != nil {
 		log.Fatal(err)
 	} else {
@@ -215,7 +221,9 @@ func InitDeregisterProxyParam() {
 }
 
 func deregisterProxy() {
+	clientMutex.Lock()
 	_, err := namingClient.DeregisterInstance(*deregisterProxyParam)
+	clientMutex.Unlock()
 	if err != nil {
 		log.Fatal(err)
 	} else {
@@ -224,8 +232,10 @@ func deregisterProxy() {
 	}
 }
 
+var killed = atomic.NewBool(false) // 用于控制无限 loop 是否停止
+
 func healthCheckLoop() {
-	for {
+	for !killed.Load() {
 		isHealthy := true
 		if healthCheckURL != "" {
 			isHealthy = healthCheck()
@@ -319,6 +329,7 @@ func main() {
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM)
 	<-stop
+	killed.Store(true)
 	log.Println("Server is shutting down...")
 	shutdownHook()
 

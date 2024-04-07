@@ -29,3 +29,13 @@ def header(
     return {
         'jupyter_token': request.headers.get("authorization")
     }
+
+
+@app.post('/headers')
+def headers(
+    request: Request
+):
+    print(request.headers)
+    return {
+        "yes": "yes"
+    }
