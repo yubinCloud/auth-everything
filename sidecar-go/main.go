@@ -141,12 +141,12 @@ func forwardHandler(w http.ResponseWriter, r *http.Request) {
 		_ = targetResp.Body.Close()
 	}()
 	// 读取目标服务的响应，并将其写入到原始请求的响应中
-	w.WriteHeader(targetResp.StatusCode)
 	for headerKey, headerValues := range targetResp.Header {
 		for _, value := range headerValues {
 			w.Header().Set(headerKey, value)
 		}
 	}
+	w.WriteHeader(targetResp.StatusCode) // Notice：必须先 w.Header().Set(xxx)，才能 w.WriteHeader()
 	_, err = io.Copy(w, targetResp.Body)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
