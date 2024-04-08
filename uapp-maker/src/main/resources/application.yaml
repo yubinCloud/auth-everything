@@ -1,0 +1,27 @@
+server:
+  port: ${APP_PORT:8228}
+  servlet:
+    context-path: /uapp-maker
+
+spring:
+  application:
+    name: @artifactId@
+  threads:
+    virtual:
+      enabled: true
+  cloud:
+    nacos:
+      server-addr: http://${NACOS_HOST:127.0.0.1}:${NACOS_PORT:8848}
+
+  data:
+    mongodb:
+      host: ${UAPP_MONGODB_HOST:127.0.0.1}
+      port: ${UAPP_MONGODB_PORT:27017}
+      database: uapp
+      username: "${UAPP_MONGODB_USERNAME:root}"
+      password: "${UAPP_MONGODB_PASSWORD:inet_store@2018}"
+      authentication-database: admin
+
+logging:
+  level:
+    org.springframework.data.mongodb.core.MongoTemplate: DEBUG
