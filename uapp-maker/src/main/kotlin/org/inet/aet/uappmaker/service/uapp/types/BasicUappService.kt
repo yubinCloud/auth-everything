@@ -5,10 +5,7 @@ import org.inet.aet.uappmaker.constant.UappType
 import org.inet.aet.uappmaker.dto.request.uapptypes.AddUiBasicTabRequest
 import org.inet.aet.uappmaker.dto.request.uapptypes.CreateNavInfo
 import org.inet.aet.uappmaker.entity.Uapp
-import org.inet.aet.uappmaker.entity.uielement.UiBasicNav
-import org.inet.aet.uappmaker.entity.uielement.UiBasicNavMetadata
-import org.inet.aet.uappmaker.entity.uielement.UiBasicTab
-import org.inet.aet.uappmaker.entity.uielement.UiBasicTabMetadata
+import org.inet.aet.uappmaker.entity.uielement.*
 import org.inet.aet.uappmaker.exception.BaseBuzException
 import org.inet.aet.uappmaker.exception.UappOprException
 import org.inet.aet.uappmaker.exception.UappTypeMismatchException
@@ -53,10 +50,12 @@ class BasicUappService (private val uappService: UappService,
     fun addTab(addTabReq: AddUiBasicTabRequest): Boolean {
         val tab = UiBasicTab(
             id = UUID.randomUUID().toString().replace("-", ""),
+            tabType = addTabReq.tabType,
             name = addTabReq.name,
             icon = addTabReq.icon,
             color = addTabReq.color,
-            navs = ArrayList()
+            navs = ArrayList(),
+            body = addTabReq.body,
         )
         val ok = uappBasicTypeRepository.addTab(addTabReq.uappId, tab)
         if (!ok) {
@@ -69,6 +68,9 @@ class BasicUappService (private val uappService: UappService,
      * 将一个 nav 加入到 tab 中
      */
     fun addNavToTab(navInfo: CreateNavInfo, uapp: Uapp, tabId: String): Boolean {
+        if (uapp.uappId != null && uapp.appType != UiBasicTabType.NAVS.no) {
+            throw BaseBuzException("single-page 型的 tab 不支持添加 nav 操作")
+        }
         val tabs = parseContent(uapp)
         val tab = tabs.stream().filter { tab -> tab.id == tabId }.findFirst()
         if (tab.isEmpty) {

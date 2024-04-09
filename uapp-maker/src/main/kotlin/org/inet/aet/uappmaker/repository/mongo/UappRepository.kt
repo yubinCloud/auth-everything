@@ -170,6 +170,9 @@ class UappBasicTypeRepository(private val uappRepository: UappRepository, privat
         if (metadata.color != null) {
             update.set("content.$[tab].color", metadata.color)
         }
+        if (metadata.body != null) {
+            update.set("content.$[tab].body", metadata.body)
+        }
         update.filterArray(Criteria.where("tab._id").`is`(metadata.id))
         return mongoTemplate.updateFirst(q, update, Uapp::class.java).modifiedCount > 0
     }

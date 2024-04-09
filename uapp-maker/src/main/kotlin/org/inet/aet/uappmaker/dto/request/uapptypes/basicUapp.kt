@@ -11,12 +11,16 @@ data class AddUiBasicTabRequest (
     @NotBlank
     var uappId: String,
 
+    var tabType: Int?,
+
     @NotBlank
     var name: String,
 
     var icon: String?,
 
     var color: String?,
+
+    var body: String?,
 )
 
 data class CreateNavInfo (
