@@ -184,6 +184,9 @@ class UappBasicTypeRepository(private val uappRepository: UappRepository, privat
         if (locateInfo.navLevel == 2) {
             attrPrefix = "content.$[tab].navs.$[parentNav].children.$[nav]."
         }
+        if (metadata.navType != null) {
+            update.set(attrPrefix + "navType", metadata.navType)
+        }
         if (metadata.name != null) {
             update.set(attrPrefix + "name", metadata.name)
         }

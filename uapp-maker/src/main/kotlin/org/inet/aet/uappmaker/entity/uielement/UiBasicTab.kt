@@ -20,6 +20,7 @@ data class UiBasicTab(
 
 data class UiBasicTabMetadata (
     var id: String,
+    var tabType: Int?,
     var name: String?,
     var icon: String?,
     var color: String?,

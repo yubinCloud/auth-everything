@@ -79,6 +79,7 @@ class BasicUappService (private val uappService: UappService,
         }
         val nav = UiBasicNav(
             id = UUID.randomUUID().toString().replace("-", ""),
+            navType = navInfo.navType,
             name = navInfo.name,
             icon = navInfo.icon,
             color = navInfo.color,
@@ -100,6 +101,7 @@ class BasicUappService (private val uappService: UappService,
         val tabs = parseContent(uapp)
         val childNav = UiBasicNav(
             id = UUID.randomUUID().toString().replace("-", ""),
+            navType = navInfo.navType,
             name = navInfo.name,
             icon = navInfo.icon,
             color = navInfo.color,

@@ -25,6 +25,9 @@ data class AddUiBasicTabRequest (
 
 data class CreateNavInfo (
 
+    @Schema(description = "1 代表 avue 大屏 nav（默认），2 代表外链 nav")
+    var navType: Int?,
+
     var name: String,
 
     var icon: String?,
