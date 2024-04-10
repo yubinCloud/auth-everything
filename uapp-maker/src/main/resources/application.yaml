@@ -1,5 +1,5 @@
 server:
-  port: ${APP_PORT:8228}
+  port: ${APP_PORT:8229}
   servlet:
     context-path: /uapp-maker
 

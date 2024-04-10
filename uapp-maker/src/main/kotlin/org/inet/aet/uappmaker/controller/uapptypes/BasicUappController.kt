@@ -101,8 +101,11 @@ class BasicUappController(private val uappService: UappService, private val uapp
     fun updateTabMetadata(@RequestBody @Valid body: UpdateTabMetadataRequest, @RequestHeader(XReqHeader.IUSER_WHOAMI) userId: String): R<String> {
         val uapp = uappService.checkEditPermission(body.uappId, userId)
         uappService.checkUappType(uapp.appType, UappType.BASIC)
-        uappBasicService.updateTabMetadata(body.uappId, body.tabMetadata)
-        return R_SUCCESS("更新失败")
+        return when (val ret = uappBasicService.updateTabMetadata(body.uappId, body.tabMetadata)) {
+            BasicUappService.UpdateResultEnum.RET_OK            -> R_SUCCESS("更新成功")
+            BasicUappService.UpdateResultEnum.RET_NOT_FOUND     -> R_CODE(ret.code, "未找到该应用", "")
+            BasicUappService.UpdateResultEnum.RET_NOT_UPDATED   -> R_CODE(ret.code, "更新失败", "")
+        }
     }
 
     @PostMapping("/update-nav-metadata")

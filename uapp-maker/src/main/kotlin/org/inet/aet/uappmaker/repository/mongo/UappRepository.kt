@@ -1,6 +1,7 @@
 package org.inet.aet.uappmaker.repository.mongo
 
 import com.mongodb.bulk.BulkWriteResult
+import com.mongodb.client.result.UpdateResult
 import org.inet.aet.uappmaker.constant.UappType
 import org.inet.aet.uappmaker.dto.request.UpdateUappMetadataRequest
 import org.inet.aet.uappmaker.entity.Uapp
@@ -9,6 +10,7 @@ import org.inet.aet.uappmaker.entity.uielement.UiBasicNav
 import org.inet.aet.uappmaker.entity.uielement.UiBasicNavMetadata
 import org.inet.aet.uappmaker.entity.uielement.UiBasicTab
 import org.inet.aet.uappmaker.entity.uielement.UiBasicTabMetadata
+import org.inet.aet.uappmaker.exception.UappOprException
 import org.inet.aet.uappmaker.service.uapp.types.NavLocateInfo
 import org.springframework.data.mongodb.core.BulkOperations
 import org.springframework.data.mongodb.core.MongoTemplate
@@ -158,7 +160,7 @@ class UappBasicTypeRepository(private val uappRepository: UappRepository, privat
         return mongoTemplate.updateFirst(q, deleteOpr, Uapp::class.java).modifiedCount > 0
     }
 
-    fun updateTabMetadata(uappId: String, metadata: UiBasicTabMetadata): Boolean {
+    fun updateTabMetadata(uappId: String, metadata: UiBasicTabMetadata): UpdateResult {
         val q = uappRepository.oprOfQueryById(uappId)
         val update = Update()
         if (metadata.icon != null) {
@@ -174,7 +176,7 @@ class UappBasicTypeRepository(private val uappRepository: UappRepository, privat
             update.set("content.$[tab].body", metadata.body)
         }
         update.filterArray(Criteria.where("tab._id").`is`(metadata.id))
-        return mongoTemplate.updateFirst(q, update, Uapp::class.java).modifiedCount > 0
+        return mongoTemplate.updateFirst(q, update, Uapp::class.java)
     }
 
     fun updateNavMetadata(uapp: Uapp, locateInfo: NavLocateInfo, metadata: UiBasicNavMetadata): Boolean {

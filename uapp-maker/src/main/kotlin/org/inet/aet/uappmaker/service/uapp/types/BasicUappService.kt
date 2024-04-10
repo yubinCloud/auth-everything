@@ -1,6 +1,6 @@
 package org.inet.aet.uappmaker.service.uapp.types
 
-import io.prometheus.client.Collector
+import com.mongodb.client.result.UpdateResult
 import org.inet.aet.uappmaker.constant.UappType
 import org.inet.aet.uappmaker.dto.request.uapptypes.AddUiBasicTabRequest
 import org.inet.aet.uappmaker.dto.request.uapptypes.CreateNavInfo
@@ -42,6 +42,10 @@ class BasicUappService (private val uappService: UappService,
         const val DELETE_NAV_RET_OK             = 0
         const val DELETE_NAV_RET_EXIST_CHILD    = 1
         const val DELETE_NAV_RET_NOT_FOUND      = 2
+    }
+
+    enum class UpdateResultEnum(val code: Int) {
+        RET_OK(0), RET_NOT_FOUND(1), RET_NOT_UPDATED(2)
     }
 
     /**
@@ -174,8 +178,6 @@ class BasicUappService (private val uappService: UappService,
     }
 
 
-
-
     /**
      * 在 uapp 中删除一个 nav
      * 返回值含义：
@@ -196,7 +198,13 @@ class BasicUappService (private val uappService: UappService,
                         retCode = DELETE_NAV_RET_EXIST_CHILD
                         break@findNav
                     }
-                    tab.navs = tab.navs.stream().filter{ nav.id != navId }.collect(Collectors.toList())
+                    val newNavs = ArrayList<UiBasicNav>()
+                    for (i in 0..<tab.navs.size) {
+                        if (tab.navs[i].id != navId) {
+                            newNavs.addLast(tab.navs[i])
+                        }
+                    }
+                    tab.navs = newNavs
                     retCode = DELETE_NAV_RET_OK
                     break@findNav
                 } else {
@@ -228,12 +236,14 @@ class BasicUappService (private val uappService: UappService,
         return DELETE_NAV_RET_OK
     }
 
-    fun updateTabMetadata(uappId: String, tabMetadata: UiBasicTabMetadata): Boolean {
-        val ok = uappBasicTypeRepository.updateTabMetadata(uappId, tabMetadata)
-        if (!ok) {
-            throw UappOprException("更新 tab 失败")
+    fun updateTabMetadata(uappId: String, tabMetadata: UiBasicTabMetadata): UpdateResultEnum {
+        val updateResult = uappBasicTypeRepository.updateTabMetadata(uappId, tabMetadata)
+        if (updateResult.matchedCount < 1) {
+            return UpdateResultEnum.RET_NOT_FOUND
+        } else if (updateResult.modifiedCount <= 0) {
+            return UpdateResultEnum.RET_NOT_UPDATED
         }
-        return true
+        return UpdateResultEnum.RET_OK
     }
 
     // TODO：扩展到无限层级
