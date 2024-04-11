@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.1.5</version>
+        <version>3.2.4</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.example</groupId>
@@ -15,11 +15,11 @@
     <description>sso-auth</description>
     <properties>
         <java.version>17</java.version>
-        <spring-cloud.version>2022.0.2</spring-cloud.version>
+        <spring-cloud.version>2023.0.1</spring-cloud.version>
         <mysqlconnector.version>8.0.32</mysqlconnector.version>
-        <mybatis.version>3.0.2</mybatis.version>
+        <mybatis.version>3.0.3</mybatis.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
-        <lombok.version>1.18.26</lombok.version>
+        <lombok.version>1.18.30</lombok.version>
         <pagehelper.version>1.4.6</pagehelper.version>
         <knife4j.version>4.1.0</knife4j.version>
         <passay.version>1.6.3</passay.version>
@@ -150,7 +150,7 @@
             <dependency>
                 <groupId>com.alibaba.cloud</groupId>
                 <artifactId>spring-cloud-alibaba-dependencies</artifactId>
-                <version>2022.0.0.0</version>
+                <version>2023.0.0.0-RC1</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
