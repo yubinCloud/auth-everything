@@ -210,13 +210,13 @@ class BasicUappService (private val uappService: UappService,
                     val parentNav = findNavParent(nav, navId)
                     if (parentNav != null) {
                         if (!isForce) {
-                            val targetNav = parentNav.children!!.stream().filter {it.id == navId}.findFirst()
+                            val targetNav = parentNav.children!!.stream().filter { it.id == navId }.findFirst()
                             if (targetNav.isPresent && targetNav.get().children != null && targetNav.get().children!!.isNotEmpty()) {
                                 retCode = DELETE_NAV_RET_EXIST_CHILD
                                 break@findNav
                             }
                         }
-                        parentNav.children = parentNav.children!!.stream().filter { nav.id != navId }.collect(Collectors.toList())
+                        parentNav.children = parentNav.children!!.stream().filter { it.id != navId }.collect(Collectors.toList())
                         retCode = DELETE_NAV_RET_OK
                         break@findNav
                     }

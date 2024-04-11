@@ -175,10 +175,10 @@ services:
       - platform-net
   
   sentinel-dashboard:
-    container_name: ${PROJECT_PREFIX}-${SENTINEL_HOST}
-    hostname: ${SENTINEL_HOST}
-    image: aet-sentinel-dashboard
-    command: ["/wait4x", "tcp", "mysql8:3306", "--", "sh", "-c", "java -Dauth.enabled=false -jar app.jar --server.servlet.context-path=/sentinel"]
+    container_name: aet-sentinel
+    hostname: sentinel
+    image: aet-sentinel
+    command: ["/wait-for-it.sh", "mysql8:3306", "-t", "0", "--", "sh", "-c", "java -Dauth.enabled=false -jar app.jar --server.servlet.context-path=/sentinel"]
     expose:
       - 8080
     healthcheck:
