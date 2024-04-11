@@ -11,7 +11,7 @@ WORKDIR /build
 RUN mvn clean package -Dmaven.test.skip=true --quiet
 
 
-FROM openjdk:17
+FROM openjdk:21
 
 WORKDIR /root
 COPY --from=builder /build/target/*.jar app.jar
