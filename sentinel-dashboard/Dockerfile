@@ -8,8 +8,8 @@ WORKDIR /root
 
 EXPOSE 8080
 
-COPY wait-for-it.sh /wait-for-it.sh
-RUN chmod +x /wait-for-it.sh
+COPY wait4x /wait4x
+RUN chmod +x /wait4x
 
 ADD sentinel.jar.protected app.jar
 

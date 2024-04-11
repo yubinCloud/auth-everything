@@ -113,8 +113,11 @@ class BasicUappController(private val uappService: UappService, private val uapp
     fun updateNavMetadata(@RequestBody @Valid body: UpdateNavMetadataRequest, @RequestHeader(XReqHeader.IUSER_WHOAMI) userId: String): R<String> {
         val uapp = uappService.checkEditPermission(body.uappId, userId)
         uappService.checkUappType(uapp.appType, UappType.BASIC)
-        uappBasicService.updateNavMetadata(uapp, body.navMetadata)
-        return R_SUCCESS("更新成功")
+        return when (val ret = uappBasicService.updateNavMetadata(uapp, body.navMetadata)) {
+            BasicUappService.UpdateResultEnum.RET_OK            -> R_SUCCESS("更新成功")
+            BasicUappService.UpdateResultEnum.RET_NOT_FOUND     -> R_CODE(ret.code, "未找到该导航栏", "")
+            BasicUappService.UpdateResultEnum.RET_NOT_UPDATED   -> R_CODE(ret.code, "更新失败", "")
+        }
     }
 
     @GetMapping("/tab-list/{uappId}")

@@ -23,9 +23,6 @@ public class JupyterService {
 
     static private final String KEY_PREFIX_JUPYTER = "aet:j-ctx:";
 
-    @Value("${sa-token.timeout}")
-    private Long REDIS_TIMEOUT;
-
     public void loginJupyter(String username) {
         var loginResp = jupyterExchange.jupyterLogin(username);  // 远程调用 jupyter 的登录接口
         // 解析 response 获取 token
@@ -36,6 +33,7 @@ public class JupyterService {
         String token = respBody.getData().getToken();
         // 将 token 存入 redis
         String keyInRedis = redisKeyFactory(username);
+        long REDIS_TIMEOUT = 2592000;
         redisJackson.set(keyInRedis, token, REDIS_TIMEOUT);
     }
 

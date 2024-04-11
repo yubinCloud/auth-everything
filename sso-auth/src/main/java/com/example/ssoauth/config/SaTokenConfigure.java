@@ -1,7 +1,6 @@
 package com.example.ssoauth.config;
 
 import cn.dev33.satoken.interceptor.SaInterceptor;
-import cn.dev33.satoken.jwt.StpLogicJwtForSimple;
 import cn.dev33.satoken.stp.StpLogic;
 import lombok.RequiredArgsConstructor;
 import org.passay.MessageResolver;
@@ -18,12 +17,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class SaTokenConfigure implements WebMvcConfigurer {
 
     private final MessageSource messageSource;
-
-    // Sa-Token 整合 jwt (Simple 简单模式)
-    @Bean
-    public StpLogic getStpLogicJwt() {
-        return new StpLogicJwtForSimple();
-    }
 
     @Bean
     public MessageResolver messageResolver() {

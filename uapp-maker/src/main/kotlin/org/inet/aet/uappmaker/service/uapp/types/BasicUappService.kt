@@ -1,6 +1,5 @@
 package org.inet.aet.uappmaker.service.uapp.types
 
-import com.mongodb.client.result.UpdateResult
 import org.inet.aet.uappmaker.constant.UappType
 import org.inet.aet.uappmaker.dto.request.uapptypes.AddUiBasicTabRequest
 import org.inet.aet.uappmaker.dto.request.uapptypes.CreateNavInfo
@@ -246,14 +245,26 @@ class BasicUappService (private val uappService: UappService,
         return UpdateResultEnum.RET_OK
     }
 
-    // TODO：扩展到无限层级
-    fun updateNavMetadata(uapp: Uapp, navMetadata: UiBasicNavMetadata): Boolean {
-        val navLocateInfo = locateNavLevel(parseContent(uapp), navMetadata.id)
-        val ok = uappBasicTypeRepository.updateNavMetadata(uapp, navLocateInfo, navMetadata)
-        if (!ok) {
-            throw UappOprException("更新 nav 失败")
+    fun updateNavMetadata(uapp: Uapp, navMetadata: UiBasicNavMetadata): UpdateResultEnum {
+        val tabs = parseContent(uapp)
+        // 从 tabs 中找到需要修改的 nav
+        var targetNav: UiBasicNav? = null
+        findNav@ for (tab in tabs) {
+            val navs = tab.navs
+            for (nav in navs) {
+                targetNav = walkNav(nav, navMetadata.id)
+                if (targetNav != null) {
+                    break@findNav
+                }
+            }
         }
-        return true
+        if (targetNav == null) {
+            return UpdateResultEnum.RET_NOT_FOUND
+        }
+        // 修改 nav 相关信息
+        updateNavMetadata(targetNav, navMetadata)
+        uappRepository.saveUapp(uapp)
+        return UpdateResultEnum.RET_OK
     }
 
     fun getTabList(uapp: Uapp): List<UiBasicTab> {
@@ -358,5 +369,26 @@ class BasicUappService (private val uappService: UappService,
             }
         }
         return null
+    }
+
+    private fun updateNavMetadata(nav: UiBasicNav, metadata: UiBasicNavMetadata) {
+        if (metadata.navType != null) {
+            nav.navType = metadata.navType
+        }
+        if (metadata.name != null) {
+            nav.name = metadata.name!!
+        }
+        if (metadata.icon != null) {
+            nav.icon = metadata.icon
+        }
+        if (metadata.color != null) {
+            nav.color = metadata.color
+        }
+        if (metadata.path != null) {
+            nav.path = metadata.path!!
+        }
+        if (metadata.avid != null) {
+            nav.avid = metadata.avid
+        }
     }
 }

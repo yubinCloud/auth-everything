@@ -198,14 +198,10 @@ spring:
 
 sa-token:
   token-name: authz
-  timeout: 2592000
-  activity-timeout: -1
   is-concurrent: true
   is-share: true
   token-style: uuid
   is-log: false
-  jwt-secret-key: ${JWT_SECRET:sfaisokhnfsdsadaitfasf}
-  is-print: false
 
 
 management:

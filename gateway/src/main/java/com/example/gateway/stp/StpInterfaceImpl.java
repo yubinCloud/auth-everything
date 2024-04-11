@@ -35,8 +35,7 @@ public class StpInterfaceImpl implements StpInterface {
 
     static private final String KEY_PREFIX_ROLE = "aet:auth-role:";
 
-    @Value("${sa-token.timeout}")
-    private Long REDIS_TIMEOUT = 259200L;  // 3 天
+    private static final Long REDIS_TIMEOUT = 259200L;  // 3 天
 
     @Override
     @SuppressWarnings("unchecked")

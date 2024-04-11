@@ -179,7 +179,11 @@ class UappBasicTypeRepository(private val uappRepository: UappRepository, privat
         return mongoTemplate.updateFirst(q, update, Uapp::class.java)
     }
 
-    fun updateNavMetadata(uapp: Uapp, locateInfo: NavLocateInfo, metadata: UiBasicNavMetadata): Boolean {
+    fun updateNavMetadata(nav: UiBasicNav, metadata: UiBasicNavMetadata) {
+
+    }
+
+    fun updateNavMetadata(uapp: Uapp, locateInfo: NavLocateInfo, metadata: UiBasicNavMetadata): UpdateResult {
         val q = uappRepository.oprOfQueryById(uapp.uappId!!)
         val update = Update()
         var attrPrefix = "content.$[tab].navs.$[nav]."
@@ -209,7 +213,7 @@ class UappBasicTypeRepository(private val uappRepository: UappRepository, privat
             update.filterArray(Criteria.where("parentNav._id").`is`(locateInfo.navPath[0].id))
         }
         update.filterArray(Criteria.where("nav._id").`is`(metadata.id))
-        return mongoTemplate.updateFirst(q, update, Uapp::class.java).modifiedCount > 0
+        return mongoTemplate.updateFirst(q, update, Uapp::class.java)
     }
 
     /**

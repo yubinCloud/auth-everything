@@ -18,12 +18,6 @@ services:
     volumes:
       - ./mysql8/volume/conf/my.cnf:/etc/mysql/my.cnf
       - mysql8-data:/var/lib/mysql
-    healthcheck:
-      test: ["CMD-SHELL", "mysql -uroot -proot -e \"SELECT 'UP';\" | grep UP || exit 1; echo healthy"]
-      interval: 8s
-      timeout: 5s
-      retries: 5
-      start_period: 200s
     restart: ${DOCKER_RESTART_POLICY}
     networks:
       - platform-net
@@ -184,7 +178,7 @@ services:
     container_name: ${PROJECT_PREFIX}-${SENTINEL_HOST}
     hostname: ${SENTINEL_HOST}
     image: aet-sentinel-dashboard
-    command: ["sh", "-c", "java -Dauth.enabled=false -jar app.jar --server.servlet.context-path=/sentinel"]
+    command: ["/wait4x", "tcp", "mysql8:3306", "--", "sh", "-c", "java -Dauth.enabled=false -jar app.jar --server.servlet.context-path=/sentinel"]
     expose:
       - 8080
     healthcheck:
@@ -193,9 +187,6 @@ services:
       timeout: 10s
       retries: 3
       start_period: 360s
-    depends_on:
-      mysql8:
-        condition: service_healthy
     restart: ${DOCKER_RESTART_POLICY}
     networks:
       - platform-net

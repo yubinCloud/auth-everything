@@ -32,15 +32,10 @@ spring:
 
 sa-token:
   token-name: authz
-  timeout: 2592000   # 30 天
-  activity-timeout: -1
   is-concurrent: true
   is-share: true
   token-style: uuid
   is-log: false
-  # jwt 密钥
-  jwt-secret-key: ${JWT_SECRET:sfaisokhnfsdsadaitfasf}
-  is-print: false
 
 mybatis:
   mapper-locations: classpath:mapper/*.xml
