@@ -1,0 +1,16 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="jupyter-service" type="GoApplicationRunConfiguration" factoryName="Go Application">
+    <module name="sidecar-go" />
+    <working_directory value="$PROJECT_DIR$" />
+    <envs>
+      <env name="SERVICE_IP" value="10.245.142.209" />
+      <env name="SERVICE_PORT" value="8010" />
+      <env name="APP_NAME" value="jupyter-service" />
+    </envs>
+    <kind value="PACKAGE" />
+    <package value="sidecar-go" />
+    <directory value="$PROJECT_DIR$" />
+    <filePath value="$PROJECT_DIR$/main.go" />
+    <method v="2" />
+  </configuration>
+</component>
