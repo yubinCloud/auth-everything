@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.ssoauth.mapper.TenantMapper">
+    <resultMap id="BaseResultMap" type="com.example.ssoauth.dao.result.TenantDao">
+        <id property="tenantId" column="role_id" jdbcType="INTEGER"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="TenantDao_ColumnList">
+        tenant_id,name
+    </sql>
+
+    <insert id="addTenant">
+        insert into tenant
+        (name)
+        values (#{name,jdbcType=VARCHAR})
+    </insert>
+
+    <delete id="deleteByName">
+        delete from tenant
+        where name = #{name,jdbcType=VARCHAR}
+    </delete>
+
+    <select id="selectPageByPage" resultType="com.example.ssoauth.dao.result.TenantDao">
+        select
+        <include refid="TenantDao_ColumnList"></include>
+        from tenant as t
+        <where>
+            <if test="name != null">
+                and t.name LIKE #{name}
+            </if>
+        </where>
+    </select>
+
+
+</mapper>

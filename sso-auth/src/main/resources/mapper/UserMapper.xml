@@ -14,11 +14,12 @@
             <result property="note" column="note" jdbcType="VARCHAR"/>
             <result property="createTime" column="create_time" jdbcType="BIGINT"/>
             <result property="mobile" column="mobile" jdbcType="VARCHAR"/>
+            <result property="tenantId" column="tenant_id" jdbcType="INTEGER"/>
     </resultMap>
 
     <sql id="UserDao_ColumnList">
         id,username,password,
-        screen_name,role_list,permission_list, note, create_time, mobile
+        screen_name,role_list,permission_list, note, create_time, mobile,tenant_id
     </sql>
 
 
@@ -26,12 +27,12 @@
         insert into user
         ( id,username,password
         ,screen_name
-        ,role_list,permission_list,note,create_time,mobile
+        ,role_list,permission_list,note,create_time,mobile,tenant_id
         )
         values (#{id,jdbcType=BIGINT},#{username,jdbcType=VARCHAR},#{password,jdbcType=VARCHAR},
                 #{screenName,jdbcType=VARCHAR},
                 #{roleList,jdbcType=VARCHAR},#{permissionList,jdbcType=VARCHAR},#{note,jdbcType=VARCHAR},
-                UNIX_TIMESTAMP(),#{mobile,jdbcType=VARCHAR}
+                UNIX_TIMESTAMP(),#{mobile,jdbcType=VARCHAR},#{tenantId,jdbcType=INTEGER}
                )
     </insert>
 

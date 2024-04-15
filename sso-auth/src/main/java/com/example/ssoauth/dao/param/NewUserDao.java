@@ -20,4 +20,5 @@ public class NewUserDao {
     private String note;
 
     private String mobile;
+    private Integer tenantId;
 }

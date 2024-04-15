@@ -15,4 +15,8 @@ public class User {
     private String note;
     private Long createTime;
     private String mobile;
+    /**
+     * 租户类型
+     */
+    private Integer tenantId;
 }

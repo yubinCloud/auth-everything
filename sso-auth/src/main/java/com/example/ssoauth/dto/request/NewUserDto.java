@@ -43,4 +43,7 @@ public class NewUserDto {
     @Schema(description = "手机号")
     @Size(max = 25, message = "手机号最长 30 字符")
     private String mobile;
+
+    @Schema(description = "租户类型")
+    private Integer tenantId;
 }

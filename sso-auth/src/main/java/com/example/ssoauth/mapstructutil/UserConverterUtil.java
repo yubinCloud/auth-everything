@@ -66,6 +66,9 @@ public class UserConverterUtil {
         user.setScreenName(userDao.getScreenName());
         user.setNote(userDao.getNote());
         user.setCreateTime(userDao.getCreateTime());
+
+        user.setTenantId(userDao.getTenantId());
+
         List<RoleDao> roleDaoList = roleLookupTable.translateRoleIds(
                 userDao.getRoleList().toList(Integer.class)
         );

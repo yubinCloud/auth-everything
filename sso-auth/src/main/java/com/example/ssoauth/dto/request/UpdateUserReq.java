@@ -27,4 +27,7 @@ public class UpdateUserReq {
 
     @Schema(description = "修改的手机号")
     private String mobile;
+
+    @Schema(description = "修改的租户类型")
+    private Integer tenantId;
 }

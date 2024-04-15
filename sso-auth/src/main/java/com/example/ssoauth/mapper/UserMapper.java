@@ -28,4 +28,5 @@ public interface UserMapper {
     void appendPermission(PermissionInsertParam param);
 
     void deletePermission(DeleteUserPermissionParam param);
+
 }

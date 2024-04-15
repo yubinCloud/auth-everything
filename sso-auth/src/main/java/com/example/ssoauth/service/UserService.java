@@ -45,6 +45,7 @@ public class UserService {
     private final SaTokenDaoRedisJackson redisJackson;
 
     static private final String KEY_PREFIX_PERM = "aet:auth-perm:";
+    static private final Integer DEFAULT_TENANT_ID = 1;
 
     @Transactional
     public void addUser(NewUserDto userDto, String whoAmI) {
@@ -56,6 +57,11 @@ public class UserService {
             throw new UserAddException("Exception in jupyter-service: " + jupyterResp.getData());
         }
         NewUserDao userDao = userConverter.toNewUserDao(userDto);
+        //添加默认租户id
+        if (userDao.getTenantId()==null){
+            userDao.setTenantId(DEFAULT_TENANT_ID);
+        }
+        //新增user
         int effect = userMapper.insert(userDao);
         if (effect == 0) {
             throw new UserAddException("Exception when insert database.");
@@ -74,6 +80,7 @@ public class UserService {
         if (jupyterResp.getCode() != JR.SUCCESS) {
             throw new BaseBusinessException("Exception in jupyter-service: " + jupyterResp.getData());
         }
+        //删除user
         userMapper.deleteByUsername(username);
     }
 
