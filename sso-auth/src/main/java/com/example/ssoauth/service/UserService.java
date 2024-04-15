@@ -48,8 +48,9 @@ public class UserService {
     static private final Integer DEFAULT_TENANT_ID = 1;
 
     @Transactional
-    public void addUser(NewUserDto userDto, String whoAmI) {
-        String jupyterToken = findJupyterToken(whoAmI);
+    public void addUser(NewUserDto userDto, String whoAmI, Integer tenantId) {
+        String loginId = tenantId + "," + whoAmI;
+        String jupyterToken = findJupyterToken(loginId);
         var jupyterReq = new JupyterUsrCreateRequest();
         jupyterReq.setAdmin(userDto.getJupyterhubAdmin());
         var jupyterResp = jupyterExchange.createUser(userDto.getUsername(), jupyterReq, jupyterToken);
@@ -58,7 +59,7 @@ public class UserService {
         }
         NewUserDao userDao = userConverter.toNewUserDao(userDto);
         //添加默认租户id
-        if (userDao.getTenantId()==null){
+        if (userDao.getTenantId() == null) {
             userDao.setTenantId(DEFAULT_TENANT_ID);
         }
         //新增user
@@ -70,6 +71,11 @@ public class UserService {
 
     public User findByUsername(String username) {
         UserDao userDao = userMapper.selectByUsername(username);
+        return userConverterUtil.toUser(userDao);
+    }
+
+    public User findByUsernameAndTenantId(String username, Integer tenantId) {
+        UserDao userDao = userMapper.selectByUsernameAndTenantId(username, tenantId);
         return userConverterUtil.toUser(userDao);
     }
 

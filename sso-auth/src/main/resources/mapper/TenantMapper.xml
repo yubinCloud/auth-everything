@@ -15,8 +15,18 @@
     <insert id="addTenant">
         insert into tenant
         (name)
-        values (#{name,jdbcType=VARCHAR})
+        values (#{name, jdbcType=VARCHAR})
     </insert>
+
+    <update id="updateById">
+        update tenant
+        <set>
+            <if test="name != null">
+                name = #{name}
+            </if>
+        </set>
+        where tenant_id = #{tenantId, jdbcType=INTEGER}
+    </update>
 
     <delete id="deleteByName">
         delete from tenant

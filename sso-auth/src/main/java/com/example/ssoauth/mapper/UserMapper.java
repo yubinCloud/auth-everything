@@ -21,7 +21,7 @@ public interface UserMapper {
 
     List<UserDao> selectByCond(UserSelectCond cond);
 
-    UserDao selectByUsername(String username);
+    UserDao selectByUsernameAndTenantId(String username,Integer tenantId);
 
     void updateUserInfo(UpdateUserParam param);
 
@@ -29,4 +29,5 @@ public interface UserMapper {
 
     void deletePermission(DeleteUserPermissionParam param);
 
+    UserDao selectByUsername(String username);
 }

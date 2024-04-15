@@ -23,8 +23,8 @@ public class JupyterService {
 
     static private final String KEY_PREFIX_JUPYTER = "aet:j-ctx:";
 
-    public void loginJupyter(String username) {
-        var loginResp = jupyterExchange.jupyterLogin(username);  // 远程调用 jupyter 的登录接口
+    public void loginJupyter(String loginId) {
+        var loginResp = jupyterExchange.jupyterLogin(loginId);  // 远程调用 jupyter 的登录接口
         // 解析 response 获取 token
         var respBody = loginResp.getBody();
         if (respBody == null || respBody.getCode() != JR.SUCCESS) {
@@ -32,7 +32,7 @@ public class JupyterService {
         }
         String token = respBody.getData().getToken();
         // 将 token 存入 redis
-        String keyInRedis = redisKeyFactory(username);
+        String keyInRedis = redisKeyFactory(loginId);
         long REDIS_TIMEOUT = 2592000;
         redisJackson.set(keyInRedis, token, REDIS_TIMEOUT);
     }

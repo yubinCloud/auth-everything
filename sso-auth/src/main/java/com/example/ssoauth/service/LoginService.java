@@ -25,24 +25,31 @@ public class LoginService {
     private final PasswordEncoder passwordEncoder;
 
     private final JupyterService jupyterService;
+    private static final Integer DEFAULT_TENANT_ID = 1;
 
     /**
      * 用户登录
      * @param username
      * @param pwd
+     * @param tenantId
      * @return
      */
     @Transactional
-    public LoginResp doLogin(String username, String pwd) {
+    public LoginResp doLogin(String username, String pwd,Integer tenantId) {
+        //若未选择租户类型,默认为1
+        if(tenantId == null){
+            tenantId = DEFAULT_TENANT_ID;
+        }
         // 1. 根据账号id，查询用户数据并校验
-        var userInDb = userService.findByUsername(username);
+        var userInDb = userService.findByUsernameAndTenantId(username,tenantId);
         if (userInDb == null || !passwordEncoder.match(pwd, userInDb.getPassword())) {
             throw new LoginException();  // 用户名或密码校验错误
         }
         // 2. 根据账号id，进行登录
-        StpUtil.login(username);
+        String loginId = tenantId+","+username;
+        StpUtil.login(loginId);
         // 3. 登录 jupyter
-        jupyterService.loginJupyter(username);
+        jupyterService.loginJupyter(loginId);
         // 构造 resp
         LoginResp resp = userConverter.toLoginResp(userInDb);
         resp.setToken(StpUtil.getTokenValue());

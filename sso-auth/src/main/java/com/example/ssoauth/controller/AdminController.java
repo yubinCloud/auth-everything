@@ -45,12 +45,13 @@ public class AdminController {
     @Operation(summary = "添加用户")
     public R<String> addUser(
             @RequestBody @Valid NewUserDto userDto,
-            @RequestHeader("User") String whoAmI
+            @RequestHeader("User") String whoAmI,
+            @RequestHeader("X-TenantId") Integer tenantId
     ) {
         if (userDto.getJupyterhubAdmin() == null) {
             userDto.setJupyterhubAdmin(false);
         }
-        userService.addUser(userDto, whoAmI);
+        userService.addUser(userDto, whoAmI,tenantId);
         return R.ok("add success");
     }
 

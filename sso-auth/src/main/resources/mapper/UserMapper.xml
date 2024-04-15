@@ -56,11 +56,18 @@
         </where>
     </select>
 
-    <select id="selectByUsername" parameterType="java.lang.String" resultMap="UserDao">
+    <select id="selectByUsername" resultMap="UserDao">
         SELECT
         <include refid="UserDao_ColumnList" />
         FROM user
         where username = #{username}
+    </select>
+
+    <select id="selectByUsernameAndTenantId" resultMap="UserDao">
+        SELECT
+        <include refid="UserDao_ColumnList" />
+        FROM user
+        where username = #{username} and tenant_id = #{tenantId}
     </select>
 
     <delete id="deleteByUsername" parameterType="java.lang.String">

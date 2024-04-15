@@ -15,4 +15,7 @@ public class LoginParam {
     @NotBlank
     @Schema(description = "密码")
     private String pwd;
+
+    @Schema(description = "租户类型")
+    private Integer tenantId;
 }

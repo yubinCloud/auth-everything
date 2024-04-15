@@ -44,7 +44,8 @@ public class SaTokenConfigure {
                 // 鉴权方法：每次访问进入
                 .setAuth(obj -> {
                     // ********** 登录校验：除登录接口外，均需要登录 ***********
-                    SaRouter.match("/**", "/auth/login/doLogin", r -> StpUtil.checkLogin());
+                    SaRouter.match("/**", "/auth/login/doLogin", r -> StpUtil.checkLogin())
+                            .match("/**","/auth/tenant/list",r -> StpUtil.checkLogin());
                     // *****************************************************
 
                     for (var authority: authorities) {

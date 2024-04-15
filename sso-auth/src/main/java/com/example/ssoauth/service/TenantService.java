@@ -2,6 +2,7 @@ package com.example.ssoauth.service;
 
 import com.example.ssoauth.dao.result.TenantDao;
 import com.example.ssoauth.dto.request.NewTenantDto;
+import com.example.ssoauth.dto.request.UpdateTenantDto;
 import com.example.ssoauth.dto.response.PageResp;
 import com.example.ssoauth.entity.Tenant;
 import com.example.ssoauth.mapper.TenantMapper;
@@ -42,5 +43,10 @@ public class TenantService {
     @Transactional
     public void deleteByName(String name) {
         tenantMapper.deleteByName(name);
+    }
+
+    @Transactional
+    public void updateById(UpdateTenantDto req) {
+        tenantMapper.updateById(req.getTenantId(),req.getName());
     }
 }
