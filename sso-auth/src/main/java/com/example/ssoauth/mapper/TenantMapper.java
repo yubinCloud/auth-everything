@@ -2,7 +2,8 @@ package com.example.ssoauth.mapper;
 
 import com.example.ssoauth.dao.result.TenantDao;
 import io.lettuce.core.dynamic.annotation.Param;
-import org.mapstruct.Mapper;
+import org.apache.ibatis.annotations.Mapper;
+
 
 import java.util.Collection;
 import java.util.List;
