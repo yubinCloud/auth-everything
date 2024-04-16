@@ -37,8 +37,9 @@ public class JupyterService {
         redisJackson.set(keyInRedis, token, REDIS_TIMEOUT);
     }
 
-    public String findCtx(String username) {
-        String keyInRedis = redisKeyFactory(username);
+    public String findCtx(String loginId) {
+
+        String keyInRedis = redisKeyFactory(loginId);
         String token = redisJackson.get(keyInRedis);
         if (token == null) {
             return null;
@@ -47,7 +48,7 @@ public class JupyterService {
         }
     }
 
-    private String redisKeyFactory(String username) {
-        return KEY_PREFIX_JUPYTER + username;
+    private String redisKeyFactory(String loginId) {
+        return KEY_PREFIX_JUPYTER + loginId;
     }
 }

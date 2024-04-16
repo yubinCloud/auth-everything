@@ -45,13 +45,13 @@ public class AdminController {
     @Operation(summary = "添加用户")
     public R<String> addUser(
             @RequestBody @Valid NewUserDto userDto,
-            @RequestHeader("User") String whoAmI,
+            @RequestHeader("User") String username,
             @RequestHeader("X-TenantId") Integer tenantId
     ) {
         if (userDto.getJupyterhubAdmin() == null) {
             userDto.setJupyterhubAdmin(false);
         }
-        userService.addUser(userDto, whoAmI,tenantId);
+        userService.addUser(userDto, username,tenantId);
         return R.ok("add success");
     }
 
@@ -59,9 +59,10 @@ public class AdminController {
     @Operation(summary = "删除用户")
     public R<String> deleteUser(
             @RequestBody @Valid DeleteUserReq req,
-            @RequestHeader("User") String whoAmI
+            @RequestHeader("User") String whoAmI,
+            @RequestHeader("X-TenantId") Integer tenantId
     ) {
-        userService.deleteByUsername(req.getUsername(), whoAmI);
+        userService.deleteByUsernameAndTenantId(req.getUsername(), whoAmI,tenantId);
         return R.ok("delete success");
     }
 
@@ -73,12 +74,13 @@ public class AdminController {
             @Parameter(description = "过滤条件：用户名") @RequestParam(required = false) String username,
             @Parameter(description = "过滤条件：screen name") @RequestParam(required = false) String screenName,
             @Parameter(description = "过滤条件：description，支持模糊搜索") @RequestParam(required = false) String note,
-            @Parameter(description = "手机号") @RequestParam(required = false) String mobile
+            @Parameter(description = "手机号") @RequestParam(required = false) String mobile,
+            @Parameter(description = "租户类型") @RequestParam(required = false) Integer tenantId
     ) {
         username = prepostParam(username);
         screenName = prepostParam(screenName);
         note = prepostParam(note);
-        var userSelectCond = new UserSelectCond(username, screenName, note, mobile);
+        var userSelectCond = new UserSelectCond(username, screenName, note, mobile, tenantId);
         var pageInfo = userService.selectByPage(userSelectCond, pageNum, pageSize);
 
         PageResp<User> pageResp = new PageResp<>();
@@ -95,23 +97,24 @@ public class AdminController {
     @Operation(summary = "更新用户信息")
     public R<String> updateOneUser(
             @RequestBody @Valid UpdateUserReq updateReq,
-            @RequestHeader("User") String whoAmI
+            @RequestHeader("User") String whoAmI,
+            @RequestHeader("X-TenantId") Integer tenantId
     ) {
-        userService.updateUserInfo(updateReq, whoAmI);
+        userService.updateUserInfo(updateReq, whoAmI, tenantId);
         return R.ok("update success");
     }
 
     @PostMapping("/permission/add")
     @Operation(summary = "perm | 增加用户权限")
     public R<String> addPermission(@RequestBody @Valid AddPermParam param) {
-        userService.addPermission(param.getUsername(), param.getPermissionList());
+        userService.addPermission(param.getUsername(), param.getTenantId() ,param.getPermissionList());
         return R.ok("permission add success.");
     }
 
     @PostMapping("/permission/delete")
     @Operation(summary = "perm | 删除用户权限")
     public R<String> deletePermission(@RequestBody @Valid DeletePermParam param) {
-        userService.deletePermission(param.getUsername(), param.getPermission());
+        userService.deletePermission(param.getUsername(), param.getTenantId(), param.getPermission());
         return R.ok("permission delete success");
     }
 

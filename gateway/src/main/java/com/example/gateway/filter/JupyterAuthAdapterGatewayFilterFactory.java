@@ -53,13 +53,18 @@ public class JupyterAuthAdapterGatewayFilterFactory extends AbstractGatewayFilte
             ) {
                 return chain.filter(exchange);
             }
+
+            //拼接loginId
+            String username = request.getHeaders().getFirst("User");
+            String tenantId = request.getHeaders().getFirst("X-TenantId");
+            String loginId = tenantId+","+username;
+
             // 如果是 ws 请求，则更换 query 中的 token
             if (path.startsWith("/ws")) {
-                String username = request.getHeaders().getFirst("User");
-                if (username == null) {
+                if (username == null || tenantId == null) {
                     return chain.filter(exchange);
                 }
-                String jupyterToken = jupyterService.findToken(username);
+                String jupyterToken = jupyterService.findToken(loginId);
                 String query = "token=" + jupyterToken;
                 String[] originalParts = org.springframework.util.StringUtils.tokenizeToStringArray(path, "/");
                 StringBuilder newPath = new StringBuilder("/");
@@ -77,11 +82,10 @@ public class JupyterAuthAdapterGatewayFilterFactory extends AbstractGatewayFilte
                 return chain.filter(exchange.mutate().request(request).build());
             }
             // 如果是正常的 API 请求，则替换 Header 中的 Authorization
-            String username = request.getHeaders().getFirst("User");
-            if (StringUtils.isEmpty(username)) {
+            if (StringUtils.isEmpty(username)||StringUtils.isEmpty(tenantId)) {
                 return chain.filter(exchange);
             }
-            String jupyterToken = jupyterService.findToken(username);
+            String jupyterToken = jupyterService.findToken(loginId);
             request = request.mutate().header("Authorization", "token " + jupyterToken).build();
             return chain.filter(exchange.mutate().request(request).build());
         }

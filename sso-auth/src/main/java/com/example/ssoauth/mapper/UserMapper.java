@@ -7,21 +7,21 @@ import org.apache.ibatis.annotations.Mapper;
 import java.util.List;
 
 /**
-* @author yubin
-* @description 针对表【user(用户信息表)】的数据库操作Mapper
-* @createDate 2023-05-26 19:30:23
-* @Entity com.example.ssoauth.dao.User
-*/
+ * @author yubin
+ * @description 针对表【user(用户信息表)】的数据库操作Mapper
+ * @createDate 2023-05-26 19:30:23
+ * @Entity com.example.ssoauth.dao.User
+ */
 @Mapper
 public interface UserMapper {
 
-    int deleteByUsername(String username);
+    int deleteByUsernameAndTenantId(String username, Integer tenantId);
 
     int insert(NewUserDao userDao);
 
     List<UserDao> selectByCond(UserSelectCond cond);
 
-    UserDao selectByUsernameAndTenantId(String username,Integer tenantId);
+    UserDao selectByUsernameAndTenantId(String username, Integer tenantId);
 
     void updateUserInfo(UpdateUserParam param);
 

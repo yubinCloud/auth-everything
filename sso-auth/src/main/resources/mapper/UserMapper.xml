@@ -53,12 +53,15 @@
             <if test="mobile != null">
                 and mobile = #{mobile}
             </if>
+            <if test="tenantId != null">
+                and tenant_id = #{tenantId}
+            </if>
         </where>
     </select>
 
     <select id="selectByUsername" resultMap="UserDao">
         SELECT
-        <include refid="UserDao_ColumnList" />
+        <include refid="UserDao_ColumnList"/>
         FROM user
         where username = #{username}
     </select>
@@ -70,10 +73,10 @@
         where username = #{username} and tenant_id = #{tenantId}
     </select>
 
-    <delete id="deleteByUsername" parameterType="java.lang.String">
+    <delete id="deleteByUsernameAndTenantId" >
         delete
         from user
-        where username = #{username,jdbcType=VARCHAR}
+        where username = #{username, jdbcType=VARCHAR} and tenant_id = #{tenantId,jdbcType=INTEGER}
     </delete>
 
     <update id="updateUserInfo" parameterType="com.example.ssoauth.dao.param.UpdateUserParam">
@@ -92,18 +95,20 @@
                 mobile = #{mobile}
             </if>
         </set>
-        where username = #{username,jdbcType=VARCHAR}
+        where username = #{username,jdbcType=VARCHAR} and tenant_id = #{tenantId,jdbcType=INTEGER}
     </update>
 
     <update id="appendPermission" parameterType="com.example.ssoauth.dao.param.PermissionInsertParam">
         update user
         set permission_list = json_merge(permission_list, #{permissionList})
-        where username = #{username,jdbcType=VARCHAR}
+        where username = #{username,jdbcType=VARCHAR} and tenant_id = #{tenantId,jdbcType=INTEGER}
     </update>
 
     <update id="deletePermission" parameterType="com.example.ssoauth.dao.param.DeleteUserPermissionParam">
         update user
         set permission_list = JSON_REMOVE(permission_list, JSON_UNQUOTE(JSON_SEARCH(permission_list, 'one', #{permission})))
-        where username = #{username} and JSON_SEARCH(permission_list, 'one', #{permission});
+        where username = #{username,jdbcType=VARCHAR}
+          and tenant_id = #{tenantId,jdbcType=INTEGER}
+          and JSON_SEARCH(permission_list, 'one', #{permission});
     </update>
 </mapper>

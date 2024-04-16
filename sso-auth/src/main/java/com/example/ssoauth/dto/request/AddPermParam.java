@@ -14,5 +14,8 @@ public class AddPermParam {
     private String username;
 
     @NotNull
+    private Integer tenantId;
+
+    @NotNull
     private List<String> permissionList;
 }

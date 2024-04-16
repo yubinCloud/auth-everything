@@ -4,6 +4,7 @@ import cn.dev33.satoken.stp.StpUtil;
 import com.example.ssoauth.entity.User;
 import com.example.ssoauth.service.JupyterService;
 import com.example.ssoauth.service.UserService;
+import com.example.ssoauth.util.LoginIdUtil;
 import com.example.ssoauth.util.PasswordEncoder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -29,6 +30,8 @@ public class InternalController {
 
     private final PasswordEncoder passwordEncoder;
 
+    private final LoginIdUtil loginIdUtil;
+
     @GetMapping("/user/info/{username}")
     @Operation(summary = "查看用户信息")
     public User userInfo(@PathVariable String username) {
@@ -46,9 +49,11 @@ public class InternalController {
     @GetMapping("/user/jupyter/ctx")
     @Operation(summary = "获取用户的 jupyter 登录信息的上下文")
     public String getJupyterToken(
-            @NotBlank @Parameter(description = "用户名", required = true) @RequestParam String username
+            @NotBlank @Parameter(description = "用户名", required = true) @RequestParam String username,
+            @NotBlank @Parameter(description = "租户类型", required = true) @RequestParam Integer tenantId
     ) {
-        return jupyterService.findCtx(username);
+        String loginId = loginIdUtil.appendLoginId(tenantId,username);
+        return jupyterService.findCtx(loginId);
     }
 
     @GetMapping("/user/jupyter/ctxByToken")
@@ -56,10 +61,10 @@ public class InternalController {
     public String getJupyterCtxByToken(
             @NotBlank @Parameter(description = "authz 的 token", required = true) @RequestParam String token
     ) {
-        String username = (String) StpUtil.getLoginIdByToken(token);
-        if (username == null) {
+        String loginId = (String) StpUtil.getLoginIdByToken(token);
+        if (loginId == null) {
             return null;
         }
-        return jupyterService.findCtx(username);
+        return jupyterService.findCtx(loginId);
     }
 }
