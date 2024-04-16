@@ -6,6 +6,5 @@ import lombok.Data;
 @Data
 @Schema(description = "创建新租户")
 public class NewTenantDto {
-    private Integer tenantId;
     private String name;
 }

@@ -29,9 +29,6 @@ public class UsernameHeaderFilter implements WebFilter {
             return chain.filter(exchange);  // 即便无法从 token 中解析出 loginId 也直接放行
         }
         String[] headers = loginId.split(",");
-        for (String header : headers) {
-            System.out.println(header.toString());
-        }
         request = request.mutate()
                 .header("X-TenantId", headers[0])
                 .header("User", headers[1])

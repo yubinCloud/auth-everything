@@ -9,7 +9,7 @@
     </resultMap>
 
     <sql id="TenantDao_ColumnList">
-        tenant_id,name
+        tenant_id , name
     </sql>
 
     <insert id="addTenant">
@@ -35,7 +35,7 @@
 
     <select id="selectPageByPage" resultType="com.example.ssoauth.dao.result.TenantDao">
         select
-        <include refid="TenantDao_ColumnList"></include>
+        tenant_id tenantId,name
         from tenant as t
         <where>
             <if test="name != null">

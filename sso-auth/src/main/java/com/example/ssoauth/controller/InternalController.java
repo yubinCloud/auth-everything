@@ -32,10 +32,10 @@ public class InternalController {
 
     private final LoginIdUtil loginIdUtil;
 
-    @GetMapping("/user/info/{username}")
+    @GetMapping("/user/info/{username}/{tenantId}")
     @Operation(summary = "查看用户信息")
-    public User userInfo(@PathVariable String username) {
-        return userService.findByUsername(username);
+    public User userInfo(@PathVariable String username, @PathVariable Integer tenantId) {
+        return userService.findByUsernameAndTenantId(username,tenantId);
     }
 
     @GetMapping("/user/pwd-hash")
