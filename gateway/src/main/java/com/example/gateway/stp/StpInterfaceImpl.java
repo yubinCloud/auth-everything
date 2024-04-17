@@ -74,8 +74,6 @@ public class StpInterfaceImpl implements StpInterface {
         String[] loginIdArr = loginIdEntity.split(",");
         Integer tenantId = Integer.parseInt(loginIdArr[0]);
         String username = loginIdArr[1];
-        //TODO 这里的缓存使用的key仍是username,需要改为loginId
-        //TODO feign接口仍使用username查询用户信息,需改为username+tenantId
 
         List<String> roleList = roleCache.getIfPresent(loginIdEntity);
         if (roleList != null) {
@@ -97,6 +95,7 @@ public class StpInterfaceImpl implements StpInterface {
     /**
      * 通过远程调用 sso-auth 服务获取 user-info
      * @param username
+     * @param tenantId
      * @return
      */
     private UserInfo getUserInfo(String username,Integer tenantId) {

@@ -5,6 +5,7 @@ import com.example.ssoauth.dao.result.JupyterContext;
 import com.example.ssoauth.exception.BaseBusinessException;
 import com.example.ssoauth.exchange.JupyterExchange;
 import com.example.ssoauth.exchange.response.JR;
+import com.example.ssoauth.util.LoginIdUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,10 +22,16 @@ public class JupyterService {
 
     private final SaTokenDaoRedisJackson redisJackson;
 
+    private final LoginIdUtil loginIdUtil;
+
     static private final String KEY_PREFIX_JUPYTER = "aet:j-ctx:";
 
     public void loginJupyter(String loginId) {
-        var loginResp = jupyterExchange.jupyterLogin(loginId);  // 远程调用 jupyter 的登录接口
+        //获取loginId中的username,去登录jupyter
+        String[] loginIdEntity = loginIdUtil.splitLoginId(loginId);
+        String username = loginIdEntity[1];
+
+        var loginResp = jupyterExchange.jupyterLogin(username);  // 远程调用 jupyter 的登录接口
         // 解析 response 获取 token
         var respBody = loginResp.getBody();
         if (respBody == null || respBody.getCode() != JR.SUCCESS) {

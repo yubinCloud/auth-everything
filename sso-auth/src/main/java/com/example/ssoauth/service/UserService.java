@@ -58,7 +58,8 @@ public class UserService {
         String jupyterToken = findJupyterToken(loginId);
         var jupyterReq = new JupyterUsrCreateRequest();
         jupyterReq.setAdmin(userDto.getJupyterhubAdmin());
-        var jupyterResp = jupyterExchange.createUser(userDto.getUsername(), jupyterReq, jupyterToken);
+        String username = userDto.getUsername();
+        var jupyterResp = jupyterExchange.createUser(username, jupyterReq, jupyterToken);
         if (jupyterResp.getCode() != JR.SUCCESS) {
             throw new UserAddException("Exception in jupyter-service: " + jupyterResp.getData());
         }
