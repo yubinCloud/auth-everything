@@ -12,11 +12,9 @@ public class DeletePermParam {
     @Schema(description = "所要删除的用户的用户名")
     private String username;
 
-    @NotNull
     @Schema(description = "所要删除的用户的租户类型")
     private Integer tenantId;
 
-    @NotNull
     @Schema(description = "所要删除的权限")
     private String permission;
 }

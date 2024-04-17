@@ -106,7 +106,8 @@
 
     <update id="deletePermission" parameterType="com.example.ssoauth.dao.param.DeleteUserPermissionParam">
         update user
-        set permission_list = JSON_REMOVE(permission_list, JSON_UNQUOTE(JSON_SEARCH(permission_list, 'one', #{permission})))
+        set permission_list = JSON_REMOVE(permission_list,
+                                          JSON_UNQUOTE(JSON_SEARCH(permission_list, 'one', #{permission})))
         where username = #{username,jdbcType=VARCHAR}
           and tenant_id = #{tenantId,jdbcType=INTEGER}
           and JSON_SEARCH(permission_list, 'one', #{permission});
