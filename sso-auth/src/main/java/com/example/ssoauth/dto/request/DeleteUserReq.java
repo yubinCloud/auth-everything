@@ -8,4 +8,8 @@ public class DeleteUserReq {
 
     @NotBlank
     private String username;
+
+
+    private Integer tenantId;
+
 }

@@ -27,7 +27,7 @@ public class JupyterService {
     static private final String KEY_PREFIX_JUPYTER = "aet:j-ctx:";
 
     public void loginJupyter(String loginId) {
-        //获取loginId中的username,去登录jupyter
+        //获取 loginId 中的 username , 登录 jupyter
         String[] loginIdEntity = loginIdUtil.splitLoginId(loginId);
         String username = loginIdEntity[1];
 

@@ -33,9 +33,9 @@
         where name = #{name,jdbcType=VARCHAR}
     </delete>
 
-    <select id="selectPageByPage" resultType="com.example.ssoauth.dao.result.TenantDao">
+    <select id="selectPageByPage" resultType="com.example.ssoauth.dao.result.TenantDao" resultMap="BaseResultMap">
         select
-        tenant_id tenantId,name
+        <include refid="TenantDao_ColumnList"></include>
         from tenant as t
         <where>
             <if test="name != null">

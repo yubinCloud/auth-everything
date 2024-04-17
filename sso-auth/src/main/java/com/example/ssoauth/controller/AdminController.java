@@ -45,13 +45,13 @@ public class AdminController {
     @Operation(summary = "添加用户")
     public R<String> addUser(
             @RequestBody @Valid NewUserDto userDto,
-            @RequestHeader("User") String username,
+            @RequestHeader("User") String whoAmI,
             @RequestHeader("X-TenantId") Integer tenantId
     ) {
         if (userDto.getJupyterhubAdmin() == null) {
             userDto.setJupyterhubAdmin(false);
         }
-        userService.addUser(userDto, username,tenantId);
+        userService.addUser(userDto, whoAmI,tenantId);
         return R.ok("add success");
     }
 
@@ -62,7 +62,7 @@ public class AdminController {
             @RequestHeader("User") String whoAmI,
             @RequestHeader("X-TenantId") Integer tenantId
     ) {
-        userService.deleteByUsernameAndTenantId(req.getUsername(), whoAmI,tenantId);
+        userService.deleteByUsernameAndTenantId(req, whoAmI,tenantId);
         return R.ok("delete success");
     }
 

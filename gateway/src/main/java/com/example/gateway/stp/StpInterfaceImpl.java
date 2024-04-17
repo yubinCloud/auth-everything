@@ -41,16 +41,16 @@ public class StpInterfaceImpl implements StpInterface {
     @SuppressWarnings("unchecked")
     public List<String> getPermissionList(Object loginId, String loginType) {
         //解析loginId,分为tenantId和username
-        String loginIdEntity = (String) loginId;
-        String[] loginIdArr = loginIdEntity.split(",");
+        String loginIdString = (String) loginId;
+        String[] loginIdArr = loginIdString.split(",");
         Integer tenantId = Integer.parseInt(loginIdArr[0]);
         String username = loginIdArr[1];
 
-        List<String> permissionList = permissionCache.getIfPresent(loginIdEntity);
+        List<String> permissionList = permissionCache.getIfPresent(loginIdString);
         if (permissionList != null) {
             return permissionList;
         }
-        String keyInRedis = KEY_PREFIX_PERM + loginIdEntity;
+        String keyInRedis = KEY_PREFIX_PERM + loginIdString;
         Object objInRedis = redisJackson.getObject(keyInRedis);
         if (objInRedis == null) {
             var userInfo = getUserInfo(username,tenantId);
@@ -59,7 +59,7 @@ public class StpInterfaceImpl implements StpInterface {
         } else {
             permissionList = (List<String>) objInRedis;
         }
-        permissionCache.put(loginIdEntity, permissionList);
+        permissionCache.put(loginIdString, permissionList);
         return permissionList;
     }
 
@@ -70,16 +70,16 @@ public class StpInterfaceImpl implements StpInterface {
     @SuppressWarnings("unchecked")
     public List<String> getRoleList(Object loginId, String loginType) {
         //解析loginId,分为tenantId和username
-        String loginIdEntity = (String) loginId;
-        String[] loginIdArr = loginIdEntity.split(",");
+        String loginIdString = (String) loginId;
+        String[] loginIdArr = loginIdString.split(",");
         Integer tenantId = Integer.parseInt(loginIdArr[0]);
         String username = loginIdArr[1];
 
-        List<String> roleList = roleCache.getIfPresent(loginIdEntity);
+        List<String> roleList = roleCache.getIfPresent(loginIdString);
         if (roleList != null) {
             return roleList;
         }
-        String keyInRedis = KEY_PREFIX_ROLE + loginIdEntity;
+        String keyInRedis = KEY_PREFIX_ROLE + loginIdString;
         Object objInRedis = redisJackson.getObject(keyInRedis);
         if (objInRedis == null) {
             var userInfo = getUserInfo(username,tenantId);
@@ -88,7 +88,7 @@ public class StpInterfaceImpl implements StpInterface {
         } else {
             roleList = (List<String>) objInRedis;
         }
-        roleCache.put(loginIdEntity, roleList);
+        roleCache.put(loginIdString, roleList);
         return roleList;
     }
 
