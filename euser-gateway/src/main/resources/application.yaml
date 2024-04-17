@@ -53,6 +53,11 @@ spring:
           filters:
             - StripPrefix=1
 
+        - id: uapp-maker
+          uri: lb://uapp-maker
+          predicates:
+            - Path=/uapp-maker/**
+
       globalcors:
         cors-configurations:
           '[/**]':

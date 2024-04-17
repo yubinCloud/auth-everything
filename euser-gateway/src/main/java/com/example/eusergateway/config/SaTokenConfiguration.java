@@ -24,6 +24,7 @@ public class SaTokenConfiguration {
                 .addInclude("/**")
                 .addExclude("/actuator/health")
                 .addExclude("/euser-sso/sdt/sso/doLogin")
+                .addExclude("/uapp-maker/**")
                 .setAuth(obj -> {
                     // ********** 登录校验：除登录接口外，均需要登录 ***********
                     SaRouter.match("/**", "/euser-sso/auth/doLogin", r -> StpUtil.checkLogin());
