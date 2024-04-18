@@ -1,6 +1,7 @@
 package com.example.eusersso.service;
 
 import cn.dev33.satoken.stp.StpUtil;
+import cn.hutool.crypto.digest.DigestUtil;
 import com.example.eusersso.converter.EuserConverter;
 import com.example.eusersso.dao.EuserDao;
 import com.example.eusersso.dto.response.LoginResp;
@@ -24,9 +25,9 @@ public class AuthService {
     private final EuserConverter euserConverter;
 
     @Transactional
-    public LoginResp doLogin(String username, String password) {
+    public LoginResp doLogin(Integer tenantId, String username, String password) {
         // 查询用户数据
-        var userInDb = euserMapper.selectByUsername(username);
+        var userInDb = euserMapper.selectByUsernameAndTenantId(username, tenantId);
         if (Objects.isNull(userInDb) || !passwordEncoder.match(password, userInDb.getPassword())) {
             throw new LoginException(LoginException.CANNOT_MATCH);
         }

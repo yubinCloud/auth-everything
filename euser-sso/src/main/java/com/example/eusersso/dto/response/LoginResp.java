@@ -13,5 +13,9 @@ public class LoginResp {
 
     private String mobile;
 
+    private Integer tenantId;
+
     private String token;
+
+
 }

@@ -23,6 +23,10 @@ public class NewUserDto {
     private String password;
 
     @NotBlank
+    @Schema(description = "租户类型")
+    private Integer tenantId;
+
+    @NotBlank
     @Pattern(regexp = "^[^\\s?&\\.\\\\\\/]*$", message = "显示名称中不允许含有空白字符以及 ?&\\/. 等特殊符号。")
     @Size(min = 3, max = 13, message = "显示名称长度要求 3-13")
     @Schema(description = "显示名称")
@@ -42,4 +46,5 @@ public class NewUserDto {
     @Size(max = 25, message = "手机号最长 30 字符")
     @Schema(description = "手机号")
     private String mobile;
+
 }

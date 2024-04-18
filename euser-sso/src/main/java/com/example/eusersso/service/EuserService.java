@@ -55,18 +55,21 @@ public class EuserService {
     }
 
     @Transactional
-    public PageResp<EuserListItem> selectPageByCond(String username, String screenName, Integer roleId, String routePath,
-                                     Integer pageNum, Integer pageSize,
-                                     SubsystemEnum subsystem
+    public PageResp<EuserListItem> selectPageByCond(String username, String screenName, Integer roleId, Integer tenantId,
+                                                    String routePath, Integer pageNum, Integer pageSize,
+                                                    SubsystemEnum subsystem
     ) {
+        //封装查询条件
         var cond = new EuserSelectCond();
         cond.setUsername(prepostParam(username));
         cond.setScreenName(prepostParam(screenName));
         cond.setAvueRoleId(roleId);
+        cond.setTenantId(tenantId);
         cond.setApiId(routePath);
         cond.setDbAccessLabel(subsystem.getDbAccessLabel());
         cond.setPageSize(pageSize);
         cond.setPageNum(pageNum);
+
         var list = selectByCond(cond);
         PageResp<EuserListItem> page = new PageResp<>();
         page.setList(list);

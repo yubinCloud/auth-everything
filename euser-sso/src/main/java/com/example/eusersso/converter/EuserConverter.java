@@ -43,7 +43,7 @@ public interface EuserConverter {
     EuserDao toEuserDao(UpdateEuserDto updateEuserDto);
 
     @Mappings({
-            @Mapping(target = "token", ignore = true)
+            @Mapping(target = "token", ignore = true),
     })
     LoginResp toLoginResp(EuserDao euser);
 

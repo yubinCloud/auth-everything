@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class EuserSelectCond {
 
+    private Integer tenantId;
+
     private String username;
 
     private String screenName;

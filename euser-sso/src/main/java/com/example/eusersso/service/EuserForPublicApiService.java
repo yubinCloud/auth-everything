@@ -29,27 +29,28 @@ public class EuserForPublicApiService {
     public int createEuser(NewUserDto newUserDto, String createdBy) {
         var euserDao = euserConverter.toEuserDao(newUserDto);
         euserDao.setCreatedBy(createdBy);
-        euserDao.setLabels(new HashMap<>(){{
+        euserDao.setLabels(new HashMap<>() {{
             put(SubsystemEnum.PUBLIC_API.getDbAccessLabel(), true);
         }});
         return euserService.insertOne(euserDao);
     }
 
-    public PageResp<EuserListItem> selectPageByCond(String username, String screenName, String routePath,
-                                                Integer pageNum, Integer pageSize) {
-        return euserService.selectPageByCond(username, screenName, null, routePath, pageNum, pageSize, SubsystemEnum.PUBLIC_API);
+    public PageResp<EuserListItem> selectPageByCond(String username, String screenName, String routePath, Integer tenantId,
+                                                    Integer pageNum, Integer pageSize) {
+        return euserService.selectPageByCond(username, screenName, null, tenantId,
+                routePath, pageNum, pageSize, SubsystemEnum.PUBLIC_API);
     }
 
-    public List<String> queryPermissionList(String username) {
-        return afRoutePermRepository.queryPermListInDB(username);
+    public List<String> queryPermissionList(String username, Integer tenantId) {
+        return afRoutePermRepository.queryPermListInDB(username, tenantId);
     }
 
-    public void addPublicAPIPermission(String username, List<String> routes) {
-        afRoutePermRepository.addPermission(username, routes);
+    public void addPublicAPIPermission(String username, Integer tenantId, List<String> routes) {
+        afRoutePermRepository.addPermission(username, tenantId, routes);
     }
 
-    public void deletePublicAPIPermission(String username, String apiId) {
-        afRoutePermRepository.deletePermission(username, apiId);
+    public void deletePublicAPIPermission(String username, Integer tenantId, String apiId) {
+        afRoutePermRepository.deletePermission(username, tenantId, apiId);
     }
 
     public List<String> queryCheckedByUsername(String username) {

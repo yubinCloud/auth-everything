@@ -58,30 +58,34 @@ public class AdminForPublicApiController {
             @Min(1) @Parameter(description = "页大小", example = "10") @RequestParam(required = false, defaultValue = "10") int pageSize,
             @Parameter(description = "过滤条件：用户名，支持模糊搜索") @RequestParam(required = false) String username,
             @Parameter(description = "过滤条件：screen name，支持模糊搜索") @RequestParam(required = false) String screenName,
-            @Parameter(description = "过滤条件：api") @RequestParam(required = false) String routePath
+            @Parameter(description = "过滤条件：api") @RequestParam(required = false) String routePath,
+            @Parameter(description = "过滤条件：tenant id") @RequestParam(required = false) Integer tenantId
     ) {
-        var page = euserService.selectPageByCond(username, screenName, routePath, pageNum, pageSize);
+        var page = euserService.selectPageByCond(username, screenName, routePath, tenantId, pageNum, pageSize);
         return R.ok(page);
     }
 
 
     @GetMapping("/perm/list")
     @Operation(summary = "获取某个用户的 public-api 权限列表")
-    public R<List<String>> queryPermissionList(@RequestParam @Parameter(required = true) @NotBlank String username) {
-        return R.ok(euserService.queryPermissionList(username));
+    public R<List<String>> queryPermissionList(@RequestParam @Parameter(required = true)
+                                               @NotBlank String username,
+                                               @NotBlank Integer tenantId
+    ) {
+        return R.ok(euserService.queryPermissionList(username,tenantId));
     }
 
     @PutMapping("/perm/update")
     @Operation(summary = "增加用户的 public-api 权限")
     public R<String> updateAddPermission(@RequestBody @Valid UpdateAddPublicAPIPermissionRequest body) {
-        euserService.addPublicAPIPermission(body.getUsername(), body.getRoutes());
+        euserService.addPublicAPIPermission(body.getUsername(), body.getTenantId(), body.getRoutes());
         return R.ok("success");
     }
 
     @DeleteMapping("/perm/update")
     @Operation(summary = "删除用户的 public-api 权限")
     public R<String> updateDeletePermission(@RequestBody @Valid UpdateDeletePublicAPIPermissionRequest body) {
-        euserService.deletePublicAPIPermission(body.getUsername(), body.getRoute());
+        euserService.deletePublicAPIPermission(body.getUsername(), body.getTenantId(), body.getRoute());
         return R.ok("success");
     }
 }

@@ -11,6 +11,7 @@ import com.example.eusersso.entity.AvueRole;
 import com.example.eusersso.mapper.AvueRoleMapper;
 import com.example.eusersso.repository.AvueRoleRepository;
 import com.example.eusersso.util.SubsystemEnum;
+import com.example.eusersso.util.TimestampUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import lombok.RequiredArgsConstructor;
@@ -36,15 +37,17 @@ public class EuserForAvueService {
     public int createEuser(NewUserDto newUser, String createdBy) {
         var euserDao = euserConverter.toEuserDao(newUser);
         euserDao.setCreatedBy(createdBy);
+        euserDao.setLastUpdatedIuser(createdBy);
+        euserDao.setLastUpdatedTime(TimestampUtil.now());
         euserDao.setLabels(new HashMap<>() {{
             put(SubsystemEnum.AVUE.getDbAccessLabel(), true);
         }});
         return euserService.insertOne(euserDao);
     }
 
-    public PageResp<EuserListItem> selectPageByCond(String username, String screenName, Integer roleId,
+    public PageResp<EuserListItem> selectPageByCond(String username, String screenName, Integer roleId, Integer tenantId,
                                                     Integer pageNum, Integer pageSize) {
-        return euserService.selectPageByCond(username, screenName, roleId, null, pageNum, pageSize, SubsystemEnum.AVUE);
+        return euserService.selectPageByCond(username, screenName, roleId, tenantId, null, pageNum, pageSize, SubsystemEnum.AVUE);
     }
 
     @Transactional
