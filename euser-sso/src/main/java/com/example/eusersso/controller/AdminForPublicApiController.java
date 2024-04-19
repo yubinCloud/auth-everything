@@ -39,12 +39,13 @@ public class AdminForPublicApiController {
     @Operation(summary = "创建用户")
     public R<String> createUser(
             @RequestBody @Valid NewUserDto userDto,
-            @RequestHeader(ConstantUtil.IUSER_WHOAMI_HEADER) String whoAmI
+            @RequestHeader(ConstantUtil.IUSER_WHOAMI_HEADER) String whoAmI,
+            @RequestHeader(ConstantUtil.TENANT_ID_HEADER) Integer tenantId
     ) {
         if (Objects.isNull(userDto.getAvueRoles())) {
             userDto.setAvueRoles(Collections.emptyList());
         }
-        int result = euserService.createEuser(userDto, whoAmI);
+        int result = euserService.createEuser(userDto, whoAmI, tenantId);
         if (result == 0) {
             return R.error("插入失败，请稍后尝试", null);
         }
@@ -72,7 +73,7 @@ public class AdminForPublicApiController {
                                                @NotBlank String username,
                                                @NotBlank Integer tenantId
     ) {
-        return R.ok(euserService.queryPermissionList(username,tenantId));
+        return R.ok(euserService.queryPermissionList(username, tenantId));
     }
 
     @PutMapping("/perm/update")

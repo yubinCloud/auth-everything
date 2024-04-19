@@ -5,9 +5,12 @@ import com.example.eusersso.dao.EuserDao;
 import com.example.eusersso.dto.request.NewUserDto;
 import com.example.eusersso.dto.response.EuserListItem;
 import com.example.eusersso.dto.response.PageResp;
+import com.example.eusersso.feign.client.AuthFeignClient;
+import com.example.eusersso.feign.response.UserInfo;
 import com.example.eusersso.mapper.EuserMapper;
 import com.example.eusersso.repository.AfRoutePermRepository;
 import com.example.eusersso.util.SubsystemEnum;
+import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +29,21 @@ public class EuserForPublicApiService {
 
     private final AfRoutePermRepository afRoutePermRepository;
 
-    public int createEuser(NewUserDto newUserDto, String createdBy) {
+    @Resource
+    private AuthFeignClient authFeignClient;
+
+    static private final String SUPER_ADMIN = "super-admin";
+
+    public int createEuser(NewUserDto newUserDto, String createdBy, Integer tenantId) {
+        //校验管理员权限等级
+        UserInfo creator = authFeignClient.userInfo(createdBy, tenantId);
+        List<String> creatorRoleList = creator.getRoleList();
+        List<String> list = creatorRoleList.stream().filter(role -> role.equals(SUPER_ADMIN)).toList();
+        //如果没有super-admin权限,则将新用户的tenantId与当前管理员同步
+        if (list.isEmpty()){
+            newUserDto.setTenantId(tenantId);
+        }
+
         var euserDao = euserConverter.toEuserDao(newUserDto);
         euserDao.setCreatedBy(createdBy);
         euserDao.setLabels(new HashMap<>() {{

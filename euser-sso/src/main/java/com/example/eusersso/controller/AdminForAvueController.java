@@ -37,9 +37,10 @@ public class AdminForAvueController {
     @Operation(summary = "创建用户")
     public R<String> createUser(
             @RequestBody @Valid NewUserDto userDto,
-            @RequestHeader(ConstantUtil.IUSER_WHOAMI_HEADER) String whoAmI
+            @RequestHeader(ConstantUtil.IUSER_WHOAMI_HEADER) String whoAmI,
+            @RequestHeader(ConstantUtil.TENANT_ID_HEADER) Integer tenantId
     ) {
-        int result = euserService.createEuser(userDto, whoAmI);
+        int result = euserService.createEuser(userDto, whoAmI, tenantId);
         if (result >= 1) {
             return R.ok("success");
         }
