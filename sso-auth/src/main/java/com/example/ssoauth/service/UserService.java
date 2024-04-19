@@ -98,7 +98,6 @@ public class UserService {
         if (jupyterResp.getCode() != JR.SUCCESS) {
             throw new BaseBusinessException("Exception in jupyter-service: " + jupyterResp.getData());
         }
-
         //删除user
         userMapper.deleteByUsernameAndTenantId(username, req.getTenantId());
     }

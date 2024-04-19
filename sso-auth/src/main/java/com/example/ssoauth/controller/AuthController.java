@@ -44,7 +44,7 @@ public class AuthController {
     public R<LoginResp> getDoLogin(
             @NotBlank @Parameter(description = "用户名", required = true) @RequestParam String username,
             @NotBlank @Parameter(description = "密码", required = true) @RequestParam String pwd,
-            @Parameter(description = "租户类型", required = false) @RequestParam Integer tenantId
+            @Parameter(description = "租户类型", required = true) @RequestParam Integer tenantId
     ) {
         LoginResp resp = loginService.doLogin(username, pwd,tenantId);
         return R.ok(resp);

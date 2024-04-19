@@ -8,6 +8,7 @@ import com.example.eusersso.dto.request.NewUserDto;
 import com.example.eusersso.dto.response.EuserListItem;
 import com.example.eusersso.dto.response.PageResp;
 import com.example.eusersso.entity.AvueRole;
+import com.example.eusersso.exception.PermissionDeniedException;
 import com.example.eusersso.feign.response.UserInfo;
 import com.example.eusersso.mapper.AvueRoleMapper;
 import com.example.eusersso.repository.AvueRoleRepository;
@@ -47,9 +48,9 @@ public class EuserForAvueService {
         UserInfo creator = authFeignClient.userInfo(createdBy, tenantId);
         List<String> creatorRoleList = creator.getRoleList();
         List<String> list = creatorRoleList.stream().filter(role -> role.equals(SUPER_ADMIN)).toList();
-        //如果没有super-admin权限,则将新用户的tenantId与当前管理员同步
-        if (list.isEmpty()){
-            newUser.setTenantId(tenantId);
+        //如果没有super-admin权限,则需要将新用户的tenantId与当前管理员同步
+        if (list.isEmpty() && tenantId != newUser.getTenantId()){
+            throw new PermissionDeniedException(PermissionDeniedException.INSUFFICIENT_PRIVILEGES);
         }
 
         var euserDao = euserConverter.toEuserDao(newUser);
