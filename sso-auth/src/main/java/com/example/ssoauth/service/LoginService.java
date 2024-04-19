@@ -11,11 +11,13 @@ import com.example.ssoauth.util.LoginIdUtil;
 import com.example.ssoauth.util.PasswordEncoder;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class LoginService {
 

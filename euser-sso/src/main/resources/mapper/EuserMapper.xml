@@ -89,7 +89,8 @@
         VALUES (#{username}, #{password}, #{mobile}, #{checked,jdbcType=BOOLEAN},
                 #{screenName}, #{createdBy,jdbcType=VARCHAR}, #{createTime,jdbcType=BIGINT}, #{note},
                 #{avueRoles,typeHandler=IntegerListTypeHandler}::jsonb,
-                #{labels,typeHandler=StringMapTypeHandler}::jsonb, #{tenantId, jdbcType=INTEGER},
+                #{labels,typeHandler=StringMapTypeHandler}::jsonb,
+                    #{tenantId, jdbcType=INTEGER},
                 #{lastUpdatedIuser},#{lastUpdatedTime})
     </insert>
 
@@ -115,19 +116,28 @@
     <select id="queryAfRoutePerms" parameterType="java.lang.String" resultType="java.lang.String">
         SELECT publicapi_ids
         FROM euser
-        WHERE username = #{username} AND tenant_id = #{tenantId}
+        WHERE username = #{username}
+        <if test="tenantId != null">
+            AND tenant_id = #{tenantId}
+        </if>
     </select>
 
     <update id="appendPublicAPI">
         UPDATE euser
         SET publicapi_ids = publicapi_ids || #{routes,typeHandler=StringListTypeHandler}::jsonb
-        WHERE username = #{username} AND tenant_id = #{tenantId}
+        WHERE username = #{username}
+        <if test="tenantId != null">
+            AND tenant_id = #{tenantId}
+        </if>
     </update>
 
     <update id="deletePublicAPI">
         UPDATE euser
         SET publicapi_ids = jsonb_delete(publicapi_ids, #{route})
-        WHERE username = #{username} AND tenant_id = #{tenantId}
+        WHERE username = #{username}
+        <if test="tenantId != null">
+            AND tenant_id = #{tenantId}
+        </if>
     </update>
 
     <select id="queryCheckedByUsernameInPublicAPI" parameterType="java.lang.String" resultType="java.lang.String">
@@ -140,7 +150,10 @@
     <select id="selectByUsernameAndTenantId" resultType="com.example.eusersso.dao.EuserDao" resultMap="EuserMapping">
         SELECT <include refid="Euser-ColumnList"/>
         FROM euser
-        WHERE username = #{username} AND tenant_id = #{tenantId}
+        WHERE username = #{username}
+        <if test="tenantId != null">
+            AND tenant_id = #{tenantId}
+        </if>
     </select>
 
 </mapper>

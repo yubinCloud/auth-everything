@@ -3,6 +3,7 @@ package com.example.eusersso.repository;
 import cn.hutool.json.JSONUtil;
 import com.example.eusersso.mapper.EuserMapper;
 import com.example.eusersso.util.LoginIdUtil;
+import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -26,6 +27,7 @@ public class AfRoutePermRepository {
 
     private final EuserMapper euserMapper;
 
+    @Resource
     private LoginIdUtil loginIdUtil;
 
     private static final long EXPIRE_TIME = 86400;  // 24小时

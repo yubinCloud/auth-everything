@@ -30,8 +30,8 @@ public class JupyterService {
         //获取 loginId 中的 username , 登录 jupyter
         String[] loginIdEntity = loginIdUtil.splitLoginId(loginId);
         String username = loginIdEntity[1];
-
         var loginResp = jupyterExchange.jupyterLogin(username);  // 远程调用 jupyter 的登录接口
+
         // 解析 response 获取 token
         var respBody = loginResp.getBody();
         if (respBody == null || respBody.getCode() != JR.SUCCESS) {

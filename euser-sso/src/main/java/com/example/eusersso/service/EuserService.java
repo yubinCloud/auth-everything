@@ -47,10 +47,15 @@ public class EuserService {
 
     private final AvueHelperExchange avueHelperExchange;
 
+    static private final Integer DEFAULT_TENANT_ID = 1;
+
     @Transactional
     public int insertOne(EuserDao euserDao) {
         euserDao.setPassword(passwordEncoder.encode(euserDao.getPassword()));
         euserDao.setCreateTime(TimestampUtil.now());  // 获取自1970年1月1日以来的秒数
+        if (euserDao.getTenantId() == null){
+            euserDao.setTenantId(DEFAULT_TENANT_ID);
+        }
         return euserMapper.insertOne(euserDao);
     }
 

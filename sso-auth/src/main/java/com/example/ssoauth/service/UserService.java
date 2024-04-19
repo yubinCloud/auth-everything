@@ -25,6 +25,7 @@ import com.example.ssoauth.util.LoginIdUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +34,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserService {
     private final JupyterService jupyterService;
 
@@ -60,16 +62,17 @@ public class UserService {
         var jupyterReq = new JupyterUsrCreateRequest();
         jupyterReq.setAdmin(userDto.getJupyterhubAdmin());
         String username = userDto.getUsername();
+        //jupyter注册用户
         var jupyterResp = jupyterExchange.createUser(username, jupyterReq, jupyterToken);
         if (jupyterResp.getCode() != JR.SUCCESS) {
             throw new UserAddException("Exception in jupyter-service: " + jupyterResp.getData());
         }
+        //数据库添加用户
         NewUserDao userDao = userConverter.toNewUserDao(userDto);
         //添加默认租户id
         if (userDao.getTenantId() == null) {
             userDao.setTenantId(DEFAULT_TENANT_ID);
         }
-        //新增user
         int effect = userMapper.insert(userDao);
         if (effect == 0) {
             throw new UserAddException("Exception when insert database.");

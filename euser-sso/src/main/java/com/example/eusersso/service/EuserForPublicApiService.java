@@ -42,7 +42,7 @@ public class EuserForPublicApiService {
         List<String> list = creatorRoleList.stream().filter(role -> role.equals(SUPER_ADMIN)).toList();
         //如果没有super-admin权限,则需要将新用户的tenantId与当前管理员同步
         if (list.isEmpty() && tenantId != newUserDto.getTenantId()){
-            throw new PermissionDeniedException(PermissionDeniedException.INSUFFICIENT_PRIVILEGES);
+            newUserDto.setTenantId(tenantId);
         }
 
         var euserDao = euserConverter.toEuserDao(newUserDto);

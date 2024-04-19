@@ -50,7 +50,7 @@ public class EuserForAvueService {
         List<String> list = creatorRoleList.stream().filter(role -> role.equals(SUPER_ADMIN)).toList();
         //如果没有super-admin权限,则需要将新用户的tenantId与当前管理员同步
         if (list.isEmpty() && tenantId != newUser.getTenantId()){
-            throw new PermissionDeniedException(PermissionDeniedException.INSUFFICIENT_PRIVILEGES);
+            newUser.setTenantId(tenantId);
         }
 
         var euserDao = euserConverter.toEuserDao(newUser);
