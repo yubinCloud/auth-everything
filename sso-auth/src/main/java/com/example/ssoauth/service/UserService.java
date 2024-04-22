@@ -67,12 +67,13 @@ public class UserService {
         if (jupyterResp.getCode() != JR.SUCCESS) {
             throw new UserAddException("Exception in jupyter-service: " + jupyterResp.getData());
         }
-        //数据库添加用户
+
         NewUserDao userDao = userConverter.toNewUserDao(userDto);
         //添加默认租户id
         if (userDao.getTenantId() == null) {
             userDao.setTenantId(DEFAULT_TENANT_ID);
         }
+        //数据库添加用户
         int effect = userMapper.insert(userDao);
         if (effect == 0) {
             throw new UserAddException("Exception when insert database.");
@@ -90,18 +91,21 @@ public class UserService {
     }
 
     @Transactional
-    public void deleteByUsernameAndTenantId(DeleteUserReq req, String whoAmI, Integer tenantId) {
+    public void deleteByUsernameAndTenantId(DeleteUserReq req, String whoAmI, Integer myTenantId) {
+        if (req.getTenantId() == null){
+            req.setTenantId(DEFAULT_TENANT_ID);
+        }
         //redis中jupyter的token,key为loginId,需要先拼接
-        String loginId = loginIdUtil.appendLoginId(tenantId, whoAmI);
+        String loginId = loginIdUtil.appendLoginId(myTenantId, whoAmI);
         String jupyterToken = findJupyterToken(loginId);
 
         String username = req.getUsername();
-
+        // jupyter 根据 username 删除用户, token 为当前操作人的 token
         var jupyterResp = jupyterExchange.deleteUser(username, jupyterToken);
         if (jupyterResp.getCode() != JR.SUCCESS) {
             throw new BaseBusinessException("Exception in jupyter-service: " + jupyterResp.getData());
         }
-        //删除user
+        // MYSQL 删除 user
         userMapper.deleteByUsernameAndTenantId(username, req.getTenantId());
     }
 

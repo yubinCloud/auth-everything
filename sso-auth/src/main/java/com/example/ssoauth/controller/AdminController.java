@@ -60,9 +60,9 @@ public class AdminController {
     public R<String> deleteUser(
             @RequestBody @Valid DeleteUserReq req,
             @RequestHeader("User") String whoAmI,
-            @RequestHeader("X-TenantId") Integer tenantId
+            @RequestHeader("X-TenantId") Integer myTenantId
     ) {
-        userService.deleteByUsernameAndTenantId(req, whoAmI,tenantId);
+        userService.deleteByUsernameAndTenantId(req, whoAmI,myTenantId);
         return R.ok("delete success");
     }
 

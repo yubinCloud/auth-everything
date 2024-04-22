@@ -100,20 +100,22 @@
                 note = #{note},
             </if>
             <if test="mobile != null">
-                mobile = #{mobile}
+                mobile = #{mobile},
+            </if>
+            <if test="tenantId != null">
+                tenant_id = #{tenantId,jdbcType=INTEGER}
             </if>
         </set>
         where username = #{username,jdbcType=VARCHAR}
-        <if test="tenantId != null">
-            and
-            tenant_id = #{tenantId,jdbcType=INTEGER}
-        </if>
     </update>
 
     <update id="appendPermission" parameterType="com.example.ssoauth.dao.param.PermissionInsertParam">
         update user
         set permission_list = json_merge(permission_list, #{permissionList})
-        where username = #{username,jdbcType=VARCHAR} and tenant_id = #{tenantId,jdbcType=INTEGER}
+        where username = #{username,jdbcType=VARCHAR}
+        <if test="tenantId != null">
+            and tenant_id = #{tenantId,jdbcType=INTEGER}
+        </if>
     </update>
 
     <update id="deletePermission" parameterType="com.example.ssoauth.dao.param.DeleteUserPermissionParam">
@@ -122,8 +124,7 @@
                                           JSON_UNQUOTE(JSON_SEARCH(permission_list, 'one', #{permission})))
         where username = #{username,jdbcType=VARCHAR}
         <if test="tenantId != null">
-            and
-            tenant_id = #{tenantId,jdbcType=INTEGER}
+            and tenant_id = #{tenantId,jdbcType=INTEGER}
         </if>
           and JSON_SEARCH(permission_list, 'one', #{permission});
     </update>
