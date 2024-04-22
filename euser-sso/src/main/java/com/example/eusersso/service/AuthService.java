@@ -24,8 +24,13 @@ public class AuthService {
 
     private final EuserConverter euserConverter;
 
+    private static final Integer DEFAULT_TENANT_ID = 1;
+
     @Transactional
     public LoginResp doLogin(Integer tenantId, String username, String password) {
+        if (tenantId == null){
+            tenantId = DEFAULT_TENANT_ID;
+        }
         // 查询用户数据
         var userInDb = euserMapper.selectByUsernameAndTenantId(username, tenantId);
         if (Objects.isNull(userInDb) || !passwordEncoder.match(password, userInDb.getPassword())) {

@@ -71,7 +71,7 @@ public class AdminForPublicApiController {
     @Operation(summary = "获取某个用户的 public-api 权限列表")
     public R<List<String>> queryPermissionList(@RequestParam @Parameter(required = true)
                                                @NotBlank String username,
-                                               @NotBlank Integer tenantId
+                                                Integer tenantId
     ) {
         return R.ok(euserService.queryPermissionList(username, tenantId));
     }

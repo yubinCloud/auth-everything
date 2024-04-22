@@ -41,7 +41,9 @@ public class LoginService {
      */
     @Transactional
     public LoginResp doLogin(String username, String pwd, Integer tenantId) {
-
+        if (tenantId == null){
+            tenantId = DEFAULT_TENANT_ID;
+        }
         // 1. 根据账号id，查询用户数据并校验
         var userInDb = userService.findByUsernameAndTenantId(username, tenantId);
         if (userInDb == null || !passwordEncoder.match(pwd, userInDb.getPassword())) {
