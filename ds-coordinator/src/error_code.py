@@ -1,0 +1,3 @@
+SUCCESS = 0
+
+BUSINESS_EXEC = -1

@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    image: database-visualization
+    container_name: aet-ds-coordinator
+    hostname: ds-coordinator
+#    ports:
+#      - "15530:15530"
+    restart: "always"
+    environment:
+      - ENV_FOR_DYNACONF=internal
+      - TZ=Asia/Shanghai
+      - SIDECAR_HOST=sidecar-ds-coordinator
+      - SIDECAR_PORT=10014
+      - CLOSE_ES=False    # 不使用 True / true / TRUE.  使用：False / false / FALSE
+    volumes:
+        - ./src:/app/src
+    networks:
+      - platform-net
+
+networks:
+  platform-net:
+    external: true
+    name: platform-net
+
+

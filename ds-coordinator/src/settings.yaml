@@ -1,0 +1,45 @@
+default:
+  port: 15530
+  host: 127.0.0.1
+  redis:
+    host: 10.245.142.208
+    port: 6379
+  mysql:
+    host: 10.245.142.253
+    port: 3307
+    username: root
+    password: root
+    database: antv_data_server_noauth
+  aes_key: O2BEeIv399qHQNhD6aGW8R8DEj4bqHXm
+  es:
+    host: 10.245.142.253
+    port: 9200
+  avue_host: 10.245.143.119:10014/avue-data-server
+  other_ds_worker_host: 10.245.143.119:10014/ds-worker/ds-worker
+#  ds_worker_host: 10.245.143.119:10014
+  debug: True       # True代表不缓存数据
+
+internal:
+  host: 0.0.0.0
+  redis:
+    host: redis6
+    port: 6379
+  mysql:
+    host: mysql8
+    port: 3306
+    username: root
+    password: root
+    database: antv_data_server
+  aes_key: O2BEeIv399qHQNhD6aGW8R8DEj4bqHXm
+  es:
+    host: elasticsearch7
+    port: 9200
+  avue_host: sidecar-ds-coordinator:10014/avue-data-server
+  ds_worker_host: sidecar-ds-coordinator:10014/ds-worker/ds-worker
+  other_ds_worker_host: sidecar-ds-coordinator:10014/ds-worker/ds-worker
+  debug: False
+
+prod:
+  host: 0.0.0.0
+#  mysql:
+#    database: antv_data_server
