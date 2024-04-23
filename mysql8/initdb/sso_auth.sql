@@ -91,9 +91,10 @@ CREATE TABLE `user` (
   `mobile` varchar(30) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL COMMENT '手机号',
   `tenant_id` int NOT NULL COMMENT '"租户 ID"',
   PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `user_pk` (`username`),
   KEY `tenant_fk` (`tenant_id`),
   CONSTRAINT `tenant_fk` FOREIGN KEY (`tenant_id`) REFERENCES `tenant` (`tenant_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=67 DEFAULT CHARSET=utf8mb3 ROW_FORMAT=DYNAMIC COMMENT='用户信息表';
+) ENGINE=InnoDB AUTO_INCREMENT=68 DEFAULT CHARSET=utf8mb3 ROW_FORMAT=DYNAMIC COMMENT='用户信息表';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -102,7 +103,7 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES (5,'admin','e10adc3949ba59abbe56e057f20f883e','admin','[1]','[\"i:nacos\", \"avue:vs:10\"]','初始化的管理员',1691140213,'17863116898',1),(44,'test12345','c06db68e819be6ec3d26c6038d8e8d1f','test12345','[2]','[]','test12345',1713334065,'13222222222',2),(56,'test123456','47ec2dd791e31e2ef2076caf64ed9b3d','test123456','[4]','[]','test123456',1713768302,'15232366555',1),(58,'test01-admin','be62953c97bb38b562ce12d2a0b6917e','test01-admin','[4]','[]','',1713775127,'15888888888',2),(59,'test1-normal','30c14d3bd6d40fbfd69c6bf16a040ea1','test1-normal','[2]','[]','test1-normal',1713775473,'17555555555',2),(60,'zxz','715e08d1129736a7121d3809489b305c','zxz','[1]','[]','1',1713777014,'13212123231',1),(62,'zxz1','715e08d1129736a7121d3809489b305c','zxz1','[4]','[]','',1713831884,'',6),(65,'zxz01','715e08d1129736a7121d3809489b305c','zxz01','[4]','[]','',1713833621,'',2),(66,'test01-adm02','1250895553672687f04c00aa8a0348b1','test01-adm02','[4]','[]','test01-adm02',1713839715,'15365555555',2);
+INSERT INTO `user` VALUES (5,'admin','e10adc3949ba59abbe56e057f20f883e','admin','[1]','[\"i:nacos\", \"avue:vs:10\"]','初始化的管理员',1691140213,'17863116898',1),(44,'test12345','c06db68e819be6ec3d26c6038d8e8d1f','test12345','[2]','[]','test12345',1713334065,'13222222222',2),(56,'test123456','47ec2dd791e31e2ef2076caf64ed9b3d','test123456','[4]','[]','test123456',1713768302,'15232366555',1),(58,'test01-admin','be62953c97bb38b562ce12d2a0b6917e','test01-admin','[4]','[]','',1713775127,'15888888888',2),(59,'test1-normal','30c14d3bd6d40fbfd69c6bf16a040ea1','test1-normal','[2]','[]','test1-normal',1713775473,'17555555555',2),(62,'zxz1','715e08d1129736a7121d3809489b305c','zxz1','[4]','[]','',1713831884,'',6),(65,'zxz01','715e08d1129736a7121d3809489b305c','zxz01','[4]','[]','',1713833621,'',2),(66,'test01-adm02','1250895553672687f04c00aa8a0348b1','test01-adm02','[4]','[]','test01-adm02',1713839715,'15365555555',2);
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -115,4 +116,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-04-23  6:14:20
+-- Dump completed on 2024-04-23  7:18:07
