@@ -45,6 +45,7 @@ public class EuserTotalRepository {
             total = euserMapper.countByCond(cond);
         }
         return total;
+      //  return euserMapper.countByCond(cond);
     }
 
     public int updateEuserTotal(SubsystemEnum subsystem) {

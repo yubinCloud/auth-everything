@@ -39,4 +39,5 @@ public interface EuserMapper {
     String queryCheckedByUsernameInPublicAPI(String username);
 
     EuserDao selectByUsernameAndTenantId(String username, Integer tenantId);
+
 }

@@ -90,6 +90,10 @@ function getParamsSql (params) {
       list.push(`loginid = '${value}'`)
       return
     }
+    if (ele === 'tenantId') {
+        list.push(`tenant_id = '${value}'`)
+        return
+    }
     if (validatenull(value) || value.indexOf('%%') != -1) return
     if (value.indexOf('%') != -1) {
       list.push(`${ele} LIKE '${value}'`)

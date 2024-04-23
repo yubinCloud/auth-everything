@@ -2,6 +2,7 @@ package com.example.ssoauth.service;
 
 import cn.dev33.satoken.stp.SaLoginConfig;
 import cn.dev33.satoken.stp.StpUtil;
+import com.example.ssoauth.config.JupyterConfig;
 import com.example.ssoauth.constant.SaLoginConfExtraKey;
 import com.example.ssoauth.dto.response.LoginResp;
 import com.example.ssoauth.exception.LoginException;
@@ -28,7 +29,11 @@ public class LoginService {
     private final PasswordEncoder passwordEncoder;
 
     private final JupyterService jupyterService;
+
     private final LoginIdUtil loginIdUtil;
+
+    private final JupyterConfig jupyterConfig;
+
     private static final Integer DEFAULT_TENANT_ID = 1;
 
     /**
@@ -52,8 +57,16 @@ public class LoginService {
         // 2. 根据账号id，进行登录
         String loginId = loginIdUtil.appendLoginId(tenantId, username);
         StpUtil.login(loginId);
-        // 3. 登录 jupyter
-        jupyterService.loginJupyter(loginId);
+
+        //判断是否登录jupyter
+        if (jupyterConfig.isEnableSubsystem()){
+            // 3. 登录 jupyter
+            jupyterService.loginJupyter(loginId);
+            log.info("jupyter已登录");
+        }else{
+            log.info("未开启jupyter登录");
+        }
+
         // 构造 resp
         LoginResp resp = userConverter.toLoginResp(userInDb);
         resp.setToken(StpUtil.getTokenValue());

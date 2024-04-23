@@ -34,7 +34,7 @@ public class AuthController {
     public R<LoginResp> postDoLogin(
             @RequestBody @Valid LoginParam param
     ) {
-        var loginResp = authService.doLogin(param.getTenantId(), param.getUsername(), param.getPassword());
+        var loginResp = authService.doLogin( param.getUsername(), param.getPassword());
         return R.ok(loginResp);
     }
 
@@ -42,10 +42,9 @@ public class AuthController {
     @Operation(summary = "登录（GET 方式）")
     public R<LoginResp> getDoLogin(
             @NotBlank @Parameter(description = "用户名", required = true) @RequestParam String username,
-            @NotBlank @Parameter(description = "密码", required = true) @RequestParam String pwd,
-             @Parameter(description = "租户ID", required = false)  Integer tenantId
+            @NotBlank @Parameter(description = "密码", required = true) @RequestParam String pwd
     ) {
-        LoginResp resp = authService.doLogin(tenantId, username, pwd);
+        LoginResp resp = authService.doLogin( username, pwd);
         return R.ok(resp);
     }
 

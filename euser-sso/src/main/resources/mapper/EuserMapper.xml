@@ -77,6 +77,7 @@
             <if test="username != null">AND username LIKE #{username}</if>
             <if test="screenName != null">AND screen_name LIKE #{screenName}</if>
             <if test="mobile != null">AND mobile = #{mobile}</if>
+            <if test="tenantId != null">AND tenant_id = #{tenantId}</if>
             <if test="avueRoleId != null">AND #{avueRoleId,jdbcType=INTEGER} = ANY(avue_roles)</if>
             <if test="apiId != null">AND #{apiId,jdbcType=VARCHAR} = ANY(publicapi_ids)</if>
         </where>
@@ -99,6 +100,7 @@
         <set>
             <if test="password != null">password=#{password},</if>
             <if test="mobile != null">mobile=#{mobile},</if>
+            <if test="tenantId != null">tenant_id = #{tenantId},</if>
             <if test="checked != null">checked=#{checked,jdbcType=BOOLEAN},</if>
             <if test="screenName != null">screen_name=#{screenName},</if>
             <if test="note != null">note=#{note},</if>
@@ -155,5 +157,6 @@
             AND tenant_id = #{tenantId}
         </if>
     </select>
+
 
 </mapper>

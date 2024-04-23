@@ -9,7 +9,7 @@ public class DeleteUserReq {
     @NotBlank
     private String username;
 
-    @NotBlank
+
     private Integer tenantId;
 
 }

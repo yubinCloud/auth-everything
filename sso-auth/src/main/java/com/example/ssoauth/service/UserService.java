@@ -92,9 +92,9 @@ public class UserService {
 
     @Transactional
     public void deleteByUsernameAndTenantId(DeleteUserReq req, String whoAmI, Integer myTenantId) {
-        if (req.getTenantId() == null){
-            req.setTenantId(DEFAULT_TENANT_ID);
-        }
+//        if (req.getTenantId() == null){
+//            req.setTenantId(DEFAULT_TENANT_ID);
+//        }
         //redis中jupyter的token,key为loginId,需要先拼接
         String loginId = loginIdUtil.appendLoginId(myTenantId, whoAmI);
         String jupyterToken = findJupyterToken(loginId);

@@ -13,13 +13,16 @@ import com.example.eusersso.entity.SysHome;
 import com.example.eusersso.exception.RemoteCallException;
 import com.example.eusersso.exchange.AvueHelperExchange;
 import com.example.eusersso.exchange.request.avuehelper.BatchQueryVisualNameRequest;
+import com.example.eusersso.feign.client.AuthFeignClient;
 import com.example.eusersso.mapper.AvueRoleMapper;
 import com.example.eusersso.mapper.EuserMapper;
 import com.example.eusersso.repository.AvueRoleRepository;
 import com.example.eusersso.repository.EuserTotalRepository;
 import com.example.eusersso.util.PasswordEncoder;
+import com.example.eusersso.util.PermissionCheckUtil;
 import com.example.eusersso.util.SubsystemEnum;
 import com.example.eusersso.util.TimestampUtil;
+import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -47,15 +50,15 @@ public class EuserService {
 
     private final AvueHelperExchange avueHelperExchange;
 
+    @Resource
+    private PermissionCheckUtil permissionCheckUtil;
+
     static private final Integer DEFAULT_TENANT_ID = 1;
 
     @Transactional
     public int insertOne(EuserDao euserDao) {
         euserDao.setPassword(passwordEncoder.encode(euserDao.getPassword()));
         euserDao.setCreateTime(TimestampUtil.now());  // 获取自1970年1月1日以来的秒数
-        if (euserDao.getTenantId() == null){
-            euserDao.setTenantId(DEFAULT_TENANT_ID);
-        }
         return euserMapper.insertOne(euserDao);
     }
 
@@ -81,6 +84,7 @@ public class EuserService {
         page.setPageNum(pageNum);
         page.setPageSize(list.size());
         page.setTotal(euserTotalRepository.getEuserTotal(cond, subsystem));
+        page.setTotal(list.size());
         return page;
     }
 
@@ -92,8 +96,21 @@ public class EuserService {
         }).toList();
     }
 
-    public int updateUser(EuserDao euserDao) {
-        return euserMapper.updateUser(euserDao);
+    @Transactional
+    public int updateUser(UpdateEuserDto euserDto, String whoAmI, Integer tenantId) {
+
+        var userDao = euserConverter.toEuserDao(euserDto);
+        userDao.setPassword(passwordEncoder.encode(userDao.getPassword()));
+        userDao.setLastUpdatedIuser(whoAmI);
+        userDao.setLastUpdatedTime(TimestampUtil.now());
+
+        //校验 super-admin 权限
+        boolean isSuperAdmin = permissionCheckUtil.superAdminCheck(whoAmI, tenantId);
+        //若非 super-admin , 则无权修改 tenantId
+        if (!isSuperAdmin) {
+            userDao.setTenantId(null);
+        }
+        return euserMapper.updateUser(userDao);
     }
 
     public int deleteByUsername(String username) {
@@ -109,7 +126,7 @@ public class EuserService {
     }
 
     public List<AvuePermission> getAvuePermission(List<Integer> avueRoleIds) {
-        List<AvueRole> roles =  avueRoleMapper.selectBatchById(avueRoleIds);
+        List<AvueRole> roles = avueRoleMapper.selectBatchById(avueRoleIds);
         return roles.stream().map(AvueRole::getPermissions).flatMap(Collection::stream).toList();
     }
 

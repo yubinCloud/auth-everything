@@ -27,12 +27,10 @@ public class AuthService {
     private static final Integer DEFAULT_TENANT_ID = 1;
 
     @Transactional
-    public LoginResp doLogin(Integer tenantId, String username, String password) {
-        if (tenantId == null){
-            tenantId = DEFAULT_TENANT_ID;
-        }
+    public LoginResp doLogin( String username, String password) {
+
         // 查询用户数据
-        var userInDb = euserMapper.selectByUsernameAndTenantId(username, tenantId);
+        var userInDb = euserMapper.selectByUsername(username);
         if (Objects.isNull(userInDb) || !passwordEncoder.match(password, userInDb.getPassword())) {
             throw new LoginException(LoginException.CANNOT_MATCH);
         }

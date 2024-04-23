@@ -12,6 +12,7 @@ import com.example.eusersso.exception.PermissionDeniedException;
 import com.example.eusersso.feign.response.UserInfo;
 import com.example.eusersso.mapper.AvueRoleMapper;
 import com.example.eusersso.repository.AvueRoleRepository;
+import com.example.eusersso.util.PermissionCheckUtil;
 import com.example.eusersso.util.SubsystemEnum;
 import com.example.eusersso.util.TimestampUtil;
 import com.github.pagehelper.PageHelper;
@@ -39,17 +40,19 @@ public class EuserForAvueService {
 
     private final AvueRoleRepository avueRoleRepository;
     @Resource
-    private AuthFeignClient authFeignClient;
+    private PermissionCheckUtil permissionCheckUtil;
 
-    static private final String SUPER_ADMIN = "super-admin";
+    private static final Integer DEFAULT_TENANT_ID = 1;
 
     public int createEuser(NewUserDto newUser, String createdBy, Integer tenantId) {
         //校验管理员权限等级
-        UserInfo creator = authFeignClient.userInfo(createdBy, tenantId);
-        List<String> creatorRoleList = creator.getRoleList();
-        List<String> list = creatorRoleList.stream().filter(role -> role.equals(SUPER_ADMIN)).toList();
+        boolean permission = permissionCheckUtil.superAdminCheck(createdBy, tenantId);
+
+        if (newUser.getTenantId() == null){
+            newUser.setTenantId(DEFAULT_TENANT_ID);
+        }
         //如果没有super-admin权限,则需要将新用户的tenantId与当前管理员同步
-        if (list.isEmpty() && tenantId != newUser.getTenantId()){
+        if ( !permission && tenantId != newUser.getTenantId()){
             newUser.setTenantId(tenantId);
         }
 

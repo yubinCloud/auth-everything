@@ -42,4 +42,6 @@ public class UserDao {
      * 租户类型
      */
     private Integer tenantId;
+
+    private Long total;
 }

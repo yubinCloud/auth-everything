@@ -2,6 +2,7 @@ package com.example.gateway.filter;
 
 import cn.dev33.satoken.stp.StpUtil;
 import com.alibaba.nacos.common.utils.StringUtils;
+import com.example.gateway.config.JupyterConfig;
 import com.example.gateway.service.JupyterService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,9 +24,11 @@ public class JupyterAuthAdapterGatewayFilterFactory extends AbstractGatewayFilte
 
     private final JupyterService jupyterService;
 
+    private final JupyterConfig jupyterConfig;
+
     @Override
     public GatewayFilter apply(Object config) {
-        return new JupyterAuthAdapterFilter(jupyterService);
+        return new JupyterAuthAdapterFilter(jupyterService,jupyterConfig);
     }
 
     @Slf4j
@@ -33,8 +36,12 @@ public class JupyterAuthAdapterGatewayFilterFactory extends AbstractGatewayFilte
 
         private final JupyterService jupyterService;
 
-        public JupyterAuthAdapterFilter(JupyterService jupyterService) {
+        private final JupyterConfig jupyterConfig;
+
+
+        public JupyterAuthAdapterFilter(JupyterService jupyterService, JupyterConfig jupyterConfig) {
             this.jupyterService = jupyterService;
+            this.jupyterConfig = jupyterConfig;
         }
 
         @Override
@@ -44,6 +51,9 @@ public class JupyterAuthAdapterGatewayFilterFactory extends AbstractGatewayFilte
 
         @Override
         public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+            if (!jupyterConfig.isEnableSubsystem()) {
+                return chain.filter(exchange);
+            }
             var request = exchange.getRequest();
             String path = request.getPath().value();
             // 如果是静态资源，则直接放行
