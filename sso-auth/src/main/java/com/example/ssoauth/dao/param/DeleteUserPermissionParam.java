@@ -9,5 +9,7 @@ public class DeleteUserPermissionParam {
 
     private String username;
 
+    private Integer tenantId;
+
     private String permission;
 }

@@ -35,6 +35,8 @@ public class EuserDao implements Serializable {
 
     private String note;
 
+    private Integer tenantId;
+
     private Map<String, Object> labels;
 
     private String lastUpdatedIuser;
@@ -44,4 +46,5 @@ public class EuserDao implements Serializable {
     private List<Integer> avueRoles;
 
     private List<String> publicApiIds;
+
 }

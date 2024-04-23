@@ -1,14 +1,11 @@
-package com.example.ssoauth.dao.result;
+package com.example.eusersso.feign.response;
 
-import cn.hutool.json.JSONArray;
 import lombok.Data;
 
-/**
- * 用户信息表
- * @TableName user
- */
+import java.util.List;
+
 @Data
-public class UserDao {
+public class UserInfo {
     /**
      * 主键
      */
@@ -29,19 +26,17 @@ public class UserDao {
      */
     private String screenName;
 
-    private JSONArray roleList;
+    /**
+     *
+     */
+    private List<String> roleList;
 
-    private JSONArray permissionList;
+    /**
+     * 权限列表
+     */
+    private List<String> permissionList;
 
     private String note;
 
     private Long createTime;
-
-    private String mobile;
-    /**
-     * 租户类型
-     */
-    private Integer tenantId;
-
-    private Long total;
 }

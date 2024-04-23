@@ -40,21 +40,26 @@ public class StpInterfaceImpl implements StpInterface {
     @Override
     @SuppressWarnings("unchecked")
     public List<String> getPermissionList(Object loginId, String loginType) {
-        String username = (String) loginId;
-        List<String> permissionList = permissionCache.getIfPresent(username);
+        //解析loginId,分为tenantId和username
+        String loginIdString = (String) loginId;
+        String[] loginIdArr = loginIdString.split(",");
+        Integer tenantId = Integer.parseInt(loginIdArr[0]);
+        String username = loginIdArr[1];
+
+        List<String> permissionList = permissionCache.getIfPresent(loginIdString);
         if (permissionList != null) {
             return permissionList;
         }
-        String keyInRedis = KEY_PREFIX_PERM + username;
+        String keyInRedis = KEY_PREFIX_PERM + loginIdString;
         Object objInRedis = redisJackson.getObject(keyInRedis);
         if (objInRedis == null) {
-            var userInfo = getUserInfo(username);
+            var userInfo = getUserInfo(username,tenantId);
             permissionList = userInfo.getPermissionList();
             redisJackson.setObject(keyInRedis, permissionList, REDIS_TIMEOUT);
         } else {
             permissionList = (List<String>) objInRedis;
         }
-        permissionCache.put(username, permissionList);
+        permissionCache.put(loginIdString, permissionList);
         return permissionList;
     }
 
@@ -64,31 +69,37 @@ public class StpInterfaceImpl implements StpInterface {
     @Override
     @SuppressWarnings("unchecked")
     public List<String> getRoleList(Object loginId, String loginType) {
-        String username = (String) loginId;
-        List<String> roleList = roleCache.getIfPresent(username);
+        //解析loginId,分为tenantId和username
+        String loginIdString = (String) loginId;
+        String[] loginIdArr = loginIdString.split(",");
+        Integer tenantId = Integer.parseInt(loginIdArr[0]);
+        String username = loginIdArr[1];
+
+        List<String> roleList = roleCache.getIfPresent(loginIdString);
         if (roleList != null) {
             return roleList;
         }
-        String keyInRedis = KEY_PREFIX_ROLE + username;
+        String keyInRedis = KEY_PREFIX_ROLE + loginIdString;
         Object objInRedis = redisJackson.getObject(keyInRedis);
         if (objInRedis == null) {
-            var userInfo = getUserInfo(username);
+            var userInfo = getUserInfo(username,tenantId);
             roleList = userInfo.getRoleList();
             redisJackson.setObject(keyInRedis, roleList, REDIS_TIMEOUT);
         } else {
             roleList = (List<String>) objInRedis;
         }
-        roleCache.put(username, roleList);
+        roleCache.put(loginIdString, roleList);
         return roleList;
     }
 
     /**
      * 通过远程调用 sso-auth 服务获取 user-info
      * @param username
+     * @param tenantId
      * @return
      */
-    private UserInfo getUserInfo(String username) {
-        var future = executorService.submit(() -> authFeignClient.userInfo(username));
+    private UserInfo getUserInfo(String username,Integer tenantId) {
+        var future = executorService.submit(() -> authFeignClient.userInfo(username,tenantId));
         UserInfo userInfo = null;
         try {
             userInfo = future.get();

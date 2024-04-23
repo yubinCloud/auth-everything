@@ -7,6 +7,8 @@ import java.util.List;
 @Data
 public class EuserListItem {
 
+    private Integer tenantId;
+
     private String username;
 
     private String screenName;

@@ -14,7 +14,6 @@ public class TenantConverterUtil {
             return null;
         }
         TenantDao tenantDao = new TenantDao();
-        tenantDao.setTenantId(tenantDto.getTenantId());
         tenantDao.setName(tenantDto.getName());
 
         return tenantDao;

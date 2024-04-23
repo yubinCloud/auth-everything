@@ -11,5 +11,7 @@ public class PermissionInsertParam {
 
     private String username;
 
+    private Integer tenantId;
+
     private String permissionList;
 }

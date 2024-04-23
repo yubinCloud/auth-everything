@@ -9,21 +9,31 @@
     </resultMap>
 
     <sql id="TenantDao_ColumnList">
-        tenant_id,name
+        tenant_id , name
     </sql>
 
     <insert id="addTenant">
         insert into tenant
         (name)
-        values (#{name,jdbcType=VARCHAR})
+        values (#{name, jdbcType=VARCHAR})
     </insert>
+
+    <update id="updateById">
+        update tenant
+        <set>
+            <if test="name != null">
+                name = #{name}
+            </if>
+        </set>
+        where tenant_id = #{tenantId, jdbcType=INTEGER}
+    </update>
 
     <delete id="deleteByName">
         delete from tenant
         where name = #{name,jdbcType=VARCHAR}
     </delete>
 
-    <select id="selectPageByPage" resultType="com.example.ssoauth.dao.result.TenantDao">
+    <select id="selectPageByPage" resultType="com.example.ssoauth.dao.result.TenantDao" resultMap="BaseResultMap">
         select
         <include refid="TenantDao_ColumnList"></include>
         from tenant as t

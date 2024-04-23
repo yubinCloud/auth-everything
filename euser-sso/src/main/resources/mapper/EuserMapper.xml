@@ -15,15 +15,16 @@
         <result property="createdBy" column="created_by" jdbcType="VARCHAR"/>
         <result property="createTime" column="create_time" jdbcType="BIGINT"/>
         <result property="note" column="note" jdbcType="VARCHAR"/>
-        <result property="labels" column="labels" jdbcType="OTHER" typeHandler="StringMapTypeHandler"/>
+        <result property="labels" column="labels" jdbcType="OTHER" typeHandler="com.example.eusersso.mybatis.StringMapTypeHandler"/>
         <result property="lastUpdatedIuser" column="last_updated_iuser" jdbcType="VARCHAR" />
         <result property="lastUpdatedTime" column="last_updated_time" jdbcType="BIGINT" />
-        <result property="avueRoles" column="avue_roles" jdbcType="OTHER" typeHandler="IntegerListTypeHandler"/>
-        <result property="publicApiIds" column="publicapi_ids" jdbcType="OTHER" typeHandler="StringListTypeHandler"/>
+        <result property="avueRoles" column="avue_roles" jdbcType="OTHER" typeHandler="com.example.eusersso.mybatis.IntegerListTypeHandler"/>
+        <result property="publicApiIds" column="publicapi_ids" jdbcType="OTHER" typeHandler="com.example.eusersso.mybatis.StringListTypeHandler"/>
+        <result property="tenantId" column="tenant_id" jdbcType="INTEGER"/>
     </resultMap>
 
     <sql id="Euser-ColumnList">
-        uid, username, password, mobile, checked, screen_name, created_by, create_time, note, labels, last_updated_iuser, last_updated_time, avue_roles, publicapi_ids
+        uid, username, password, mobile, checked, screen_name, created_by, create_time, note, labels, last_updated_iuser, last_updated_time, avue_roles, publicapi_ids,tenant_id
     </sql>
 
     <select id="selectByUsername" parameterType="java.lang.String" resultMap="EuserMapping">
@@ -59,6 +60,7 @@
             <if test="username != null">AND username LIKE #{username}</if>
             <if test="screenName != null">AND screen_name LIKE #{screenName}</if>
             <if test="mobile != null">AND mobile = #{mobile}</if>
+            <if test="tenantId != null">AND tenant_id = #{tenantId}</if>
             <if test="avueRoleId != null">AND #{avueRoleId,jdbcType=INTEGER} = ANY(avue_roles)</if>
             <if test="apiId != null">AND #{apiId,jdbcType=VARCHAR} = ANY(publicapi_ids)</if>
         </where>
@@ -75,6 +77,7 @@
             <if test="username != null">AND username LIKE #{username}</if>
             <if test="screenName != null">AND screen_name LIKE #{screenName}</if>
             <if test="mobile != null">AND mobile = #{mobile}</if>
+            <if test="tenantId != null">AND tenant_id = #{tenantId}</if>
             <if test="avueRoleId != null">AND #{avueRoleId,jdbcType=INTEGER} = ANY(avue_roles)</if>
             <if test="apiId != null">AND #{apiId,jdbcType=VARCHAR} = ANY(publicapi_ids)</if>
         </where>
@@ -82,9 +85,14 @@
 
     <insert id="insertOne" parameterType="EuserDao">
         INSERT INTO euser
-        (username, password, mobile, checked, screen_name, created_by, create_time, note, avue_roles, labels)
-        VALUES
-        (#{username}, #{password}, #{mobile}, #{checked,jdbcType=BOOLEAN}, #{screenName}, #{createdBy,jdbcType=VARCHAR}, #{createTime,jdbcType=BIGINT}, #{note}, #{avueRoles,typeHandler=IntegerListTypeHandler}::jsonb, #{labels,typeHandler=StringMapTypeHandler}::jsonb)
+        (username, password, mobile, checked, screen_name, created_by, create_time, note, avue_roles, labels,
+         tenant_id, last_updated_iuser, last_updated_time)
+        VALUES (#{username}, #{password}, #{mobile}, #{checked,jdbcType=BOOLEAN},
+                #{screenName}, #{createdBy,jdbcType=VARCHAR}, #{createTime,jdbcType=BIGINT}, #{note},
+                #{avueRoles,typeHandler=IntegerListTypeHandler}::jsonb,
+                #{labels,typeHandler=StringMapTypeHandler}::jsonb,
+                    #{tenantId, jdbcType=INTEGER},
+                #{lastUpdatedIuser},#{lastUpdatedTime})
     </insert>
 
     <update id="updateUser" parameterType="EuserDao">
@@ -92,6 +100,7 @@
         <set>
             <if test="password != null">password=#{password},</if>
             <if test="mobile != null">mobile=#{mobile},</if>
+            <if test="tenantId != null">tenant_id = #{tenantId},</if>
             <if test="checked != null">checked=#{checked,jdbcType=BOOLEAN},</if>
             <if test="screenName != null">screen_name=#{screenName},</if>
             <if test="note != null">note=#{note},</if>
@@ -110,18 +119,27 @@
         SELECT publicapi_ids
         FROM euser
         WHERE username = #{username}
+        <if test="tenantId != null">
+            AND tenant_id = #{tenantId}
+        </if>
     </select>
 
     <update id="appendPublicAPI">
         UPDATE euser
         SET publicapi_ids = publicapi_ids || #{routes,typeHandler=StringListTypeHandler}::jsonb
         WHERE username = #{username}
+        <if test="tenantId != null">
+            AND tenant_id = #{tenantId}
+        </if>
     </update>
 
     <update id="deletePublicAPI">
         UPDATE euser
         SET publicapi_ids = jsonb_delete(publicapi_ids, #{route})
         WHERE username = #{username}
+        <if test="tenantId != null">
+            AND tenant_id = #{tenantId}
+        </if>
     </update>
 
     <select id="queryCheckedByUsernameInPublicAPI" parameterType="java.lang.String" resultType="java.lang.String">
@@ -131,5 +149,14 @@
             username = #{username} AND checked = true AND labels @> '{"access-pa": true}'
         </where>
     </select>
+    <select id="selectByUsernameAndTenantId" resultType="com.example.eusersso.dao.EuserDao" resultMap="EuserMapping">
+        SELECT <include refid="Euser-ColumnList"/>
+        FROM euser
+        WHERE username = #{username}
+        <if test="tenantId != null">
+            AND tenant_id = #{tenantId}
+        </if>
+    </select>
+
 
 </mapper>

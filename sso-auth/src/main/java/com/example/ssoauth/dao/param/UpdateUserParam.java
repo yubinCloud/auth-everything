@@ -14,4 +14,6 @@ public class UpdateUserParam {
     private String note;
 
     private String mobile;
+
+    private Integer tenantId;
 }

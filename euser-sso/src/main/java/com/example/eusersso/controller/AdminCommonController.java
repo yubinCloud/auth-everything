@@ -28,21 +28,14 @@ public class AdminCommonController {
 
     private final EuserService euserService;
 
-    private final EuserConverter euserConverter;
-
-    private final PasswordEncoder passwordEncoder;
-
     @PostMapping("/user/update")
     @Operation(summary = "更新用户信息")
     public R<String> updateUser(
             @RequestBody @Valid UpdateEuserDto updateDto,
-            @RequestHeader(ConstantUtil.IUSER_WHOAMI_HEADER) String whoAmI
+            @RequestHeader(ConstantUtil.IUSER_WHOAMI_HEADER) String whoAmI,
+            @RequestHeader(ConstantUtil.TENANT_ID_HEADER) Integer tenantId
     ) {
-        var userDao = euserConverter.toEuserDao(updateDto);
-        userDao.setPassword(passwordEncoder.encode(userDao.getPassword()));
-        userDao.setLastUpdatedIuser(whoAmI);
-        userDao.setLastUpdatedTime(TimestampUtil.now());
-        int updateResult = euserService.updateUser(userDao);
+        int updateResult = euserService.updateUser(updateDto,whoAmI,tenantId);
         if (updateResult == 0) {
             return R.error("更新失败", null);
         }

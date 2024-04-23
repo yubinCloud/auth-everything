@@ -21,4 +21,6 @@ public interface TenantMapper {
     void deleteByName(@Param("name") String name);
 
     List<TenantDao> selectPageByPage(@Param("name")String name);
+
+    void updateById(@Param("tenantId")Integer tenantId, @Param("name")String name);
 }

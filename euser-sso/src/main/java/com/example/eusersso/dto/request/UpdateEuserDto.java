@@ -9,6 +9,9 @@ import java.util.List;
 @Schema(description = "更新用户信息")
 public class UpdateEuserDto {
 
+    @Schema(description = "新的 租户类型ID")
+    private Integer tenantId;
+
     @Schema(description = "所要更新用户的 username")
     private String username;
 

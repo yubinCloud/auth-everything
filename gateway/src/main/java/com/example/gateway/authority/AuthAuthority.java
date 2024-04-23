@@ -19,7 +19,10 @@ public class AuthAuthority implements Authority {
     @Override
     public SaRouterStaff authInfo() {
         return SaRouter.match(MATCH_PATH + "/**").free(r -> {
-            SaRouter.match(MATCH_PATH + "/admin/**", rq -> StpUtil.checkRole(RoleEum.SUPER_ADMIN));
+            SaRouter.match(MATCH_PATH + "/admin/**", rq -> {
+                SaRouter.match(MATCH_PATH + "/**", req -> StpUtil.checkRoleOr(RoleEum.SUPER_ADMIN, RoleEum.ORG_ADMIN));
+                SaRouter.match(MATCH_PATH + "/admin/role/delete/**", req -> StpUtil.checkRole(RoleEum.SUPER_ADMIN));
+            });
             SaRouter.match(MATCH_PATH + "/internal/**", rq -> StpUtil.checkRoleOr(RoleEum.SUPER_ADMIN, RoleEum.INTERNAL));
         }).stop();
     }

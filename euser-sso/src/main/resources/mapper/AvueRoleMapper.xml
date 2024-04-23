@@ -6,8 +6,8 @@
 
     <resultMap id="AvueRoleMapping" type="AvueRole">
         <id property="roleId" column="role_id" jdbcType="INTEGER" />
-        <result property="permissions" column="permissions" jdbcType="OTHER" typeHandler="AvuePermissionsTypeHandler" />
-        <result property="sysHomes" column="sys_homes" jdbcType="OTHER" typeHandler="LongListTypeHandler" />
+        <result property="permissions" column="permissions" jdbcType="OTHER" typeHandler="com.example.eusersso.mybatis.AvuePermissionsTypeHandler" />
+        <result property="sysHomes" column="sys_homes" jdbcType="OTHER" typeHandler="com.example.eusersso.mybatis.LongListTypeHandler" />
     </resultMap>
 
     <sql id="AvueRole-BaseColumn">

@@ -34,7 +34,7 @@ public class AuthController {
     public R<LoginResp> postDoLogin(
             @RequestBody @Valid LoginParam param
     ) {
-        var loginResp = authService.doLogin(param.getUsername(), param.getPassword());
+        var loginResp = authService.doLogin( param.getUsername(), param.getPassword());
         return R.ok(loginResp);
     }
 
@@ -44,7 +44,7 @@ public class AuthController {
             @NotBlank @Parameter(description = "用户名", required = true) @RequestParam String username,
             @NotBlank @Parameter(description = "密码", required = true) @RequestParam String pwd
     ) {
-        LoginResp resp = authService.doLogin(username, pwd);
+        LoginResp resp = authService.doLogin( username, pwd);
         return R.ok(resp);
     }
 

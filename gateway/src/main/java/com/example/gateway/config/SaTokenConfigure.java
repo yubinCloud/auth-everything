@@ -40,6 +40,7 @@ public class SaTokenConfigure {
                 .addExclude("/simulator/**")
                 .addExclude("/s3/**")
                 .addExclude("/minio-console/**")
+                .addExclude("/auth/tenant/list")
 //                .addExclude("/avue/**")
                 // 鉴权方法：每次访问进入
                 .setAuth(obj -> {

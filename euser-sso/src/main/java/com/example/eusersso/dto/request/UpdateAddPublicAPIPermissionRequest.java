@@ -15,6 +15,10 @@ public class UpdateAddPublicAPIPermissionRequest {
     @NotBlank(message = "用户名不能为空")
     private String username;
 
+    @Schema(description = "租户类型")
+    @NotBlank(message = "租户类型不能为空")
+    private Integer tenantId;
+
     @Schema(description = "需要增加的 API 列表")
     @NotNull(message = "路径列表不能为空")
     private List<String> routes;

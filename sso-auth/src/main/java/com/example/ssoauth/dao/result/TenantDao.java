@@ -7,6 +7,9 @@ import lombok.Data;
  */
 @Data
 public class TenantDao {
+
     private Integer tenantId;
+
     private String name;
+
 }

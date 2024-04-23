@@ -1,6 +1,7 @@
-package com.example.gateway.feign.client;
+package com.example.eusersso.feign.client;
 
-import com.example.gateway.feign.client.response.UserInfo;
+
+import com.example.eusersso.feign.response.UserInfo;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

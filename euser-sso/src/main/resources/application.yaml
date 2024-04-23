@@ -29,6 +29,12 @@ spring:
       discovery:
         server-addr: http://${NACOS_HOST:127.0.0.1}:${NACOS_PORT:8848}
 
+    openfeign:
+      httpclient:
+        enabled: true
+        max-connections: 200
+        max-connections-per-route: 50
+
 memcached:
   host: ${EUSER_SSO_MEMCACHED_HOST:127.0.0.1}
   port: ${EUSER_SSO_MEMCACHED_PORT:11211}

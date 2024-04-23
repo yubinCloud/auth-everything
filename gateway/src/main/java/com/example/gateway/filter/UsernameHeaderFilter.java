@@ -28,7 +28,11 @@ public class UsernameHeaderFilter implements WebFilter {
         if (loginId == null) {
             return chain.filter(exchange);  // 即便无法从 token 中解析出 loginId 也直接放行
         }
-        request = request.mutate().header("User", loginId).build();
+        String[] headers = loginId.split(",");
+        request = request.mutate()
+                .header("X-TenantId", headers[0])
+                .header("User", headers[1])
+                .build();
         return chain.filter(exchange.mutate().request(request).build());
     }
 }

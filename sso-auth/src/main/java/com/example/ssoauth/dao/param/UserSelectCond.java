@@ -13,4 +13,6 @@ public class UserSelectCond {
     private String note;
 
     private String mobile;
+
+    private Integer tenantId;
 }

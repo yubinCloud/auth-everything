@@ -8,16 +8,23 @@ import com.example.eusersso.dto.request.NewUserDto;
 import com.example.eusersso.dto.response.EuserListItem;
 import com.example.eusersso.dto.response.PageResp;
 import com.example.eusersso.entity.AvueRole;
+import com.example.eusersso.exception.PermissionDeniedException;
+import com.example.eusersso.feign.response.UserInfo;
 import com.example.eusersso.mapper.AvueRoleMapper;
 import com.example.eusersso.repository.AvueRoleRepository;
+import com.example.eusersso.util.PermissionCheckUtil;
 import com.example.eusersso.util.SubsystemEnum;
+import com.example.eusersso.util.TimestampUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.example.eusersso.feign.client.AuthFeignClient;
 
 import java.util.HashMap;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -32,19 +39,36 @@ public class EuserForAvueService {
     private final AvueRoleMapper avueRoleMapper;
 
     private final AvueRoleRepository avueRoleRepository;
+    @Resource
+    private PermissionCheckUtil permissionCheckUtil;
 
-    public int createEuser(NewUserDto newUser, String createdBy) {
+    private static final Integer DEFAULT_TENANT_ID = 1;
+
+    public int createEuser(NewUserDto newUser, String createdBy, Integer tenantId) {
+        //校验管理员权限等级
+        boolean permission = permissionCheckUtil.superAdminCheck(createdBy, tenantId);
+
+        if (newUser.getTenantId() == null){
+            newUser.setTenantId(DEFAULT_TENANT_ID);
+        }
+        //如果没有super-admin权限,则需要将新用户的tenantId与当前管理员同步
+        if ( !permission && tenantId != newUser.getTenantId()){
+            newUser.setTenantId(tenantId);
+        }
+
         var euserDao = euserConverter.toEuserDao(newUser);
         euserDao.setCreatedBy(createdBy);
+        euserDao.setLastUpdatedIuser(createdBy);
+        euserDao.setLastUpdatedTime(TimestampUtil.now());
         euserDao.setLabels(new HashMap<>() {{
             put(SubsystemEnum.AVUE.getDbAccessLabel(), true);
         }});
         return euserService.insertOne(euserDao);
     }
 
-    public PageResp<EuserListItem> selectPageByCond(String username, String screenName, Integer roleId,
+    public PageResp<EuserListItem> selectPageByCond(String username, String screenName, Integer roleId, Integer tenantId,
                                                     Integer pageNum, Integer pageSize) {
-        return euserService.selectPageByCond(username, screenName, roleId, null, pageNum, pageSize, SubsystemEnum.AVUE);
+        return euserService.selectPageByCond(username, screenName, roleId, tenantId, null, pageNum, pageSize, SubsystemEnum.AVUE);
     }
 
     @Transactional

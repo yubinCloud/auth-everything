@@ -1,10 +1,7 @@
 package com.example.ssoauth.controller;
 
 import com.example.ssoauth.dao.param.UserSelectCond;
-import com.example.ssoauth.dto.request.DeleteTenantReq;
-import com.example.ssoauth.dto.request.DeleteUserReq;
-import com.example.ssoauth.dto.request.NewTenantDto;
-import com.example.ssoauth.dto.request.NewUserDto;
+import com.example.ssoauth.dto.request.*;
 import com.example.ssoauth.dto.response.PageResp;
 import com.example.ssoauth.dto.response.R;
 import com.example.ssoauth.entity.Tenant;
@@ -56,8 +53,16 @@ public class TenantController {
             @Parameter(description = "过滤条件：description，支持模糊搜索") @RequestParam(required = false) String name
     ) {
 
-        PageResp<Tenant> pageResp = tenantService.selectByPage(pageNum,pageSize,name);
+        PageResp<Tenant> pageResp = tenantService.selectByPage(pageNum, pageSize, name);
 
         return R.ok(pageResp);
     }
+
+    @PostMapping("/update")
+    @Operation(summary = "修改租户")
+    public R<String> updateTenantById(@RequestBody @Valid UpdateTenantDto req) {
+        tenantService.updateById(req);
+        return R.ok("update success");
+    }
+
 }

@@ -12,6 +12,10 @@ public class UpdateDeletePublicAPIPermissionRequest {
     @NotBlank(message = "用户名不能为空")
     private String username;
 
+    @Schema(description = "租户类型")
+    @NotBlank(message = "租户类型不能为空")
+    private Integer tenantId;
+
     @Schema(description = "待删除的 API")
     @NotBlank(message = "路径名不能为空")
     private String route;

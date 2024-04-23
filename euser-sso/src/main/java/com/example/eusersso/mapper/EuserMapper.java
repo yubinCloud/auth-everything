@@ -30,11 +30,14 @@ public interface EuserMapper {
 
     int deleteByUsername(String username);
 
-    String queryAfRoutePerms(String username);
+    String queryAfRoutePerms(String username, Integer tenantId);
 
-    int appendPublicAPI(String username, List<String> routes);
+    int appendPublicAPI(String username, Integer tenantId, List<String> routes);
 
-    int deletePublicAPI(String username, String route);
+    int deletePublicAPI(String username, Integer tenantId, String route);
 
     String queryCheckedByUsernameInPublicAPI(String username);
+
+    EuserDao selectByUsernameAndTenantId(String username, Integer tenantId);
+
 }

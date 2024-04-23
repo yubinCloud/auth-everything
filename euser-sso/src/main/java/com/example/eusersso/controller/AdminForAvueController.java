@@ -37,9 +37,10 @@ public class AdminForAvueController {
     @Operation(summary = "创建用户")
     public R<String> createUser(
             @RequestBody @Valid NewUserDto userDto,
-            @RequestHeader(ConstantUtil.IUSER_WHOAMI_HEADER) String whoAmI
+            @RequestHeader(ConstantUtil.IUSER_WHOAMI_HEADER) String whoAmI,
+            @RequestHeader(ConstantUtil.TENANT_ID_HEADER) Integer tenantId
     ) {
-        int result = euserService.createEuser(userDto, whoAmI);
+        int result = euserService.createEuser(userDto, whoAmI, tenantId);
         if (result >= 1) {
             return R.ok("success");
         }
@@ -53,9 +54,10 @@ public class AdminForAvueController {
             @Min(1) @Parameter(description = "页大小", example = "10") @RequestParam(required = false, defaultValue = "10") int pageSize,
             @Parameter(description = "过滤条件：用户名，支持模糊搜索") @RequestParam(required = false) String username,
             @Parameter(description = "过滤条件：screen name，支持模糊搜索") @RequestParam(required = false) String screenName,
-            @Parameter(description = "过滤条件：role id") @RequestParam(required = false) Integer roleId
+            @Parameter(description = "过滤条件：role id") @RequestParam(required = false) Integer roleId,
+            @Parameter(description = "过滤条件：tenant id") @RequestParam(required = false) Integer tenantId
     ) {
-        var page = euserService.selectPageByCond(username, screenName, roleId, pageNum, pageSize);
+        var page = euserService.selectPageByCond(username, screenName, roleId, tenantId, pageNum, pageSize);
         return R.ok(page);
     }
 
