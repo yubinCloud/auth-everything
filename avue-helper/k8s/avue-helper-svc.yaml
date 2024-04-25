@@ -16,7 +16,6 @@ spec:
       labels:
         app: avue-helper
     spec:
-      restartPolicy: Always
       containers:
         - name: avue-helper
           image: aet-avue-helper
@@ -26,7 +25,19 @@ spec:
           envFrom:
             - configMapRef:
                 name: public-env
-          
+          env:
+            - name: AVUE_HELPER_MINIO_HOST
+              value: http://minio-server:9000
+            - name: AVUE_HELPER_MINIO_ACCESS_KEY
+              valueFrom:
+                configMapKeyRef:
+                  name: public-env
+                  key: MINIO_ROOT_USER
+            - name: AVUE_HELPER_MINIO_SECRET_KEY
+              valueFrom:
+                configMapKeyRef:
+                  name: public-env
+                  key: MINIO_ROOT_PASSWORD
 ---
 
 kind: Service
@@ -38,6 +49,7 @@ spec:
   selector:
     app: avue-helper
   type: ClusterIP
+  clusterIP: None
   ports:
   - port:  9620
     targetPort:  9620

@@ -34,9 +34,9 @@ internal:
   es:
     host: elasticsearch7
     port: 9200
-  avue_host: sidecar-ds-coordinator:10014/avue-data-server
-  ds_worker_host: sidecar-ds-coordinator:10014/ds-worker/ds-worker
-  other_ds_worker_host: sidecar-ds-coordinator:10014/ds-worker/ds-worker
+  avue_host: "@format {env[SIDECAR_HOST]}:10014/avue-data-server"
+  ds_worker_host: "@format {env[SIDECAR_HOST]}:10014/ds-worker/ds-worker"
+  other_ds_worker_host: "@format {env[SIDECAR_HOST]}:10014/ds-worker/ds-worker"
   debug: False
 
 prod:

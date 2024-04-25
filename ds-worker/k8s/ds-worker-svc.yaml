@@ -16,7 +16,6 @@ spec:
       labels:
         app: ds-worker
     spec:
-      restartPolicy: Always
       containers:
         - name: ds-worker
           image: aet-ds-worker
@@ -28,7 +27,6 @@ spec:
                 name: public-env
           
 ---
-
 kind: Service
 apiVersion: v1
 metadata:
@@ -38,6 +36,7 @@ spec:
   selector:
     app: ds-worker
   type: ClusterIP
+  clusterIP: None
   ports:
   - port:  9300
     targetPort:  9300

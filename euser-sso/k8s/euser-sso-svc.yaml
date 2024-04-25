@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: euser-sso
+  namespace: aet
+  labels:
+    k8s.kuboard.cn/layer: svc
+    k8s.kuboard.cn/name: euser-sso
+spec:
+  selector:
+    matchLabels:
+      app: euser-sso
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: euser-sso
+    spec:
+      containers:
+        - name: euser-sso
+          image: aet-euser-sso
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 9592
+          envFrom:
+            - configMapRef:
+                name: public-env
+          env:
+            - name: EUSER_SSO_REDIS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: public-env
+                  key: REDIS_HOST
+            - name: EUSER_SSO_AF_REDIS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: public-env
+                  key: REDIS_HOST
+            - name: EUSER_SSO_PG_HOST
+              value: euser-postgresql
+            - name: EUSER_SSO_PG_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: public-env
+                  key: EUSER_POSTGRESQL_USER
+            - name: EUSER_SSO_PG_PASSWOR
+              valueFrom:
+                configMapKeyRef:
+                  name: public-env
+                  key: EUSER_POSTGRESQL_PASSWORD
+            - name: EUSER_SSO_MEMCACHED_HOST
+              value: euser-memcached
+            - name: EUSER_SSO_MEMCACHED_USERNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: public-env
+                  key: EUSER_MEMCACHED_USERNAME
+            - name: EUSER_SSO_MEMCACHED_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: public-env
+                  key: EUSER_MEMCACHED_PASSWORD
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: euser-sso
+  namespace: aet
+spec:
+  selector:
+    app: euser-sso
+  type: ClusterIP
+  clusterIP: None
+  ports:
+  - port: 9592
+    targetPort: 9592

@@ -16,7 +16,6 @@ spec:
       labels:
         app: avue-data-server
     spec:
-      restartPolicy: Always
       containers:
         # avue-data-server 服务
         - name: avue-data-server
@@ -86,6 +85,7 @@ spec:
   selector:
     app: avue-data-server
   type: ClusterIP
+  clusterIP: None
   ports:
     - protocol: TCP
       port: 10002

@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uapp-maker
+  namespace: aet
+  labels:
+    k8s.kuboard.cn/layer: svc
+    k8s.kuboard.cn/name: uapp-maker
+spec:
+  selector:
+    matchLabels:
+      app: uapp-maker
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: uapp-maker
+    spec:
+      containers:
+        - name: uapp-maker
+          image: aet-uapp-maker
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8228
+          envFrom:
+            - configMapRef:
+                name: public-env
+          env:
+            - name: UAPP_MONGODB_HOST
+              value: mongodb
+            - name: UAPP_MONGODB_PORT
+              value: 27017
+            - name: UAPP_MONGODB_USERNAME
+              value: root
+            - name: UAPP_MONGODB_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: public-env
+                  key: MONGODB_ROOT_PWD
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: uapp-maker
+  namespace: aet
+spec:
+  selector:
+    app: uapp-maker
+  type: ClusterIP
+  clusterIP: None
+  ports:
+  - port: 8228
+    targetPort: 8228

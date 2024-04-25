@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongodb
+  namespace: aet
+  labels:
+    k8s.kuboard.cn/layer: db
+    k8s.kuboard.cn/name: mongodb
+spec:
+  serviceName: mongodb
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: mongodb
+
+  template:
+    metadata:
+      labels:
+        app: mongodb
+    spec:
+      containers:
+        - name: mongodb
+          image: mongo:5
+          imagePullPolicy: Never
+          securityContext:
+            privileged: true
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - name: mongodb-data-pvc
+              mountPath: /data/db
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              value: root
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: public-env
+                  key: MONGODB_ROOT_PWD
+      volumes:
+        - name: mongodb-data-pvc
+          hostPath:
+            path: /root/yubin/datahub/aet/volume/mongodb
+            type: DirectoryOrCreate
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: mongodb
+  namespace: aet
+spec:
+  selector:
+    app: mongodb
+  type: None
+  ports:
+    - protocol: TCP
+      port: 27017
+      targetPort: 27017

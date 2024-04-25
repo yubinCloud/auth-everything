@@ -5,7 +5,7 @@ metadata:
   namespace: aet
   labels:
     k8s.kuboard.cn/layer: svc
-    k8s.kuboard.cn/name: gateway
+    k8s.kuboard.cn/name: sso-auth
 spec:
   selector:
     matchLabels:
@@ -17,15 +17,14 @@ spec:
         app: sso-auth
     spec:
       containers:
-        - name: aet-auth
-          image: aet-auth
+        - name: aet-sso-auth
+          image: aet-sso-auth
           imagePullPolicy: Never
           ports:
-          - containerPort: 9590
+            - containerPort: 9590
           envFrom:
             - configMapRef:
                 name: public-env
-      restartPolicy: Always
 
 ---
 
@@ -38,6 +37,7 @@ spec:
   selector:
     app: sso-auth
   type: ClusterIP
+  clusterIP: None
   ports:
   - port:  9590
     targetPort:  9590

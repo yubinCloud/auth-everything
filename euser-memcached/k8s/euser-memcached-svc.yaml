@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: euser-memcached
+  namespace: aet
+  labels:
+    k8s.kuboard.cn/layer: midware
+    k8s.kuboard.cn/name: euser-memcached
+spec:
+  selector:
+    matchLabels:
+      app: euser-memcached
+  serviceName: euser-memcached
+  replicas: 1 # by default is 1
+  template:
+    metadata:
+      labels:
+        app: euser-memcached # has to match .spec.selector.matchLabels
+    spec:
+      containers:
+        - name: euser-memcached
+          image: bitnami/memcached:1.6.22
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 11211
+          env:
+            - name: MEMCACHED_USERNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: public-env
+                  key: EUSER_MEMCACHED_USERNAME
+            - name: MEMCACHED_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: public-env
+                  key: EUSER_MEMCACHED_PASSWORD
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: euser-memcached
+  namespace: aet
+spec:
+  selector:
+    app: euser-memcached
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - protocol: TCP
+      port: 11211
+      targetPort: 11211

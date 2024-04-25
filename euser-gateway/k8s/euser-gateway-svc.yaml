@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: euser-gateway
+  namespace: aet
+  labels:
+    k8s.kuboard.cn/layer: gateway
+    k8s.kuboard.cn/name: euser-gateway
+spec:
+  selector:
+    matchLabels:
+      app: euser-gateway
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: euser-gateway
+    spec:
+      containers:
+      - name: euser-gateway
+        image: aet-euser-gateway
+        imagePullPolicy: Never
+        ports:
+          - containerPort: 13000
+        envFrom:
+          - configMapRef:
+              name: public-env
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: euser-gateway
+  namespace: aet
+spec:
+  selector:
+    app: euser-gateway
+  type: NodePort
+  ports:
+  - protocol: TCP
+    port: 13000
+    targetPort: 13000
+    nodePort: 33000

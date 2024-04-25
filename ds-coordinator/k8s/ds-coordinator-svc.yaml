@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ds-coordinator
+  namespace: aet
+  labels:
+    k8s.kuboard.cn/layer: svc
+    k8s.kuboard.cn/name: ds-coordinator
+spec:
+  selector:
+    matchLabels:
+      app: ds-coordinator
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: ds-coordinator
+    spec:
+      containers:
+        # ds-coordinator 服务
+        - name: ds-coordinator
+          image: aet-ds-coordinator
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 15530
+          envFrom:
+            - configMapRef:
+                name: public-env
+          env:
+            - name: ENV_FOR_DYNACONF
+              value: internal
+            - name: TZ
+              value: Asia/Shanghai
+            - name: SIDECAR_HOST
+              value: sidecar-ds-coordinator
+            - name: CLOSE_ES
+              value: False
+        # sidecar
+        - name: sidecar-avue-nginx
+          image: aet-nacos-sidecar
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 10014
+          envFrom:
+            - configMapRef:
+                name: public-env
+          env:
+            - name: APP_PORT
+              value: "10014"
+            - name: APP_NAME
+              value: "ds-coordinator"
+            - name: SERVICE_IP
+              value: "ds-coordinator"
+            - name: SERVICE_PORT
+              value: "15530"
+            - name: SERVICE_HEALTH_CHECK_URL
+              value: "http://127.0.0.1:15530/health"
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: ds-coordinator
+  namespace: aet
+spec:
+  selector:
+    app: ds-coordinator
+  type: ClusterIP
+  clusterIP: None
+  ports:
+  - port: 15530
+    targetPort: 15530

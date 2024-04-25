@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nacos
+  namespace: aet
+  labels:
+    app: nacos
+    k8s.kuboard.cn/layer: midware
+    k8s.kuboard.cn/name: nacos
+spec:
+  selector:
+    matchLabels:
+      app: nacos
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: nacos
+    spec:
+      containers:
+        - name: aet-nacos
+          image: qingpan/rnacos:stable
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8848
+              name: client-port
+            - containerPort: 9848
+              name: client-rpc
+            - containerPort: 9849
+              name: raft-rpc
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: nacos
+  namespace: aet
+spec:
+  selector:
+    app: nacos
+  clusterIP: None
+  ports:
+    - port: 8848
+      name: server
+      targetPort: 8848
+    - port: 9848
+      name: client-rpc
+      targetPort: 9848
+    - port: 9849
+      name: raft-rpc
+      targetPort: 9849

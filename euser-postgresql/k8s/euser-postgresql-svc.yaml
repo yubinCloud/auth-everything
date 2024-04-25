@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: euser-postgresql
+  namespace: aet
+  labels:
+    k8s.kuboard.cn/layer: db
+    k8s.kuboard.cn/name: euser-postgresql
+spec:
+  serviceName: euser-postgresql
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: euser-postgresql
+
+  template:
+    metadata:
+      labels:
+        app: euser-postgresql
+    spec:
+      containers:
+        - name: euser-postgresql
+          image: aet-euser-postgresql
+          imagePullPolicy: Never
+          securityContext:
+            privileged: true
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: euser-postgresql-data
+              mountPath: /var/lib/postgresql/data
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: public-env
+                  key: EUSER_POSTGRESQL_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: public-env
+                  key: EUSER_POSTGRESQL_PASSWORD
+      volumes:
+        - name: euser-postgresql-data
+          hostPath:
+            path: /root/yubin/datahub/aet/volume/euser-postgresql
+            type: DirectoryOrCreate
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: euser-postgresql
+  namespace: aet
+spec:
+  selector:
+    app: euser-postgresql
+  clusterIP: None
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
