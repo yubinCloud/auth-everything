@@ -15,7 +15,7 @@ public class PermissionCheckUtil {
     static private final String SUPER_ADMIN = "super-admin";
 
     public boolean superAdminCheck(String adminName , Integer tenantId){
-        UserInfo userInfo = authFeignClient.userInfo(adminName, tenantId);
+        UserInfo userInfo = authFeignClient.userInfo(adminName);
         List<String> roleList = userInfo.getRoleList().stream().filter(role -> role.equals(SUPER_ADMIN)).toList();
         //若为super-admin 返回 true , 否则 false
         return !roleList.isEmpty();

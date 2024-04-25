@@ -21,7 +21,7 @@ import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.example.eusersso.feign.client.AuthFeignClient;
+
 
 import java.util.HashMap;
 import java.util.List;

@@ -13,7 +13,7 @@ import com.example.eusersso.entity.SysHome;
 import com.example.eusersso.exception.RemoteCallException;
 import com.example.eusersso.exchange.AvueHelperExchange;
 import com.example.eusersso.exchange.request.avuehelper.BatchQueryVisualNameRequest;
-import com.example.eusersso.feign.client.AuthFeignClient;
+
 import com.example.eusersso.mapper.AvueRoleMapper;
 import com.example.eusersso.mapper.EuserMapper;
 import com.example.eusersso.repository.AvueRoleRepository;

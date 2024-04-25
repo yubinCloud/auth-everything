@@ -5,9 +5,7 @@ import com.example.eusersso.dao.EuserDao;
 import com.example.eusersso.dto.request.NewUserDto;
 import com.example.eusersso.dto.response.EuserListItem;
 import com.example.eusersso.dto.response.PageResp;
-import com.example.eusersso.exception.PermissionDeniedException;
-import com.example.eusersso.feign.client.AuthFeignClient;
-import com.example.eusersso.feign.response.UserInfo;
+
 import com.example.eusersso.mapper.EuserMapper;
 import com.example.eusersso.repository.AfRoutePermRepository;
 import com.example.eusersso.util.PermissionCheckUtil;

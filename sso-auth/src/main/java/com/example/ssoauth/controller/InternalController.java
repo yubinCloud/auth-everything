@@ -32,10 +32,17 @@ public class InternalController {
 
     private final LoginIdUtil loginIdUtil;
 
-    @GetMapping("/user/info/{username}/{tenantId}")
+    //euser-sso和xxl-job中均有调用,勿动
+    @GetMapping("/user/info/{username}")
     @Operation(summary = "查看用户信息")
-    public User userInfo(@PathVariable String username, @PathVariable Integer tenantId) {
-        return userService.findByUsernameAndTenantId(username,tenantId);
+    public User userInfo(@PathVariable String username) {
+        return userService.findByUsername(username);
+    }
+
+    //TODO 内部用户管理账户时出现异常:no static resource :internal/user/info/admin/1
+    @GetMapping("/user/info/{username}/{tenantId}")
+    public User userInfo1(@PathVariable String username) {
+        return userService.findByUsername(username);
     }
 
     @GetMapping("/user/pwd-hash")
@@ -50,7 +57,7 @@ public class InternalController {
     @Operation(summary = "获取用户的 jupyter 登录信息的上下文")
     public String getJupyterToken(
             @NotBlank @Parameter(description = "用户名", required = true) @RequestParam String username,
-            @NotBlank @Parameter(description = "租户类型", required = true) @RequestParam Integer tenantId
+            @RequestHeader("X-TenantId") Integer tenantId
     ) {
         String loginId = loginIdUtil.appendLoginId(tenantId,username);
         return jupyterService.findCtx(loginId);
