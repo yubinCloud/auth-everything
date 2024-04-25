@@ -1,4 +1,4 @@
 export default {
   id: 'id',
-  column: ['category_key', 'category_value']
+  column: ['category_key', 'category_value','tenant_id']
 }

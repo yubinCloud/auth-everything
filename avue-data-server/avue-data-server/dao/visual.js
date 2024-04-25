@@ -9,6 +9,7 @@ function save (data) {
     let visual = data.visual;
     let config = data.config;
     let id;
+    console.log("VISUAL:"+JSON.stringify(visual))
     insert({
       table,
       column: toColumn(visualMode.id, visualMode.column),

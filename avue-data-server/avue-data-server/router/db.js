@@ -13,10 +13,13 @@ let url = '/db'
 
 export default (app) => {
   app.get(url + '/list', jsonParser, function (req, res) {
+
     const query = {
       current: req.query.current,
-      size: req.query.size
+      size: req.query.size,
+      tenantId: req.get("X-TenantId")
     };
+
     const order = {
       "key": "id",
       "order": "DESC",
@@ -81,6 +84,12 @@ export default (app) => {
         res.json(resbody.getFailResult(error));
       });
     } else {
+      Object.defineProperty(data,"tenantId",{
+        value: req.get("X-TenantId"),
+        writable: true, // 是否可写
+        enumerable: true, // 是否可枚举
+        configurable: true
+      })
       dbDao.save(data).then(data => {
         res.json(resbody.getSuccessResult(data));
       }).catch(error => {
