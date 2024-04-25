@@ -1,4 +1,4 @@
 export default {
   id: 'id',
-  column: ['title', 'background_url', 'category', 'password', 'status', 'is_deleted']
+  column: ['title', 'background_url', 'category', 'password', 'status', 'is_deleted' ,'tenant_id']
 }

@@ -199,6 +199,7 @@ export const list = ({ table, data, parent, hump, column }, order) => {
     let sql = `SELECT ${column ? column : '*'} FROM ${table}`;
     let page = data.current;
     let size = data.size;
+    //将分页查询的参数放入params,并抽出页数和每页显示数量,其余为where条件
     delete params.current;
     delete params.size;
     let valid = {

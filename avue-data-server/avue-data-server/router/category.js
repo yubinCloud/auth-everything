@@ -7,7 +7,12 @@ var jsonParser = bodyParser.json({ limit: '1000mb' });
 let url = '/category'
 export default (app) => {
   app.get(url + '/list', jsonParser, function (req, res) {
-    const query = req.query;
+    const query = {
+      current: req.query.current,
+      size: req.query.size,
+      tenantId: req.get("X-TenantId")
+    };
+    console.log(JSON.stringify(query))
     categoryDao.list(query).then(data => {
       res.json(resbody.getSuccessResult(data));
     }).catch(error => {
@@ -32,6 +37,12 @@ export default (app) => {
   })
   app.post(url + '/save', jsonParser, function (req, res) {
     const data = req.body;
+    Object.defineProperty(data,"tenantId",{
+      value: req.get("X-TenantId"),
+      writable: true, // 是否可写
+      enumerable: true, // 是否可枚举
+      configurable: true
+    })
     categoryDao.save(data).then(data => {
       res.json(resbody.getSuccessResult(data));
     }).catch(error => {
