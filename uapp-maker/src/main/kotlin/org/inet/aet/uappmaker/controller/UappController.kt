@@ -26,16 +26,20 @@ class UappController (private val uappService: UappService) {
 
     @PostMapping("/create")
     @Operation(summary = "创建一个 Uapp")
-    fun createUapp(@RequestBody @Valid body: CreateUappRequest, @RequestHeader(XReqHeader.IUSER_WHOAMI) userId: String): R<Uapp> {
+    fun createUapp(@RequestBody @Valid body: CreateUappRequest,
+                   @RequestHeader(XReqHeader.IUSER_TENANTID) tenantId: Int,
+                   @RequestHeader(XReqHeader.IUSER_WHOAMI) userId: String): R<Uapp> {
         body.owner = userId
+        body.tenantId = tenantId
         val uapp = uappService.createUapp(body)
         return R_SUCCESS(uapp)
     }
 
     @GetMapping("/metadata/{uappId}")
     @Operation(summary = "查看 UAPP 的元信息", description = "注意权限要求，且返回数据不包含 content")
-    fun getUappMetadata(@PathVariable uappId: String, @RequestHeader(XReqHeader.IUSER_WHOAMI) userId: String): R<UappMetadata> {
-        val uapp = uappService.checkInternalViewPermission(uappId, userId)
+    fun getUappMetadata(@PathVariable uappId: String,
+                        @RequestHeader(XReqHeader.IUSER_WHOAMI) user: String): R<UappMetadata> {
+        val uapp = uappService.checkInternalViewPermission(uappId, user)
         val metadata = uappService.convertMetadata(uapp)
         return R_SUCCESS(metadata)
     }
@@ -63,8 +67,9 @@ class UappController (private val uappService: UappService) {
     fun listUapp(@PathVariable groupId: String,
                   @Min(1) @Parameter(required = false, example = "1") @RequestParam(required = false, defaultValue = "1") pageNum: Int,
                   @Min(1) @Parameter(required = false, example = "10") @RequestParam(required = false, defaultValue = "10") pageSize: Int,
-                  @RequestHeader(XReqHeader.IUSER_WHOAMI) userId: String): R<PageInfo<UappMetadata>> {
-        val page = uappService.listUapp(groupId, userId)
+                  @RequestHeader(XReqHeader.IUSER_WHOAMI) user: String,
+                  @RequestHeader(XReqHeader.IUSER_TENANTID) tenantId: Int): R<PageInfo<UappMetadata>> {
+        val page = uappService.listUapp(groupId, user, tenantId)
         return R_SUCCESS(page)
     }
 }

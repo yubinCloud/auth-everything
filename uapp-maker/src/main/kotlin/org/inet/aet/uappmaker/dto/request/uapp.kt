@@ -13,6 +13,8 @@ data class CreateUappRequest (
 
     var groupId: String?,
 
+    var tenantId: Int?,
+
     @NotBlank
     var name: String,
 

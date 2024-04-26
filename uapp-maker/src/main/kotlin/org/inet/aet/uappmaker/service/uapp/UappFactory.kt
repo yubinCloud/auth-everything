@@ -4,6 +4,7 @@ import org.inet.aet.uappmaker.dto.request.CreateUappRequest
 import org.inet.aet.uappmaker.entity.Uapp
 import org.inet.aet.uappmaker.entity.uielement.UiBasicTab
 import org.inet.aet.uappmaker.constant.UappType
+import org.inet.aet.uappmaker.entity.DEFAULT_TENANT_ID
 import org.inet.aet.uappmaker.entity.DEFAULT_UAPP_GROUP
 
 object UappFactory {
@@ -28,6 +29,7 @@ object UappFactory {
         val t = System.currentTimeMillis()
         return Uapp(
             uappId = null,
+            tenantId = if (createReq.tenantId != null)createReq.tenantId!! else DEFAULT_TENANT_ID,
             appType = createReq.appType,
             groupId = if (createReq.groupId != null) createReq.groupId!! else DEFAULT_UAPP_GROUP,
             owner = createReq.owner!!,

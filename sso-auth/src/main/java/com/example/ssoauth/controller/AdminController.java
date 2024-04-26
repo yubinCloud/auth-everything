@@ -100,8 +100,8 @@ public class AdminController {
             @RequestHeader("User") String whoAmI,
             @RequestHeader("X-TenantId") Integer tenantId
     ) {
-        userService.updateUserInfo(updateReq, whoAmI, tenantId);
-        return R.ok("update success");
+        String result = userService.updateUserInfo(updateReq, whoAmI, tenantId);
+        return R.ok(result);
     }
 
     @PostMapping("/permission/add")

@@ -107,14 +107,15 @@ class UappRepository(private val uappCrudRepository: UappCrudRepository, private
     }
 
     /**
-     * 根据 groupId 和 userId 创建出查询操作
+     * 根据 groupId, username, tenantId 创建出查询操作
      */
-    fun oprOfQueryByGroupId(groupId: String, userId: String): Query {
-        // 过滤出 groupId 为指定值的记录，且 owner 为 userId 或 eShare 为 true
+    fun oprOfQueryByGroupId(groupId: String, user: String, tenantId: Int): Query {
+        // 过滤出 groupId 为指定值的记录，且 owner 为 user 或 eShare 为 true
         val criteria = Criteria().andOperator(
             Criteria.where("groupId").`is`(groupId),
+            Criteria.where("tenantId").`is`(tenantId),
             Criteria().orOperator(
-                Criteria.where("owner").`is`(userId),
+                Criteria.where("owner").`is`(user),
                 Criteria.where("eShare").`is`(true)
             )
         )

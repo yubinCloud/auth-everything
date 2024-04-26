@@ -125,7 +125,7 @@ class BasicUappService (private val uappService: UappService,
         }
         // 如果能够找到 parentId，则保存 uapp
         if (targetNav != null) {
-            targetNav.children!!.addLast(childNav)
+            targetNav.children!!.add(childNav)
             uapp.content = tabs
             uappRepository.saveUapp(uapp)
             return true
@@ -200,7 +200,7 @@ class BasicUappService (private val uappService: UappService,
                     val newNavs = ArrayList<UiBasicNav>()
                     for (i in 0..<tab.navs.size) {
                         if (tab.navs[i].id != navId) {
-                            newNavs.addLast(tab.navs[i])
+                            newNavs.add(tab.navs[i])
                         }
                     }
                     tab.navs = newNavs

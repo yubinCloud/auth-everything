@@ -8,6 +8,7 @@ data class Uapp(
 
     @Id
     var uappId: String?,  // uapp id
+    var tenantId: Int?,   // app 的机构类型
 
     var appType: Int,    // app 类型
     var groupId: String, // 所在的 group 的 id
@@ -32,6 +33,7 @@ data class Uapp(
  */
 data class UappMetadata(
     var uappId: String,  // uapp id
+    var tenantId: Int?,   // app 的机构类型
     var appType: Int,    // app 类型
     var groupId: String, // 所在的 group 的 id
     var owner: String,   // app 所有者
