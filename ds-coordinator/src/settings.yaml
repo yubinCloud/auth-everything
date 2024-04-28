@@ -14,7 +14,7 @@ default:
   es:
     host: 10.245.142.253
     port: 9200
-  avue_host: 10.245.143.119:10014/avue-data-server
+  avue_host: 10.245.143.122:10002
   other_ds_worker_host: 10.245.143.119:10014/ds-worker/ds-worker
 #  ds_worker_host: 10.245.143.119:10014
   debug: True       # True代表不缓存数据
@@ -37,7 +37,7 @@ internal:
   avue_host: "@format {env[SIDECAR_HOST]}:10014/avue-data-server"
   ds_worker_host: "@format {env[SIDECAR_HOST]}:10014/ds-worker/ds-worker"
   other_ds_worker_host: "@format {env[SIDECAR_HOST]}:10014/ds-worker/ds-worker"
-  debug: False
+  debug: False       # false: 不进行user/role/es检查
 
 prod:
   host: 0.0.0.0

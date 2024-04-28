@@ -15,11 +15,13 @@ class DsWorker():
     def get_url(self, uri):
         return f"http://{settings.other_ds_worker_host}{uri}"
 
-    async def base_request(self, method, url, payload, timeout=5):
+    async def base_request(self, method, url, payload, header=None, timeout=5):
         '''基本的request请求，所有请求都从这里发出'''
         headers = {
             'Content-Type': 'application/json'
         }
+        if header:
+            headers.update(header)
         new_time = datetime.datetime.now() + datetime.timedelta(minutes=14)
         formatted_time = new_time.strftime('%Y-%m-%d %H:%M:%S')
         print("# 请求时间：", formatted_time, "(非生产环境下需-14分钟即为实际时间)")
@@ -93,11 +95,11 @@ class DsWorker():
 
         return None
 
-    async def get_table_list(self, conn_obj):
+    async def get_table_list(self, conn_obj, header=None):
         uri = "/meta/tables"
         url = self.get_url(uri)
         data = self.get_payload(conn_obj, is_table_list=True, head_name=f"{sys._getframe().f_code.co_name}")
-        response = await self.base_request("post", url, data)
+        response = await self.base_request("post", url, data, header=header)
         if response.get("code", None) == 0:
             if conn_obj.driverClass == "oracle.jdbc.OracleDriver":
                 return [f"{item['TABLE_SCHEM']}.{item['TABLE_NAME']}" for item in response["data"]], ""
@@ -108,7 +110,7 @@ class DsWorker():
         else:
             return [], str(response)
 
-    async def get_table_field(self, conn_obj, table_name):
+    async def get_table_field(self, conn_obj, table_name, header=None):
         uri = "/meta/fields"
         url = self.get_url(uri)
         remove_id = False
@@ -118,7 +120,7 @@ class DsWorker():
             data = self.get_payload(conn_obj, table_name, head_name=f"{sys._getframe().f_code.co_name}",
                                     remove_id=remove_id)
             print("ds-worker payload", data)
-            response = await self.base_request("post", url, data)
+            response = await self.base_request("post", url, data, header=header)
             if response["code"] == -400:
                 remove_id = True
                 continue
@@ -136,11 +138,11 @@ class DsWorker():
                                                                page_info['page_size'], oracle_12c_after)
         return sql
 
-    async def exec_sql(self, db_conn_obj, sql, sub_name=""):
+    async def exec_sql(self, db_conn_obj, sql, sub_name="", header=None):
         uri = "/exec/select"
         url = self.get_url(uri)
         data = self.get_payload(db_conn_obj, sql=sql, head_name=f"{sys._getframe().f_code.co_name}", sub_name=sub_name)
-        response = await self.base_request("post", url, data, timeout=120)
+        response = await self.base_request("post", url, data, timeout=120, header=header)
         return response
 
 
@@ -151,7 +153,7 @@ if __name__ == '__main__':
     loop = asyncio.get_event_loop()
     ds_worker = DsWorker()
     # print(loop.run_until_complete(get_domain_ssl_detail("114.242.19.134")))
-    print(loop.run_until_complete(ds_worker.base_request('get', url='http://www.baidu.com', payload=None)))
+    print(loop.run_until_complete(ds_worker.base_request('get', url='http://www.baidu.com', payload=None,header=None)))
 
 
 

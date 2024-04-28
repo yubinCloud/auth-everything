@@ -78,10 +78,10 @@ class EsDbSearch():
         start = (page - 1) * page_size
         return {"from_": start, "size": page_size}
 
-    def kw_search(self, keyword, page, page_size, user:str):
+    def kw_search(self, keyword, page, page_size, headers:dict):
         table = TableInfo()
         s = table.search().query("bool", must=[
-            {"match": {"owner": user}},
+            {"match": {"owner": headers['user']}},
             {"nested": {
                 "path": "field_list",
                 "query": {"wildcard": {"field_list.field_name": f"*{keyword}*"}}

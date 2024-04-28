@@ -26,7 +26,7 @@ class RestfulModel(GenericModel, Generic[T]):
     """
     code: int = Field(default=0, title='错误码', description='正常状态下返回 0')
     msg: str = Field(default='', title='状态消息', description='给出调用者本次接口运行的状态提示信息')
-    data: Optional[T] = Field(default=None, title='响应的数据部分')
+    data: Optional[T] = Field(default={}, title='响应的数据部分')
 
     @staticmethod
     def response(data:dict):

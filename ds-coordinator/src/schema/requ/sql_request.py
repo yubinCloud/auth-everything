@@ -1,5 +1,6 @@
 import random
-from fastapi import Query
+from typing import List, Annotated, Union
+from fastapi import Query, Header
 
 
 def create_sql_conn(
@@ -56,3 +57,14 @@ def page_query(
         "page_num": page_num,
         "page_size": page_size,
     }
+
+
+def custom_header(
+    x_TenantId: Annotated[Union[str, None], Header(...)] = 1,
+    user: Annotated[Union[str, None], Header(...)] = None,
+):
+    return {
+        "x-TenantId": x_TenantId,
+        "user": user,
+    }
+
