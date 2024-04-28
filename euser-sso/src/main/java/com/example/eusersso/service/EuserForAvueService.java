@@ -12,6 +12,7 @@ import com.example.eusersso.exception.PermissionDeniedException;
 import com.example.eusersso.feign.response.UserInfo;
 import com.example.eusersso.mapper.AvueRoleMapper;
 import com.example.eusersso.repository.AvueRoleRepository;
+import com.example.eusersso.util.ConstantUtil;
 import com.example.eusersso.util.PermissionCheckUtil;
 import com.example.eusersso.util.SubsystemEnum;
 import com.example.eusersso.util.TimestampUtil;
@@ -42,14 +43,13 @@ public class EuserForAvueService {
     @Resource
     private PermissionCheckUtil permissionCheckUtil;
 
-    private static final Integer DEFAULT_TENANT_ID = 1;
 
     public int createEuser(NewUserDto newUser, String createdBy, Integer tenantId) {
         //校验管理员权限等级
         boolean permission = permissionCheckUtil.superAdminCheck(createdBy, tenantId);
 
         if (newUser.getTenantId() == null){
-            newUser.setTenantId(DEFAULT_TENANT_ID);
+            newUser.setTenantId(ConstantUtil.DEFAULT_TENANT_ID);
         }
         //如果没有super-admin权限,则需要将新用户的tenantId与当前管理员同步
         if ( !permission && tenantId != newUser.getTenantId()){
@@ -58,8 +58,7 @@ public class EuserForAvueService {
 
         var euserDao = euserConverter.toEuserDao(newUser);
         euserDao.setCreatedBy(createdBy);
-        euserDao.setLastUpdatedIuser(createdBy);
-        euserDao.setLastUpdatedTime(TimestampUtil.now());
+
         euserDao.setLabels(new HashMap<>() {{
             put(SubsystemEnum.AVUE.getDbAccessLabel(), true);
         }});

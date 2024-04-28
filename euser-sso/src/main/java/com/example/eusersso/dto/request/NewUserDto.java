@@ -26,6 +26,9 @@ public class NewUserDto {
     @Schema(description = "租户类型")
     private Integer tenantId;
 
+//    @Schema(description = "uapp角色类型")
+//    private Integer uappRole;
+
     @NotBlank
     @Pattern(regexp = "^[^\\s?&\\.\\\\\\/]*$", message = "显示名称中不允许含有空白字符以及 ?&\\/. 等特殊符号。")
     @Size(min = 3, max = 13, message = "显示名称长度要求 3-13")

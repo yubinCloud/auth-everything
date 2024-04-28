@@ -1,6 +1,7 @@
 package com.example.ssoauth.service;
 
 import cn.dev33.satoken.dao.SaTokenDaoRedisJackson;
+import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONUtil;
 import com.example.ssoauth.dao.param.DeleteUserPermissionParam;
 import com.example.ssoauth.dao.param.NewUserDao;
@@ -100,8 +101,15 @@ public class UserService {
 
     @Transactional
     public void deleteByUsernameAndTenantId(DeleteUserReq req, String whoAmI, Integer myTenantId) {
+        //获取被修改用户的 roleList
+        List<Integer> roleList = userMapper.selectByUsername(req.getUsername()).getRoleList().stream().mapToInt(role -> Integer.parseInt(role.toString())).boxed().toList();
+        //校验当前用户是否有权限修改
+        boolean permission = roleCheck(whoAmI, roleList);
+        if (!permission) {
+            throw new PermissionException();
+        }
 
-        //redis中jupyter的token,key为loginId,需要先拼接
+        //redis 中 jupyter的token, key为loginId, 需要先拼接
         String loginId = loginIdUtil.appendLoginId(myTenantId, whoAmI);
         String jupyterToken = findJupyterToken(loginId);
 
@@ -133,13 +141,13 @@ public class UserService {
 //                throw new BaseBusinessException("Exception in update jupyterhub-admin.");
 //            }
 //        }
-        //获取被修改用户的roleList
+        //获取被修改用户的 roleList
         UserDao updateUser = userMapper.selectByUsername(updateUserReq.getUsername());
         List<Integer> updateUserRoleList = updateUser.getRoleList().stream().mapToInt(role -> Integer.parseInt(role.toString())).boxed().toList();
         //校验当前用户是否有权限修改
         boolean permission = roleCheck(whoAmI, updateUserRoleList);
         if (!permission) {
-            return "权限不足";
+            throw new PermissionException();
         }
         //校验通过,修改用户信息
         var param = userConverter.toUpdateUserParam(updateUserReq);

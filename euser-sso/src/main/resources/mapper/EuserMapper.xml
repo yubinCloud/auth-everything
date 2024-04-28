@@ -51,6 +51,12 @@
         WHERE labels @> '{"access-pa": true}'
     </select>
 
+    <select id="userTotalOfUapp" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM euser
+        WHERE labels @> '{"access-uapp": true}'
+    </select>
+
     <select id="selectByCond" resultMap="EuserMapping"
             parameterType="com.example.eusersso.dao.param.EuserSelectCond">
         SELECT <include refid="Euser-ColumnList"/>

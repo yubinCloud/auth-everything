@@ -56,7 +56,7 @@ public class LoginService {
         }
         // 2. 根据账号id，进行登录
         String loginId = loginIdUtil.appendLoginId(tenantId, username);
-        StpUtil.login(loginId);
+        StpUtil.login(loginId, 2626560);
 
         //判断是否登录jupyter
         if (jupyterConfig.isEnableSubsystem()){

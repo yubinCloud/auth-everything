@@ -22,6 +22,8 @@ public interface EuserMapper {
 
     int userTotalOfPublicAPI();
 
+    int userTotalOfUapp();
+
     List<EuserDao> selectByCond(EuserSelectCond cond);
 
     int countByCond(EuserSelectCond cond);

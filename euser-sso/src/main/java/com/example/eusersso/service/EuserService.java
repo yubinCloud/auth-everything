@@ -59,6 +59,9 @@ public class EuserService {
     public int insertOne(EuserDao euserDao) {
         euserDao.setPassword(passwordEncoder.encode(euserDao.getPassword()));
         euserDao.setCreateTime(TimestampUtil.now());  // 获取自1970年1月1日以来的秒数
+        euserDao.setLastUpdatedIuser(euserDao.getCreatedBy());
+        euserDao.setLastUpdatedTime(TimestampUtil.now());
+
         return euserMapper.insertOne(euserDao);
     }
 

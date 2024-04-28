@@ -52,6 +52,7 @@ public class EuserTotalRepository {
         int total = switch (subsystem) {
             case AVUE -> euserMapper.userTotalOfAvue();
             case PUBLIC_API -> euserMapper.userTotalOfPublicAPI();
+            case UAPP -> euserMapper.userTotalOfUapp();
         };
         String key = EUSER_TOTAL_KEY_IN_MEMCACHED.get(subsystem);
         memcachedClient.set(key, 10, Integer.toString(total));

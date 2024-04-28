@@ -8,10 +8,11 @@ public class LoginIdUtil {
         return LoginId.split(",");
     }
 
-    public String appendLoginId( Integer tenantId,String username) {
+    public String appendLoginId(Integer tenantId, String username) {
         return tenantId + "," + username;
     }
-    public String appendLoginId( String tenantId,String username) {
+
+    public String appendLoginId(String tenantId, String username) {
         return tenantId + "," + username;
     }
 }

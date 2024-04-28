@@ -8,8 +8,10 @@ import com.example.eusersso.dto.response.PageResp;
 
 import com.example.eusersso.mapper.EuserMapper;
 import com.example.eusersso.repository.AfRoutePermRepository;
+import com.example.eusersso.util.ConstantUtil;
 import com.example.eusersso.util.PermissionCheckUtil;
 import com.example.eusersso.util.SubsystemEnum;
+import com.example.eusersso.util.TimestampUtil;
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -33,14 +35,13 @@ public class EuserForPublicApiService {
     private PermissionCheckUtil permissionCheckUtil;
 
 
-    private static final Integer DEFAULT_TENANT_ID = 1;
 
     public int createEuser(NewUserDto newUserDto, String createdBy, Integer tenantId) {
         //校验管理员权限等级
         boolean permission = permissionCheckUtil.superAdminCheck(createdBy, tenantId);
 
         if (newUserDto.getTenantId() == null){
-            newUserDto.setTenantId(DEFAULT_TENANT_ID);
+            newUserDto.setTenantId(ConstantUtil.DEFAULT_TENANT_ID);
         }
         //如果没有super-admin权限,则需要将新用户的tenantId与当前管理员同步
         if ( !permission && tenantId != newUserDto.getTenantId()){
