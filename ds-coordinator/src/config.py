@@ -6,22 +6,11 @@ from dynaconf import Dynaconf
 docker_global_env = os.environ.get("ENV_FOR_DYNACONF", "default")
 
 settings = Dynaconf(
-    # envvar_prefix="DYNACONF",                               # 去掉变量前缀。TODO：默认会加载系统环境变量，待测试
+    # envvar_prefix="DYNACONF",                               # 去掉变量前缀。
     envvar_prefix=False,                                      # 去掉变量前缀
     settings_files=['settings.yaml', '.secrets.yaml'],
     environments=True,                                        # 环境分层
     default_env="default",                                    # 默认环境
     env=docker_global_env,
 )
-# 处理docker 环境变量
-close_es = (os.environ.get("CLOSE_ES", "false")).upper()
-if close_es == "TRUE":
-    settings.__setattr__("CLOSE_ES", True)
-else:
-    settings.__setattr__("CLOSE_ES", False)
-
-
-## sidercar_host：
-
-
 

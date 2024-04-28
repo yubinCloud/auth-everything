@@ -63,7 +63,7 @@ def es_check():
                 'update_data_source_info',
                 'update_dataSource',
             ]
-            if settings.CLOSE_es and func.__name__ in es_func_list:
+            if settings.CLOSE_ES and func.__name__ in es_func_list:
                 return RestfulModel.response({"code": 0, "msg": "es is close.", "data": {}})
             result = await func(*args, **kwargs)
             return result

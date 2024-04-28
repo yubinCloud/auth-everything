@@ -1,3 +1,5 @@
+# 新增设置配置/修改某个配置，可通过直接设置系统环境变量完成。优先级高于当前配置文件
+
 default:
   port: 15530
   host: 127.0.0.1
@@ -17,7 +19,8 @@ default:
   avue_host: 10.245.143.122:10002
   other_ds_worker_host: 10.245.143.119:10014/ds-worker/ds-worker
 #  ds_worker_host: 10.245.143.119:10014
-  debug: True       # True代表不缓存数据
+  debug: "@bool false"                              # True代表不缓存数据
+  close_es: "@bool false"
 
 internal:
   host: 0.0.0.0
@@ -37,7 +40,8 @@ internal:
   avue_host: "@format {env[SIDECAR_HOST]}:10014/avue-data-server"
   ds_worker_host: "@format {env[SIDECAR_HOST]}:10014/ds-worker/ds-worker"
   other_ds_worker_host: "@format {env[SIDECAR_HOST]}:10014/ds-worker/ds-worker"
-  debug: False       # false: 不进行user/role/es检查
+  close_es: "@bool false"                        # 不使用 True / true / TRUE.  使用：False / false / FALSE
+  debug: "@bool false"                           # false: 不进行user/role/es检查
 
 prod:
   host: 0.0.0.0
