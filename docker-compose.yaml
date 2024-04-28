@@ -59,7 +59,7 @@ services:
       - 9200
       - 9300
     volumes:
-      - ./es/es_data:/usr/share/elasticsearch/data
+      - es-data:/usr/share/elasticsearch/data
     environment:
       - http.cors.enabled=true
       - http.cors.allow-origin=*
@@ -85,7 +85,7 @@ services:
       - 9000  # S3 API
       - 9001  # console port
     volumes:
-      - ./minio-server/volume/data:/bitnami/minio/data
+      - minio-data:/bitnami/minio/data
     environment:
       - MINIO_ROOT_USER=${MINIO_ROOT_USER}
       - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
@@ -918,6 +918,14 @@ volumes:
   mysql8-data:
     external: true
     name: aet-mysql8-data
+  
+  es-data:
+    external: true
+    name: aet-es-data
+  
+  minio-data:
+    external: true
+    name: aet-minio-data
   
   xxl-job-mysql-data:
     external: true
