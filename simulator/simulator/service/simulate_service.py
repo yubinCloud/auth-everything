@@ -56,6 +56,7 @@ class SimulateService:
         """
         for component_id in components:
             url = self.path_service.get_component_path(visual_id, component_id)
+            logger.info(f'enter url: {url}')
             await page.goto(url)
             img_data = await self._parse_image(page, credits)
             if not img_data:
@@ -64,6 +65,8 @@ class SimulateService:
             self.storage_service.save_image(img_bytes, visual_id, component_id)
     
     async def _parse_image(self, page: Page, credits: str) -> str | None:
+        page_html = await page.content()
+        logger.info(f'Content: {page_html}')
         await self._load_localstorage(page, credits)
         await page.wait_for_load_state('networkidle')
         start_button = await page.wait_for_selector('#start', state='visible')

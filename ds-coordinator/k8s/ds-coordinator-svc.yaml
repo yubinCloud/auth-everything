@@ -32,11 +32,11 @@ spec:
             - name: TZ
               value: Asia/Shanghai
             - name: SIDECAR_HOST
-              value: sidecar-ds-coordinator
+              value: 127.0.0.1
             - name: CLOSE_ES
-              value: False
+              value: "True"
         # sidecar
-        - name: sidecar-avue-nginx
+        - name: sidecar-ds-coordinator
           image: aet-nacos-sidecar
           imagePullPolicy: Never
           ports:
