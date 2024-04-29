@@ -33,5 +33,4 @@ export default {
     .then(() => fn(req, res, next))
     .catch(next);
   }
-
 }

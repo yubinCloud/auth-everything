@@ -58,8 +58,8 @@ public class EuserForPublicApiService {
 
     public PageResp<EuserListItem> selectPageByCond(String username, String screenName, String routePath, Integer tenantId,
                                                     Integer pageNum, Integer pageSize) {
-        return euserService.selectPageByCond(username, screenName, null, tenantId,
-                routePath, pageNum, pageSize, SubsystemEnum.PUBLIC_API);
+        return euserService.selectPageByCond(username, screenName, null, tenantId,routePath,
+                null, pageNum, pageSize, SubsystemEnum.PUBLIC_API);
     }
 
     public List<String> queryPermissionList(String username, Integer tenantId) {

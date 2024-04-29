@@ -16,4 +16,8 @@ public class VisualDB {
     private String username;
 
     private String password;
+
+    private Integer tenantId;
+
+    private String remark;
 }

@@ -119,6 +119,7 @@ function getPageSql ({ size, page }) {
 }
 
 export const insert = ({ table, column, data }, fn) => {
+  console.log(JSON.stringify(data))
   let sql = `INSERT INTO ${table}(${column.map(ele => ele.key)}) VALUES`
   let column_sql = [];
   column.forEach(item => {

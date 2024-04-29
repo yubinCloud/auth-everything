@@ -2,6 +2,8 @@ package com.example.eusersso.service;
 
 import com.example.eusersso.converter.EuserConverter;
 import com.example.eusersso.dto.request.NewUserDto;
+import com.example.eusersso.dto.response.EuserListItem;
+import com.example.eusersso.dto.response.PageResp;
 import com.example.eusersso.util.ConstantUtil;
 import com.example.eusersso.util.PermissionCheckUtil;
 import com.example.eusersso.util.SubsystemEnum;
@@ -43,5 +45,11 @@ public class EuserForUappService {
             put(SubsystemEnum.UAPP.getDbAccessLabel(), true);
         }});
         return euserService.insertOne(euserDao);
+    }
+
+    public PageResp<EuserListItem> selectPageByCond(String username, String screenName, Integer uappRole, Integer tenantId,
+                                                    Integer pageNum, Integer pageSize) {
+        return euserService.selectPageByCond(username, screenName, null, tenantId,null,
+                uappRole, pageNum, pageSize, SubsystemEnum.UAPP);
     }
 }

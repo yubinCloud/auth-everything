@@ -144,10 +144,7 @@ export default (app) => {
   app.post(url + '/save', jsonParser, function (req, res) {
     const data = req.body;
     Object.defineProperty(data.visual,"tenantId",{
-      value: req.get("X-TenantId"),
-      writable: true, // 是否可写
-      enumerable: true, // 是否可枚举
-      configurable: true
+      value: req.get("X-TenantId")
     })
     visualDao.save(data).then(data => {
       res.json(resbody.getSuccessResult(data));

@@ -16,6 +16,11 @@
     <sql id="VisualDBEntityColums">
         id, name, driver_class, url, username, password
     </sql>
+    <insert id="insertOne" parameterType="com.example.avuehelper.dto.request.NewVisualDBDto">
+        INSERT INTO blade_visual_db
+        (id,name,driver_class,url,username,password,tenant_id,remark)
+        values (#{id},#{name},#{driverClass},#{url},#{username},#{password},#{tenantId},#{remark})
+    </insert>
 
     <select id="selectById" resultMap="VisualDBMapping">
         SELECT <include refid="VisualDBEntityColums"/>

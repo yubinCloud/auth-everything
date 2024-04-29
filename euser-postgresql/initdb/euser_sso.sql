@@ -23,6 +23,8 @@ SET default_table_access_method = heap;
 --
 -- Name: avue_role; Type: TABLE; Schema: public; Owner: postgres
 --
+CREATE DATABASE euser_sso;
+\c euser_sso;
 
 CREATE TABLE public.avue_role (
     role_id integer NOT NULL,

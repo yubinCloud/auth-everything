@@ -67,7 +67,7 @@ public class EuserForAvueService {
 
     public PageResp<EuserListItem> selectPageByCond(String username, String screenName, Integer roleId, Integer tenantId,
                                                     Integer pageNum, Integer pageSize) {
-        return euserService.selectPageByCond(username, screenName, roleId, tenantId, null, pageNum, pageSize, SubsystemEnum.AVUE);
+        return euserService.selectPageByCond(username, screenName, roleId, tenantId, null, null, pageNum, pageSize, SubsystemEnum.AVUE);
     }
 
     @Transactional

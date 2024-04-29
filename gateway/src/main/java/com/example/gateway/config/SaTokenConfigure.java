@@ -41,7 +41,7 @@ public class SaTokenConfigure {
                 .addExclude("/s3/**")
                 .addExclude("/minio-console/**")
                 .addExclude("/auth/tenant/list")
-//                .addExclude("/avue/**")
+
                 // 鉴权方法：每次访问进入
                 .setAuth(obj -> {
                     // ********** 登录校验：除登录接口外，均需要登录 ***********

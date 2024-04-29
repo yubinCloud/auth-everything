@@ -26,4 +26,6 @@ public class EuserSelectCond {
     private Integer pageNum;
 
     private Integer pageSize;
+
+    private Integer uappRole;
 }

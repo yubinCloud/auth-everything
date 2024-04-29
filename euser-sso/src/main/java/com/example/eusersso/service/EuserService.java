@@ -67,7 +67,7 @@ public class EuserService {
 
     @Transactional
     public PageResp<EuserListItem> selectPageByCond(String username, String screenName, Integer roleId, Integer tenantId,
-                                                    String routePath, Integer pageNum, Integer pageSize,
+                                                    String routePath, Integer uappRole, Integer pageNum, Integer pageSize,
                                                     SubsystemEnum subsystem
     ) {
         //封装查询条件
@@ -80,6 +80,7 @@ public class EuserService {
         cond.setDbAccessLabel(subsystem.getDbAccessLabel());
         cond.setPageSize(pageSize);
         cond.setPageNum(pageNum);
+        cond.setUappRole(uappRole);
 
         var list = selectByCond(cond);
         PageResp<EuserListItem> page = new PageResp<>();
