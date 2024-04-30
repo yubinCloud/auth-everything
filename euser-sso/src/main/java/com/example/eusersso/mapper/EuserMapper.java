@@ -2,9 +2,7 @@ package com.example.eusersso.mapper;
 
 import com.example.eusersso.dao.EuserDao;
 import com.example.eusersso.dao.param.EuserSelectCond;
-import com.example.eusersso.dto.request.UpdateAddPublicAPIPermissionRequest;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -42,4 +40,5 @@ public interface EuserMapper {
 
     EuserDao selectByUsernameAndTenantId(String username, Integer tenantId);
 
+    int addUapp(EuserDao euserDao);
 }

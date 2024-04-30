@@ -77,17 +77,15 @@ export default (app) => {
   })
   app.post(url + '/submit', jsonParser, function (req, res) {
     const data = req.body;
+    data.tenantId = req.get("X-TenantId");
     if (data.id) {
       dbDao.update(data).then(data => {
         res.json(resbody.getSuccessResult(data));
       }).catch(error => {
         res.json(resbody.getFailResult(error));
       });
-    } else {
-      Object.defineProperty(data,"tenantId",{
-        value: req.get("X-TenantId")
-      })
-
+    }
+    else {
       dbDao.save(data).then(data => {
         res.json(resbody.getSuccessResult(data));
       }).catch(error => {

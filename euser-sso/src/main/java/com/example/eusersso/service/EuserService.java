@@ -4,6 +4,7 @@ import cn.hutool.json.JSONUtil;
 import com.example.eusersso.converter.EuserConverter;
 import com.example.eusersso.dao.EuserDao;
 import com.example.eusersso.dao.param.EuserSelectCond;
+import com.example.eusersso.dto.request.EuserUappDto;
 import com.example.eusersso.dto.request.UpdateEuserDto;
 import com.example.eusersso.dto.response.EuserListItem;
 import com.example.eusersso.dto.response.PageResp;
@@ -28,7 +29,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.rmi.Remote;
 import java.util.Collection;
 import java.util.List;
 
@@ -156,6 +156,16 @@ public class EuserService {
         }).toList();
     }
 
+    @Transactional
+    public int addUapp(EuserUappDto uappDto, String whoAmI, Integer tenantId) {
+        EuserDao euserDao = new EuserDao();
+        euserDao.setUsername(uappDto.getUsername());
+        euserDao.setUappId(uappDto.getUappId());
+        euserDao.setLastUpdatedIuser(whoAmI);
+        euserDao.setTenantId(tenantId);
+        return euserMapper.addUapp(euserDao);
+    }
+
     private String prepostParam(String selectParam) {
         if (StringUtils.isBlank(selectParam)) {
             selectParam = null;
@@ -164,4 +174,6 @@ public class EuserService {
         }
         return selectParam;
     }
+
+
 }

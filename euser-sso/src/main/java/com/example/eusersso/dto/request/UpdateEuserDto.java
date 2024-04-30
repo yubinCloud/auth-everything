@@ -12,6 +12,10 @@ public class UpdateEuserDto {
     @Schema(description = "新的 租户类型ID")
     private Integer tenantId;
 
+    @Schema(description = "所要更新用户的 uappRole")
+    private Integer uappRole;
+
+
     @Schema(description = "所要更新用户的 username")
     private String username;
 

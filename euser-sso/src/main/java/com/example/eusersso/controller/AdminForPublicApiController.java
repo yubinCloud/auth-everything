@@ -61,7 +61,7 @@ public class AdminForPublicApiController {
             @Parameter(description = "过滤条件：screen name，支持模糊搜索") @RequestParam(required = false) String screenName,
             @Parameter(description = "过滤条件：api") @RequestParam(required = false) String routePath,
             @RequestHeader(ConstantUtil.TENANT_ID_HEADER) Integer tenantId
-           // @Parameter(description = "过滤条件：tenant id") @RequestParam(required = false) Integer tenantId
+            // @Parameter(description = "过滤条件：tenant id") @RequestParam(required = false) Integer tenantId
     ) {
         var page = euserService.selectPageByCond(username, screenName, routePath, tenantId, pageNum, pageSize);
         return R.ok(page);
@@ -72,7 +72,7 @@ public class AdminForPublicApiController {
     @Operation(summary = "获取某个用户的 public-api 权限列表")
     public R<List<String>> queryPermissionList(@RequestParam @Parameter(required = true)
                                                @NotBlank String username,
-                                                Integer tenantId
+                                               Integer tenantId
     ) {
         return R.ok(euserService.queryPermissionList(username, tenantId));
     }

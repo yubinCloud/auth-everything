@@ -1,5 +1,6 @@
 package com.example.eusersso.controller;
 
+import com.example.eusersso.dto.request.EuserUappDto;
 import com.example.eusersso.dto.request.NewUserDto;
 import com.example.eusersso.dto.response.EuserListItem;
 import com.example.eusersso.dto.response.PageResp;
@@ -50,9 +51,37 @@ public class AdminForUappController {
             @Parameter(description = "过滤条件：用户名，支持模糊搜索") @RequestParam(required = false) String username,
             @Parameter(description = "过滤条件：screen name，支持模糊搜索") @RequestParam(required = false) String screenName,
             @Parameter(description = "过滤条件：uappRole") @RequestParam(required = false) Integer uappRole,
-            @RequestHeader(ConstantUtil.TENANT_ID_HEADER)  Integer tenantId
+            @RequestHeader(ConstantUtil.TENANT_ID_HEADER) Integer tenantId
     ) {
         var page = euserService.selectPageByCond(username, screenName, uappRole, tenantId, pageNum, pageSize);
         return R.ok(page);
+    }
+
+    @PostMapping("/uapp/add")
+    @Operation(summary = "为uapp外部用户新增一个uapp")
+    public R<String> addUapp(@RequestBody @Valid EuserUappDto uappDto,
+                             @RequestHeader(ConstantUtil.IUSER_WHOAMI_HEADER) String whoAmI,
+                             @RequestHeader(ConstantUtil.TENANT_ID_HEADER) Integer tenantId
+    ) {
+
+        int result = euserService.addUapp(uappDto, whoAmI, tenantId);
+        if (result >= 1) {
+            return R.ok("success");
+        }
+        return new R<>(R.CODE_ERROR, "添加uapp失败，请稍后尝试", "fail");
+    }
+
+    @PostMapping("/uapp/update")
+    @Operation(summary = "修改uapp外部用户的uapp")
+    public R<String> updateUapp(@RequestBody @Valid EuserUappDto uappDto,
+                                @RequestHeader(ConstantUtil.IUSER_WHOAMI_HEADER) String whoAmI,
+                                @RequestHeader(ConstantUtil.TENANT_ID_HEADER) Integer tenantId
+    ) {
+
+        int result = euserService.addUapp(uappDto, whoAmI, tenantId);
+        if (result >= 1) {
+            return R.ok("success");
+        }
+        return new R<>(R.CODE_ERROR, "添加uapp失败，请稍后尝试", "fail");
     }
 }

@@ -107,6 +107,7 @@
             <if test="password != null">password=#{password},</if>
             <if test="mobile != null">mobile=#{mobile},</if>
             <if test="tenantId != null">tenant_id = #{tenantId},</if>
+            <if test="uappRole != null">uapp_role=#{uappRole},</if>
             <if test="checked != null">checked=#{checked,jdbcType=BOOLEAN},</if>
             <if test="screenName != null">screen_name=#{screenName},</if>
             <if test="note != null">note=#{note},</if>
@@ -142,6 +143,21 @@
     <update id="deletePublicAPI">
         UPDATE euser
         SET publicapi_ids = jsonb_delete(publicapi_ids, #{route})
+        WHERE username = #{username}
+        <if test="tenantId != null">
+            AND tenant_id = #{tenantId}
+        </if>
+    </update>
+    <update id="addUapp" parameterType="com.example.eusersso.dao.EuserDao">
+        UPDATE euser
+        <set>
+            <if test="uappId != null">
+                uapp_id = #{uappId}
+            </if>
+            <if test="lastUpdatedIuser != null">
+                last_updated_iuser = #{lastUpdatedIuser}
+            </if>
+        </set>
         WHERE username = #{username}
         <if test="tenantId != null">
             AND tenant_id = #{tenantId}

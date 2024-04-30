@@ -44,15 +44,16 @@ public class EuserForAvueService {
     private PermissionCheckUtil permissionCheckUtil;
 
 
+    @Transactional
     public int createEuser(NewUserDto newUser, String createdBy, Integer tenantId) {
         //校验管理员权限等级
         boolean permission = permissionCheckUtil.superAdminCheck(createdBy, tenantId);
 
-        if (newUser.getTenantId() == null){
+        if (newUser.getTenantId() == null) {
             newUser.setTenantId(ConstantUtil.DEFAULT_TENANT_ID);
         }
         //如果没有super-admin权限,则需要将新用户的tenantId与当前管理员同步
-        if ( !permission && tenantId != newUser.getTenantId()){
+        if (!permission && tenantId != newUser.getTenantId()) {
             newUser.setTenantId(tenantId);
         }
 

@@ -1,16 +1,17 @@
 package com.example.eusersso.service;
 
 import com.example.eusersso.converter.EuserConverter;
+import com.example.eusersso.dto.request.EuserUappDto;
 import com.example.eusersso.dto.request.NewUserDto;
 import com.example.eusersso.dto.response.EuserListItem;
 import com.example.eusersso.dto.response.PageResp;
 import com.example.eusersso.util.ConstantUtil;
 import com.example.eusersso.util.PermissionCheckUtil;
 import com.example.eusersso.util.SubsystemEnum;
-import com.example.eusersso.util.TimestampUtil;
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 
@@ -25,17 +26,17 @@ public class EuserForUappService {
     private PermissionCheckUtil permissionCheckUtil;
 
 
-
+    @Transactional
     public int createEuser(NewUserDto newUser, String createdBy, Integer myTenantId) {
 
         //校验管理员权限等级
         boolean permission = permissionCheckUtil.superAdminCheck(createdBy, myTenantId);
 
-        if (newUser.getTenantId() == null){
+        if (newUser.getTenantId() == null) {
             newUser.setTenantId(ConstantUtil.DEFAULT_TENANT_ID);
         }
         //如果没有super-admin权限,则需要将新用户的tenantId与当前管理员同步
-        if ( !permission && myTenantId != newUser.getTenantId()){
+        if (!permission && myTenantId != newUser.getTenantId()) {
             newUser.setTenantId(myTenantId);
         }
 
@@ -49,7 +50,12 @@ public class EuserForUappService {
 
     public PageResp<EuserListItem> selectPageByCond(String username, String screenName, Integer uappRole, Integer tenantId,
                                                     Integer pageNum, Integer pageSize) {
-        return euserService.selectPageByCond(username, screenName, null, tenantId,null,
+        return euserService.selectPageByCond(username, screenName, null, tenantId, null,
                 uappRole, pageNum, pageSize, SubsystemEnum.UAPP);
+    }
+
+    @Transactional
+    public int addUapp(EuserUappDto uappDto, String whoAmI, Integer tenantId) {
+        return euserService.addUapp(uappDto, whoAmI, tenantId);
     }
 }
