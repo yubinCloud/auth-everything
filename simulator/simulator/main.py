@@ -10,13 +10,12 @@ from config import settings
 from controller import api_router
 from minio_bucket_policy import BUCKET_POLICY
 
-
-
 app = FastAPI(
     title='Simulator',
     description='模拟浏览器运行',
     version='0.1'
 )
+
 
 @app.on_event('startup')
 def startup_event_of_minio():
@@ -47,7 +46,6 @@ def health_check():
 
 app.include_router(api_router)
 
-
 if __name__ == '__main__':
     origins = ['*']
     app.add_middleware(
@@ -61,5 +59,5 @@ if __name__ == '__main__':
     banner = Path('./banner.txt')
     if banner.exists():
         with banner.open('r') as f:
-          print(f.read())
+            print(f.read())
     uvicorn.run(app, host=settings.app.host, port=settings.app.port)

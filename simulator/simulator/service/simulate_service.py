@@ -35,7 +35,9 @@ class SimulateService:
         :param credits: _description_
         """
         await page.evaluate(r'localStorage.clear()')
-        await page.goto(self.path_service.get_login_path())
+        login_url = self.path_service.get_login_path()
+        logger.info("login url: ", login_url)
+        await page.goto(login_url)
     
     async def simulate_login(self, page: Page):
         await page.goto(self.path_service.get_simulate_login_path())
@@ -54,6 +56,8 @@ class SimulateService:
         :param visual_id: _description_
         :param components: _description_
         """
+        await page.goto(self.path_service.get_simulate_login_path(), wait_until="commit")
+        await self._load_localstorage(page, credits)
         for component_id in components:
             url = self.path_service.get_component_path(visual_id, component_id)
             logger.info(f'enter url: {url}')
@@ -67,7 +71,7 @@ class SimulateService:
     async def _parse_image(self, page: Page, credits: str) -> str | None:
         page_html = await page.content()
         logger.info(f'Content: {page_html}')
-        await self._load_localstorage(page, credits)
+        # await self._load_localstorage(page, credits)
         await page.wait_for_load_state('networkidle')
         start_button = await page.wait_for_selector('#start', state='visible')
         await start_button.click()

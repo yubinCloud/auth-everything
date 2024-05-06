@@ -7,14 +7,16 @@ default:
     port: 10017
   front:
     protocol: http
-    host: 10.245.142.209
-    port: 8091
+    #host: 10.245.142.209
+    host: 192.168.255.173
+    port: 8093
     auth:
       username: admin
       password: "123456"
     img_module:
       protocol: http
-      host: 10.245.142.209
+      #host: 10.245.142.209
+      host: 192.168.255.173
       port: 8093
     path:
       login: /login

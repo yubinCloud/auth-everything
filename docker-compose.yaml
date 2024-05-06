@@ -507,7 +507,7 @@ services:
       - SIDECAR_PORT=10017
       - FRONT_PROTOCOL=http
       - FRONT_HOST=web-unit
-      - FRONT_PORT=8091
+      - FRONT_PORT=8093
       - FRONT_IMG_MOD_PROTOCOL=http
       - FRONT_IMG_MOD_HOST=web-unit
       - FRONT_IMG_MOD_PORT=8093

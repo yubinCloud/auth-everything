@@ -7,7 +7,7 @@ class PathService:
         self.front_url = f'{settings.front.protocol}://{settings.front.host}:{settings.front.port}'
         self.sidecar_url = f'http://{settings.sidecar.host}:{settings.sidecar.port}'
         self.img_module_base_url = f'{settings.front.img_module.protocol}://{settings.front.img_module.host}:{settings.front.img_module.port}'
-    
+
     def get_simulate_login_path(self):
         return self.front_url + settings.front.path.login
     

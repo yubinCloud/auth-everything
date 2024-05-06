@@ -1,0 +1,4 @@
+
+docker build ./ -f Dockerfile.BASE -t local/simulator-base:v1.0
+
+docker build ./ -f Dockerfile -t aet-simulator

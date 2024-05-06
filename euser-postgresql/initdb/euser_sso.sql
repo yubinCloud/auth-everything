@@ -20,6 +20,9 @@ SET default_tablespace = '';
 
 SET default_table_access_method = heap;
 
+CREATE DATABASE euser_sso;
+\c euser_sso;
+
 --
 -- Name: avue_role; Type: TABLE; Schema: public; Owner: postgres
 --
