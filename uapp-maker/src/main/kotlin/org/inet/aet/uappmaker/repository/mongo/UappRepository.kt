@@ -95,6 +95,9 @@ class UappRepository(private val uappCrudRepository: UappCrudRepository, private
         if (updateReq.eShare != null) {
             u.set("eShare", updateReq.eShare)
         }
+        if (updateReq.usableAvues != null) {
+            u.set("usableAvues", updateReq.usableAvues)
+        }
         return mongoTemplate.updateFirst(q, u, Uapp::class.java).modifiedCount > 0
     }
 

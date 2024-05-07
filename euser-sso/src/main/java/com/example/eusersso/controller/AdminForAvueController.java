@@ -56,7 +56,6 @@ public class AdminForAvueController {
             @Parameter(description = "过滤条件：screen name，支持模糊搜索") @RequestParam(required = false) String screenName,
             @Parameter(description = "过滤条件：role id") @RequestParam(required = false) Integer roleId,
             @RequestHeader(ConstantUtil.TENANT_ID_HEADER) Integer tenantId
-            // @Parameter(description = "过滤条件：tenant id") @RequestParam(required = false) Integer tenantId
     ) {
         var page = euserService.selectPageByCond(username, screenName, roleId, tenantId, pageNum, pageSize);
         return R.ok(page);

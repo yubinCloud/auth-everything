@@ -39,6 +39,8 @@ public class AdminForUappController {
         int result = euserService.createEuser(userDto, whoAmI, tenantId);
         if (result >= 1) {
             return R.ok("success");
+        } else if (result == -100) {
+            return new R<>(R.CODE_ERROR, "用户名已存在", "fail");
         }
         return new R<>(R.CODE_ERROR, "插入失败，请稍后尝试", "fail");
     }

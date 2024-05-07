@@ -80,6 +80,14 @@ class BasicUappService (private val uappService: UappService,
             log.info("Tab $tabId not found in uapp ${uapp.uappId}")
             throw BaseBuzException("无法在 APP ${uapp.uappId} 中找到 tab $tabId")
         }
+
+        //检查 nav 是否在 uapp 的 usableAvues 中
+        val permission = checkUsableAvues(uapp.usableAvues, navInfo.path);
+        if (!permission){
+            log.info("Nav ${navInfo.path} not found in uapp ${uapp.uappId}")
+            throw BaseBuzException("无法在 APP ${uapp.uappId} 中找到 nav ${navInfo.path}")
+        }
+
         val nav = UiBasicNav(
             id = UUID.randomUUID().toString().replace("-", ""),
             navType = navInfo.navType,
@@ -101,6 +109,13 @@ class BasicUappService (private val uappService: UappService,
      * 为 nav 添加 child nav
      */
     fun addNavChild(navInfo: CreateNavInfo, uapp: Uapp, parentId: String): Boolean {
+        //检查 nav 是否在 uapp 的 usableAvues 中
+        val permission = checkUsableAvues(uapp.usableAvues, navInfo.path);
+        if (!permission){
+            log.info("Nav ${navInfo.path} not found in uapp ${uapp.uappId}")
+            throw BaseBuzException("无法在 APP ${uapp.uappId} 中找到 nav ${navInfo.path}")
+        }
+
         val tabs = parseContent(uapp)
         val childNav = UiBasicNav(
             id = UUID.randomUUID().toString().replace("-", ""),
@@ -390,5 +405,12 @@ class BasicUappService (private val uappService: UappService,
         if (metadata.avid != null) {
             nav.avid = metadata.avid
         }
+    }
+    /**
+     * 检查当前添加的 avue 大屏是否在 uapp 的 usableAvues 列表
+     */
+    private fun checkUsableAvues(usableAvues: List<String>?, visualId: String): Boolean{
+        val result = usableAvues!!.stream().anyMatch { avue -> avue == visualId }
+        return result;
     }
 }

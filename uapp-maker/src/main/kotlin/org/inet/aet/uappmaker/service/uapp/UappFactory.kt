@@ -43,7 +43,8 @@ object UappFactory {
             iShare = DEFAULT_PERM_ISHARE,
             coEdit = DEFAULT_PERM_COEDIT,
             eShare = DEFAULT_PERM_ESHARE,
-            content = ArrayList<UiBasicTab>()
+            content = ArrayList<UiBasicTab>(),
+            usableAvues = if (createReq.usableAvues != null)createReq.usableAvues else ArrayList<String>(),
         )
     }
 

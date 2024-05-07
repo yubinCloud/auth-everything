@@ -7,6 +7,10 @@ import java.util.List;
 @Data
 public class EuserListItem {
 
+    private Integer uappRole;
+
+    private String uappId;
+
     private Integer tenantId;
 
     private String username;

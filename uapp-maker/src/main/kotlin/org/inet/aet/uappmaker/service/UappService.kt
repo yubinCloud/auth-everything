@@ -88,7 +88,8 @@ class UappService (val uappRepository: UappRepository) {
             iShare = uapp.iShare,
             coEdit = uapp.coEdit,
             eShare = uapp.eShare,
-            tenantId = uapp.tenantId
+            tenantId = uapp.tenantId,
+            usableAvues = uapp.usableAvues,
         )
         return metadata
     }

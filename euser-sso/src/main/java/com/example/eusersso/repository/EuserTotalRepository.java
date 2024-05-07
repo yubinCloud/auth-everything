@@ -26,6 +26,7 @@ public class EuserTotalRepository {
     public static final Map<SubsystemEnum, String> EUSER_TOTAL_KEY_IN_MEMCACHED = new HashMap<>() {{
         put(SubsystemEnum.AVUE, "ut:avue");
         put(SubsystemEnum.PUBLIC_API, "ut:pa");
+        put(SubsystemEnum.UAPP,"ut:uapp");
     }};
 
     public int getEuserTotal(EuserSelectCond cond, SubsystemEnum subsystem) {
@@ -34,6 +35,7 @@ public class EuserTotalRepository {
                 && Objects.isNull(cond.getScreenName())
                 && Objects.isNull(cond.getAvueRoleId())
                 && Objects.isNull(cond.getApiId())
+                && Objects.isNull(cond.getUappRole())
         ) {
             Object cached = memcachedClient.get(EUSER_TOTAL_KEY_IN_MEMCACHED.get(subsystem));
             if (Objects.isNull(cached)) {

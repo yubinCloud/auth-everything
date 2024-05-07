@@ -3,7 +3,10 @@ package com.example.eusersso.mapper;
 import com.example.eusersso.dao.EuserDao;
 import com.example.eusersso.dao.param.EuserSelectCond;
 import org.apache.ibatis.annotations.Mapper;
+import org.postgresql.util.PSQLException;
+import org.springframework.dao.DuplicateKeyException;
 
+import java.sql.SQLException;
 import java.util.List;
 
 
@@ -14,7 +17,7 @@ public interface EuserMapper {
 
     EuserDao selectByMobile(String mobile);
 
-    int insertOne(EuserDao euser);
+    int insertOne(EuserDao euser) throws DuplicateKeyException;
 
     int userTotalOfAvue();
 

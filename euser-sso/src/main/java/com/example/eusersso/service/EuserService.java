@@ -26,9 +26,12 @@ import com.example.eusersso.util.TimestampUtil;
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.postgresql.util.PSQLException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 
@@ -62,7 +65,11 @@ public class EuserService {
         euserDao.setLastUpdatedIuser(euserDao.getCreatedBy());
         euserDao.setLastUpdatedTime(TimestampUtil.now());
 
-        return euserMapper.insertOne(euserDao);
+        try{
+            return euserMapper.insertOne(euserDao);
+        }catch (DuplicateKeyException e){
+                return -100;
+        }
     }
 
     @Transactional
@@ -163,6 +170,7 @@ public class EuserService {
         euserDao.setUappId(uappDto.getUappId());
         euserDao.setLastUpdatedIuser(whoAmI);
         euserDao.setTenantId(tenantId);
+
         return euserMapper.addUapp(euserDao);
     }
 

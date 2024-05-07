@@ -8,6 +8,7 @@ data class Uapp(
 
     @Id
     var uappId: String?,  // uapp id
+
     var tenantId: Int?,   // app 的机构类型
 
     var appType: Int,    // app 类型
@@ -20,6 +21,7 @@ data class Uapp(
     var topic: String?,   // app 主题
     var description: String,    // app 描述
     var updateTime: Long,    // app 更新时间
+    var usableAvues: List<String>?, // app 可使用的大屏 id 集合
     // 权限相关信息
     var iShare: Boolean,  // 是否内部可共享
     var coEdit: Boolean,  // 是否可以共同编辑
@@ -44,6 +46,7 @@ data class UappMetadata(
     var topic: String?,   // app 主题
     var description: String,    // app 描述
     var updateTime: Long,    // app 更新时间
+    var usableAvues: List<String>?, // app 可使用的大屏 id 集合
     // 权限相关信息
     var iShare: Boolean,    // 是否内部共享
     var coEdit: Boolean,    // 是否其他人可编辑

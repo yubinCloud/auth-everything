@@ -34,7 +34,7 @@ data class CreateNavInfo (
 
     var color: String?,
 
-    var path: String,
+    var path: String,  //avue大屏 ID
 )
 
 
