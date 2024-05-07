@@ -25,6 +25,13 @@ spec:
         envFrom:
           - configMapRef:
               name: public-env
+        env:
+          - name: EUSER_GATEWAY_REDIS_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: public-env
+                key: REDIS_HOST
+
 ---
 apiVersion: v1
 kind: Service

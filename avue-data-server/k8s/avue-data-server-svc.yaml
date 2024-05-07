@@ -24,6 +24,8 @@ spec:
           ports:
             - containerPort: 10002
           env:
+            - name: NODE_ENV
+              value: production
             - name: MYSQL_HOST
               valueFrom:
                 configMapKeyRef:
