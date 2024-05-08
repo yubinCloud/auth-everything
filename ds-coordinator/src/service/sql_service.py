@@ -34,13 +34,13 @@ def make_response(data, msg=None):
     return {"code": -1, "msg": f"error; {msg}", "data": data}
 
 
-async def create_sql_conn(info: dict, user:str):
+async def create_sql_conn(info: dict, header:dict):
     '''
     创建/添加sql连接,
     '''
     if not info["remark"]:
         del info["remark"]
-    return Avue.db_save(None, info, user)
+    return Avue.db_save(None, info, header)
 
 
 async def test_sql_conn(form: dict):
@@ -58,32 +58,32 @@ async def test_sql_conn(form: dict):
     return resutl
 
 
-async def get_sql_conn_list(page: dict, user:str):
+async def get_sql_conn_list(page: dict, headers:dict):
     ''' 获取sql连接列表 '''
     page_num = page["page_num"]
     page_size = page["page_size"]
-    return Avue.db_list(page_num, page_size, user)
+    return Avue.db_list(page_num, page_size, headers)
 
 
-async def get_sql_conn_detail(conn_id: str, user:str):
+async def get_sql_conn_detail(conn_id: str, headers:dict):
     ''' 获取sql连接详情 '''
-    return Avue.db_detail(conn_id, user)
+    return Avue.db_detail(conn_id, headers)
 
 
-async def update_sql_conn( conn_id: str, info: dict, user:str):
+async def update_sql_conn( conn_id: str, info: dict, headers:dict):
     ''' 更新sql连接 '''
-    return Avue.db_save(conn_id, info, user)
+    return Avue.db_save(conn_id, info, headers)
 
 
-async def delete_sql_conn(id: str, user:str):
+async def delete_sql_conn(id: str, headers:dict):
     ''' 删除sql连接 '''
-    return Avue.db_remove(user=user, id=id)
+    return Avue.db_remove(headers=headers, id=id)
 
 
-async def get_sql_table_list(conn_id: str, user:str)->tuple:
+async def get_sql_table_list(conn_id: str, headers:dict)->tuple:
     ''' 获取数据库的数据表名列表 '''
     try:
-        db_conn_response = Avue.db_detail(conn_id, user)
+        db_conn_response = Avue.db_detail(conn_id, headers)
     except:
         return [], "链接avue获取数据源信息时发生错误"
     if not db_conn_response.get('data'):
@@ -93,19 +93,19 @@ async def get_sql_table_list(conn_id: str, user:str)->tuple:
     return retsult
 
 
-async def get_sql_table_detail(conn_id: str, table_name: str, user='',store=False) -> tuple:
+async def get_sql_table_detail(conn_id: str, table_name: str, headers:dict,store=False) -> tuple:
     '''
     获取sql表详情(字段名)
     refresh: 控制是否重新获取
     '''
-    # table_info = EsDbSearch().get_fields(conn_id, table_name, user)
+    # table_info = EsDbSearch().get_fields(conn_id, table_name, headers)
     # if table_info and not refresh:
     #     field = [item["field_name"] for item in table_info.get("field_list", [])]   # 从es中获取
     #     print("# 已缓存，不再获取：", table_name)
     #     return field, None
     # else:
     #     print("# 未找到或未缓存数据表信息，next:开始缓存")
-    avue_response = Avue.db_detail(conn_id, user)
+    avue_response = Avue.db_detail(conn_id, headers)
     db_conn_obj = ConnObj(avue_response["data"]) if avue_response.get("data") else None
     if not db_conn_obj:
         return [], f"链接有误，{str(avue_response)}"
@@ -145,7 +145,7 @@ async def get_sql_table_detail(conn_id: str, table_name: str, user='',store=Fals
                         "conn_id": conn_id,
                         "conn_name": db_conn_obj.name,
                         "table_name": table_name,
-                        "owner": user,
+                        "owner": headers["user"],
                         "field_list": table_fields_all_info["data"]
                 }
                 # TODO: 鉴别是否已存在. 当前由于首先获取了数据进行判定，所以不会重复存储
@@ -160,11 +160,11 @@ async def get_sql_table_detail(conn_id: str, table_name: str, user='',store=Fals
         return [], str(table_fields_all_info)
 
 
-async def get_sql_table_data(conn_id: str, user:str, table_name: str, page_info) -> (str, bool):
+async def get_sql_table_data(conn_id: str, headers:dict, table_name: str, page_info) -> (str, bool):
     '''
     获取sql表数据
     '''
-    db_conn_obj = ConnObj(Avue.db_detail(conn_id, user)["data"])
+    db_conn_obj = ConnObj(Avue.db_detail(conn_id, headers)["data"])
     if not db_conn_obj:
         return f"连接不存在", False
     # 拼凑sql语句，通过jdbc获取数据
@@ -205,19 +205,19 @@ async def get_sql_table_data(conn_id: str, user:str, table_name: str, page_info)
 
 
 
-async def search_keyword( key_word:str, page_info, user:str) -> (str, bool):
+async def search_keyword( key_word:str, page_info, headers:dict) -> (str, bool):
     '''执行es搜索，不再检查缓存数据情况，直接进行搜索'''
     page, page_size = page_info["page_num"], page_info["page_size"]
     # try:
-    result,count = EsDbSearch().kw_search(key_word, page, page_size, user)
+    result,count = EsDbSearch().kw_search(key_word, page, page_size, headers)
     return {"code":0, "msg": "success", "data": {"count": count, "search_result": result}}
     # except Exception as e:
     #     return {"code":-1, "msg": f"error; {e}", "data": None}
 
-async def background_get_data_source_info(conn_id_list:list, user:str):
+async def background_get_data_source_info(conn_id_list:list, headers:dict):
     """后台获取数据源信息"""
     for conn_id in conn_id_list:
-        table_list, error = await get_sql_table_list(conn_id, user)
+        table_list, error = await get_sql_table_list(conn_id, headers)
         # 记录开始时间
         with open("cache_dataSource_log.txt", "a", encoding="utf-8") as f:
             f.write(f"{time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())}@{conn_id}")
@@ -230,7 +230,7 @@ async def background_get_data_source_info(conn_id_list:list, user:str):
         for table in table_list:
             # 获取每个表的字段列表
             if "SYS_NTGjqJ" not in table:
-                table_detail, error = await get_sql_table_detail(conn_id, table, user=user, store=True)
+                table_detail, error = await get_sql_table_detail(conn_id, table, headers=headers, store=True)
                 if error:
                     print(error)
                     continue
@@ -240,7 +240,7 @@ async def background_get_data_source_info(conn_id_list:list, user:str):
 
 
 
-async def get_dataSource_cache_log(user:str):
+async def get_dataSource_cache_log(header:dict):
     """获取数据源缓存日志"""
     try:
         with open("cache_dataSource_log.txt","r",encoding="utf-8") as f:

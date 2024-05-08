@@ -1,3 +1,4 @@
+import copy
 import json
 
 import requests
@@ -13,13 +14,14 @@ class AvueApi():
     def get_url(self, uri):
         return f"http://{settings.avue_host}{uri}"
 
-    def base_request(self, method, url, payload, headers=None, user=''):
+    def base_request(self, method, url, payload, headers=None):
         '''基本的request请求，所有请求都从这里发出'''
-        if not headers:
-            headers = {
-                'Content-Type': 'application/json',
-                "User": user,
-            }
+        default_headers = {
+            'Content-Type': 'application/json',
+        }
+        if headers:
+            default_headers.update(headers)
+
         print("# avue url:", url)
         timer = 3
 
@@ -28,14 +30,14 @@ class AvueApi():
             try:
                 res = None
                 if method == "get":
-                    res = requests.request(method, url, headers=headers, params=payload, timeout=2)
+                    res = requests.request(method, url, headers=default_headers, params=payload, timeout=2)
                 elif method == "post":
-                    res = requests.request(method, url, headers=headers, json=payload, timeout=2)
+                    res = requests.request(method, url, headers=default_headers, json=payload, timeout=2)
                 # 根据code处理
                 if res.status_code == 200:
                     return res.json()
                 else:
-                    print(res.text)
+                    print("# avue response status code not is 200: ", res.status_code)
                     return {"code": -1, "msg": f"请联系开发人员检查avue服务"}
             except Exception as e:
                 print("# avue error: ", str(e))
@@ -46,31 +48,40 @@ class AvueApi():
 
     def format_response(self, response):
         '''格式化返回值'''
-        print("avue: ", response)
+        print("avue response: ", response)
         if "success" in response.keys():
             del response["success"]
         try:
-            response["code"] = 0 if response["code"] == 200 else -1
+            if response["code"] == 200:
+                response.update({
+                    "code": 0,
+                    "msg": "请求成功(avue)"
+                })
+            else:
+                response.update({
+                    "code": -1,
+                    "msg": "请求失败(avue)"
+                })
             return response
         except Exception as e:
             return {"code": -1, "msg": str(e)}
 
-    def db_list(self,current,size, user:str):
+    def db_list(self,current,size, headers:dict):
         uri = f"/db/list?current={current}&size={size}"
         url = self.get_url(uri)
-        response = self.base_request("get", url, {}, user=user)
+        response = self.base_request("get", url, {}, headers=headers)
         return self.format_response(response)
 
-    def db_detail(self, id, user:str) ->dict:
+    def db_detail(self, id, headers:dict) ->dict:
         uri = f"/db/detail?id={id}"
         url = self.get_url(uri)
-        response = self.base_request("get", url, {}, user=user)
+        response = self.base_request("get", url, {}, headers=headers)
         return self.format_response(response)
 
-    def db_remove(self, user, id):
+    def db_remove(self, headers, id):
         uri = f"/db/remove?ids={id}"
         url = self.get_url(uri)
-        response = self.base_request("post", url, {}, user=user)
+        response = self.base_request("post", url, {}, headers=headers)
         return self.format_response(response)
 
     def db_test(self, data):
@@ -86,18 +97,16 @@ class AvueApi():
         response = self.base_request("post", url, {"sql": sql, "loginId": loginId, "id": id})
         return response
 
-    def db_save(self, id, data:dict, user:str):
+    def db_save(self, id, data:dict, headers:dict):
         if id:
             data.update({"id":str(id)})
         uri = f"/db/submit"
         url = self.get_url(uri)
-        remove_k = []
-        for k,v in data.items():
+        data_ = copy.deepcopy(data)
+        for k,v in data_.items():
             if not v:
-                remove_k.append(k)
-        for k in remove_k:
-            del data[k]
-        response = self.base_request("post", url, data, user=user)
+                del data[k]
+        response = self.base_request("post", url, data, headers=headers)
         return self.format_response(response)
 
     def db_sql_export(self, id, loginid, sql, data):
@@ -123,7 +132,7 @@ if __name__ == '__main__':
         'password': 'root'
     }
 
-    response = api.db_list(1,999, "admin")
+    response = api.db_save(None, body, {"user":"admin"})
     print(response)
 
 

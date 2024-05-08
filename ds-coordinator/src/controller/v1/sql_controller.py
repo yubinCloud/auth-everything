@@ -22,6 +22,7 @@ sql_router = APIRouter(tags=['关系型数据库'])
                 )
 async def test_sql_conn(
     form: sql_request.create_sql_conn = Depends(sql_request.create_sql_conn),
+    header: sql_request.custom_header = Depends(sql_request.custom_header)
 ):
     result = await sql_service.test_sql_conn(form)
     result.update(data="")
@@ -35,10 +36,10 @@ async def test_sql_conn(
                  )
 @role_check()
 async def create_sql_conn(
-    user: Annotated[Union[str, None], Header(...)] = None,
+    header: sql_request.custom_header = Depends(sql_request.custom_header),
     form: sql_request.create_sql_conn = Depends(sql_request.create_sql_conn),
 ):
-    result= await sql_service.create_sql_conn(form, user)
+    result= await sql_service.create_sql_conn(form, header)
     return RestfulModel.response(result)
 
 
@@ -50,10 +51,10 @@ async def create_sql_conn(
 @role_check()
 async def get_sql_conn_list(
     redis: aioredis.Redis = Depends(use_redis_client),
-    user: Annotated[Union[str, None], Header(...)] = None,
+    header: sql_request.custom_header = Depends(sql_request.custom_header),
     page: sql_request.page_query = Depends(sql_request.page_query),
 ):
-    result = await sql_service.get_sql_conn_list(page, user)
+    result = await sql_service.get_sql_conn_list(page, header)
     return RestfulModel.response(result)
 
 
@@ -65,10 +66,10 @@ async def get_sql_conn_list(
 @redis_cache()
 async def get_sql_conn_detail(
     redis: aioredis.Redis = Depends(use_redis_client),
-    user: Annotated[Union[str, None], Header(...)] = None,
+    header: sql_request.custom_header = Depends(sql_request.custom_header),
     id: str = Query(..., title='数据库连接id'),
 ):
-    result = await sql_service.get_sql_conn_detail(id, user)
+    result = await sql_service.get_sql_conn_detail(id, header)
     return RestfulModel.response(result)
 
 
@@ -79,11 +80,11 @@ async def get_sql_conn_detail(
                  )
 @role_check()
 async def update_sql_conn(
-    user: Annotated[Union[str, None], Header(...)] = None,
+    header: sql_request.custom_header = Depends(sql_request.custom_header),
     form: sql_request.create_sql_conn() = Depends(sql_request.create_sql_conn),
     id: str = Query(..., title='数据库连接id'),
 ):
-    result = await sql_service.update_sql_conn(id, form, user)
+    result = await sql_service.update_sql_conn(id, form, header)
     return RestfulModel.response(result)
 
 
@@ -94,10 +95,10 @@ async def update_sql_conn(
                 )
 @role_check()
 async def delete_sql_conn(
-    user: Annotated[Union[str, None], Header(...)] = None,
+    header: sql_request.custom_header = Depends(sql_request.custom_header),
     id: str = Query(..., title='数据库连接id'),
 ):
-    result = await sql_service.delete_sql_conn(id, user)
+    result = await sql_service.delete_sql_conn(id, header)
     return RestfulModel.response(result)
 
 
@@ -109,10 +110,10 @@ async def delete_sql_conn(
 @redis_cache()
 async def get_sql_table_list(
     redis: aioredis.Redis = Depends(use_redis_client),
-    user: Annotated[Union[str, None], Header(...)] = None,
+    header: sql_request.custom_header = Depends(sql_request.custom_header),
     id: str = Query(..., title='数据库连接id'),
 ):
-    result,error = await sql_service.get_sql_table_list(id, user)
+    result,error = await sql_service.get_sql_table_list(id, header)
     return RestfulModel.response(sql_service.make_response(result, msg=error))
 
 @sql_router.get(
@@ -123,11 +124,11 @@ async def get_sql_table_list(
 @role_check()
 async def get_sql_table_detail(
     redis: aioredis.Redis = Depends(use_redis_client),
-    user: Annotated[Union[str, None], Header(...)] = None,
+    header: sql_request.custom_header = Depends(sql_request.custom_header),
     id: str = Query(..., title='数据库连接id'),
     table_name: str = Query(..., title='数据库表名'),
 ):
-    result, msg = await sql_service.get_sql_table_detail(id, table_name, user=user)
+    result, msg = await sql_service.get_sql_table_detail(id, table_name, headers=header)
     return RestfulModel.response(sql_service.make_response(result, msg))
 
 
@@ -140,12 +141,12 @@ async def get_sql_table_detail(
 @redis_cache()
 async def get_sql_table_data4(
     redis: aioredis.Redis = Depends(use_redis_client),
-    user: Annotated[Union[str, None], Header(...)] = None,
+    header: sql_request.custom_header = Depends(sql_request.custom_header),
     id: str = Query(..., title='数据库连接id'),
     table_name: str = Query(..., title='数据库表名'),
     page: sql_request.page_query = Depends(sql_request.page_query),
 ):
-    result = await sql_service.get_sql_table_data(id, user, table_name, page)
+    result = await sql_service.get_sql_table_data(id, header, table_name, page)
     # return RestfulModel.response({"code":0, "msg":"success", "data":result})
     return RestfulModel.response(result)
 
@@ -160,12 +161,12 @@ async def get_sql_table_data4(
 @redis_cache()
 async def search_keyword(
     redis: aioredis.Redis = Depends(use_redis_client),
-    user: Annotated[Union[str, None], Header(...)] = None,
+    header: sql_request.custom_header = Depends(sql_request.custom_header),
     key_word: str = Query(..., title='关键字'),
     page: sql_request.page_query = Depends(sql_request.page_query),
 ):
     # 搜索关键字，从所有表的字段中搜索符合的关键字，返回连接信息
-    result = await sql_service.search_keyword(key_word, page, user)
+    result = await sql_service.search_keyword(key_word, page, header)
     return RestfulModel.response(result)
 
 # 一个后台任务，用于定时更新数据库连接的状态
@@ -180,10 +181,10 @@ from fastapi import BackgroundTasks
 @es_check()
 async def update_data_source_info(
     background_tasks: BackgroundTasks,
-    user: Annotated[Union[str, None], Header(...)] = None,
+    header: sql_request.custom_header = Depends(sql_request.custom_header),
     conn_id: List[str] = Query(..., title='数据库连接id'),
 ):
-    background_tasks.add_task(sql_service.background_get_data_source_info, conn_id, user)
+    background_tasks.add_task(sql_service.background_get_data_source_info, conn_id, header)
     return RestfulModel.response({"code":0, "msg":"success", "data":None})
 
 @sql_router.get(
@@ -196,10 +197,10 @@ async def update_data_source_info(
 @es_check()
 async def update_dataSource(
     background_tasks: BackgroundTasks,
-    user: Annotated[Union[str, None], Header(...)] = None,
+    header: sql_request.custom_header = Depends(sql_request.custom_header),
     conn_id: str = Query(..., title='数据库连接id',description="单次只允许1个"),
 ):
-    background_tasks.add_task(sql_service.background_get_data_source_info, [conn_id], user)
+    background_tasks.add_task(sql_service.background_get_data_source_info, [conn_id], header)
     return RestfulModel.response({"code":0, "msg":"success", "data":None})
 
 @sql_router.get(
@@ -210,9 +211,9 @@ async def update_dataSource(
 @role_check()
 @es_check()
 async def get_dataSource_cache_log(
-    user: Annotated[Union[str, None], Header(...)] = None,
+    header: sql_request.custom_header = Depends(sql_request.custom_header),
 ):
-    result = await sql_service.get_dataSource_cache_log(user)
+    result = await sql_service.get_dataSource_cache_log(header)
     return RestfulModel.response(result)
 
 

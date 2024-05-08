@@ -46,7 +46,7 @@ def role_check():
     def decorator(func):
         @functools.wraps(func)
         async def wrapper(*args, **kwargs):
-            if not kwargs.get("user") and not not settings.DEBUG:
+            if not kwargs.get("header",{}).get("user", None) and settings.DEBUG:
                 return {"code": -1, "msg": "role校验失败", "data":{}}
             result = await func(*args, **kwargs)
             return result
@@ -57,15 +57,13 @@ def es_check():
     def decorator(func):
         @functools.wraps(func)
         async def wrapper(*args, **kwargs):
-            if not kwargs.get("user") and not not settings.DEBUG:
-                return {"code": -1, "msg": "es校验失败", "data":{}}
             es_func_list = [
                 'get_dataSource_cache_log',
                 'search_keyword',
                 'update_data_source_info',
                 'update_dataSource',
             ]
-            if settings.CLOSE_es and func.__name__ in es_func_list:
+            if settings.CLOSE_ES and func.__name__ in es_func_list:
                 return RestfulModel.response({"code": 0, "msg": "es is close.", "data": {}})
             result = await func(*args, **kwargs)
             return result
