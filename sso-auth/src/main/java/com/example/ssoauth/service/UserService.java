@@ -1,6 +1,7 @@
 package com.example.ssoauth.service;
 
 import cn.dev33.satoken.dao.SaTokenDaoRedisJackson;
+import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONUtil;
 import com.example.ssoauth.dao.param.DeleteUserPermissionParam;
 import com.example.ssoauth.dao.param.NewUserDao;
@@ -13,6 +14,7 @@ import com.example.ssoauth.dto.request.UpdateUserReq;
 import com.example.ssoauth.entity.User;
 import com.example.ssoauth.exception.BaseBusinessException;
 import com.example.ssoauth.exception.LoginException;
+import com.example.ssoauth.exception.PermissionException;
 import com.example.ssoauth.exception.UserAddException;
 import com.example.ssoauth.exchange.JupyterExchange;
 import com.example.ssoauth.exchange.request.JupyterUserUpdateRequest;
@@ -55,6 +57,13 @@ public class UserService {
 
     @Transactional
     public void addUser(NewUserDto userDto, String whoAmI, Integer tenantId) {
+        //权限校验
+        List<Integer> roleList = userDto.getRoleList();
+        boolean permission = roleCheck(whoAmI, roleList);
+        if (!permission) {
+            throw new PermissionException();
+        }
+
         //生成loginId
         String loginId = loginIdUtil.appendLoginId(tenantId, whoAmI);
         //查询当前操作人的 jupyter token
@@ -92,10 +101,15 @@ public class UserService {
 
     @Transactional
     public void deleteByUsernameAndTenantId(DeleteUserReq req, String whoAmI, Integer myTenantId) {
-//        if (req.getTenantId() == null){
-//            req.setTenantId(DEFAULT_TENANT_ID);
-//        }
-        //redis中jupyter的token,key为loginId,需要先拼接
+        //获取被修改用户的 roleList
+        List<Integer> roleList = userMapper.selectByUsername(req.getUsername()).getRoleList().stream().mapToInt(role -> Integer.parseInt(role.toString())).boxed().toList();
+        //校验当前用户是否有权限修改
+        boolean permission = roleCheck(whoAmI, roleList);
+        if (!permission) {
+            throw new PermissionException();
+        }
+
+        //redis 中 jupyter的token, key为loginId, 需要先拼接
         String loginId = loginIdUtil.appendLoginId(myTenantId, whoAmI);
         String jupyterToken = findJupyterToken(loginId);
 
@@ -116,7 +130,7 @@ public class UserService {
     }
 
     @Transactional
-    public void updateUserInfo(UpdateUserReq updateUserReq, String whoAmI, Integer tenantId) {
+    public String updateUserInfo(UpdateUserReq updateUserReq, String whoAmI, Integer tenantId) {
 //        if (updateUserReq.getJupyterhubAdmin() != null) {
 //            String jupyterToken = findJupyterToken(whoAmI);
 //            var body = new JupyterUserUpdateRequest();
@@ -127,8 +141,19 @@ public class UserService {
 //                throw new BaseBusinessException("Exception in update jupyterhub-admin.");
 //            }
 //        }
+        //获取被修改用户的 roleList
+        UserDao updateUser = userMapper.selectByUsername(updateUserReq.getUsername());
+        List<Integer> updateUserRoleList = updateUser.getRoleList().stream().mapToInt(role -> Integer.parseInt(role.toString())).boxed().toList();
+        //校验当前用户是否有权限修改
+        boolean permission = roleCheck(whoAmI, updateUserRoleList);
+        if (!permission) {
+            throw new PermissionException();
+        }
+        //校验通过,修改用户信息
         var param = userConverter.toUpdateUserParam(updateUserReq);
         userMapper.updateUserInfo(param);
+        return "update success";
+
     }
 
     @Transactional
@@ -160,5 +185,26 @@ public class UserService {
             throw new LoginException("用户的 jupyter-token 获取失败，请重新登陆");
         }
         return "token " + ctx;
+    }
+
+    private boolean roleCheck(String myUsername, List<Integer> modifiedRoleList) {
+
+        UserDao whoAmI = userMapper.selectByUsername(myUsername);
+        List<Integer> myRoleList = whoAmI.getRoleList().stream().mapToInt(role -> Integer.parseInt(role.toString())).boxed().toList();
+        //双层校验
+        boolean modifiedIsSuperAdmin = !modifiedRoleList.stream().filter(role -> role == 1).toList().isEmpty();
+        boolean modifiedIsAdmin = !modifiedRoleList.stream().filter(role -> role == 4).toList().isEmpty();
+        boolean IAmSuperAdmin = !myRoleList.stream().filter(role -> role == 1).toList().isEmpty();
+        boolean IAmAdmin = !myRoleList.stream().filter(role -> role == 4).toList().isEmpty();
+
+        if (modifiedIsSuperAdmin) {
+            //若被修改用户为 super-admin , 检查当前用户是否为 super-admin
+            return IAmSuperAdmin;
+        } else {
+            //若被修改的用户为 admin , 检查当前用户是否为 admin 或 super-admin
+            if (modifiedIsAdmin) {
+                return (IAmAdmin || IAmSuperAdmin);
+            } else return true;
+        }
     }
 }

@@ -32,6 +32,8 @@ spring:
 
 sa-token:
   token-name: authz
+  timeout: 259200
+  activity-timeout: 86400
   is-concurrent: true
   is-share: true
   token-style: uuid

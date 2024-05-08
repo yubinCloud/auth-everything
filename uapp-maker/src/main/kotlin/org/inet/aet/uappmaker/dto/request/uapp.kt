@@ -13,6 +13,7 @@ data class CreateUappRequest (
 
     var groupId: String?,
 
+
     @NotBlank
     var name: String,
 
@@ -31,8 +32,14 @@ data class CreateUappRequest (
     @Schema(description = "是否与共享者共同编辑，不可编辑的话，只有自己可以编辑")
     var coEdit: Boolean,
 
+    @Schema(description = "当前uapp可以使用的大屏id列表")
+    var usableAvues: List<String>?,
+
     @Schema(description = "前端不需要传递这个参数")
     var owner: String?,
+
+    @Schema(description = "前端不需要传递这个参数")
+    var tenantId: Int?,
 )
 
 @Schema(description = "更新 Uapp 的元数据")
@@ -43,6 +50,7 @@ data class UpdateUappMetadataRequest (
     var banner: String?,
     var topic: String?,
     var description: String?,
+    var usableAvues: List<String>?,
 
     var iShare: Boolean?,
     var coEdit: Boolean?,

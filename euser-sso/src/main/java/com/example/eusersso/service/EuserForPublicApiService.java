@@ -8,11 +8,14 @@ import com.example.eusersso.dto.response.PageResp;
 
 import com.example.eusersso.mapper.EuserMapper;
 import com.example.eusersso.repository.AfRoutePermRepository;
+import com.example.eusersso.util.ConstantUtil;
 import com.example.eusersso.util.PermissionCheckUtil;
 import com.example.eusersso.util.SubsystemEnum;
+import com.example.eusersso.util.TimestampUtil;
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
@@ -33,17 +36,16 @@ public class EuserForPublicApiService {
     private PermissionCheckUtil permissionCheckUtil;
 
 
-    private static final Integer DEFAULT_TENANT_ID = 1;
-
+    @Transactional
     public int createEuser(NewUserDto newUserDto, String createdBy, Integer tenantId) {
         //校验管理员权限等级
         boolean permission = permissionCheckUtil.superAdminCheck(createdBy, tenantId);
 
-        if (newUserDto.getTenantId() == null){
-            newUserDto.setTenantId(DEFAULT_TENANT_ID);
+        if (newUserDto.getTenantId() == null) {
+            newUserDto.setTenantId(ConstantUtil.DEFAULT_TENANT_ID);
         }
         //如果没有super-admin权限,则需要将新用户的tenantId与当前管理员同步
-        if ( !permission && tenantId != newUserDto.getTenantId()){
+        if (!permission && tenantId != newUserDto.getTenantId()) {
             newUserDto.setTenantId(tenantId);
         }
 
@@ -57,14 +59,15 @@ public class EuserForPublicApiService {
 
     public PageResp<EuserListItem> selectPageByCond(String username, String screenName, String routePath, Integer tenantId,
                                                     Integer pageNum, Integer pageSize) {
-        return euserService.selectPageByCond(username, screenName, null, tenantId,
-                routePath, pageNum, pageSize, SubsystemEnum.PUBLIC_API);
+        return euserService.selectPageByCond(username, screenName, null, tenantId, routePath,
+                null, pageNum, pageSize, SubsystemEnum.PUBLIC_API);
     }
 
     public List<String> queryPermissionList(String username, Integer tenantId) {
         return afRoutePermRepository.queryPermListInDB(username, tenantId);
     }
 
+    @Transactional
     public void addPublicAPIPermission(String username, Integer tenantId, List<String> routes) {
         afRoutePermRepository.addPermission(username, tenantId, routes);
     }

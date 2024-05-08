@@ -46,4 +46,18 @@ class UappGroupRepository (private val uappGroupCrudRepository: UappGroupCrudRep
     fun count(): Long {
         return uappGroupCrudRepository.count()
     }
+
+    /**
+     * 根据 tenantId 创建查询条件
+     */
+    fun oprOfQueryByTenantId(tenantId: Int): Query {
+        val criteria = Criteria().andOperator(
+                Criteria.where("tenantId").`is`(tenantId)
+        )
+        return Query(criteria)
+    }
+
+    fun executeQuery(query: Query): List<UappGroup> {
+        return mongoTemplate.find(query, UappGroup::class.java)
+    }
 }

@@ -6,7 +6,8 @@ package com.example.eusersso.util;
 public enum SubsystemEnum {
 
     AVUE("AVUE", "access-avue"),
-    PUBLIC_API("PUBLIC_API", "access-pa");
+    PUBLIC_API("PUBLIC_API", "access-pa"),
+    UAPP("UAPP", "access-uapp");
 
     private final String name;  // 子系统的名字
 

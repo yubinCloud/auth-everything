@@ -4,6 +4,7 @@ data class CreateUappGroupRequest (
     val name: String,
     val icon: String,
     val description: String?,
+    var tenantId: Int?,
 )
 
 data class MoveUappRequest (

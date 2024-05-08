@@ -22,7 +22,6 @@ public class NewUserDto {
     @Schema(description = "密码")
     private String password;
 
-    @NotBlank
     @Schema(description = "租户类型")
     private Integer tenantId;
 
@@ -46,5 +45,11 @@ public class NewUserDto {
     @Size(max = 25, message = "手机号最长 30 字符")
     @Schema(description = "手机号")
     private String mobile;
+
+    @Schema(description = "uapp角色类型(1是管理员,2是普通用户)")
+    private Integer uappRole;
+
+    @Schema(description = "uapp用户的uappID")
+    private String uappId;
 
 }

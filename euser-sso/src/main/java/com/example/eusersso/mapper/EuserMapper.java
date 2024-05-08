@@ -2,10 +2,11 @@ package com.example.eusersso.mapper;
 
 import com.example.eusersso.dao.EuserDao;
 import com.example.eusersso.dao.param.EuserSelectCond;
-import com.example.eusersso.dto.request.UpdateAddPublicAPIPermissionRequest;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
+import org.postgresql.util.PSQLException;
+import org.springframework.dao.DuplicateKeyException;
 
+import java.sql.SQLException;
 import java.util.List;
 
 
@@ -16,11 +17,13 @@ public interface EuserMapper {
 
     EuserDao selectByMobile(String mobile);
 
-    int insertOne(EuserDao euser);
+    int insertOne(EuserDao euser) throws DuplicateKeyException;
 
     int userTotalOfAvue();
 
     int userTotalOfPublicAPI();
+
+    int userTotalOfUapp();
 
     List<EuserDao> selectByCond(EuserSelectCond cond);
 
@@ -40,4 +43,5 @@ public interface EuserMapper {
 
     EuserDao selectByUsernameAndTenantId(String username, Integer tenantId);
 
+    int addUapp(EuserDao euserDao);
 }

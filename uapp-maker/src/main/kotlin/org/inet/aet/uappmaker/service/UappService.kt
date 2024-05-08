@@ -20,6 +20,9 @@ class UappService (val uappRepository: UappRepository) {
     }
 
     fun createUapp(body: CreateUappRequest): Uapp {
+        if (body.tenantId == null){
+            body.tenantId = 1
+        }
         val uapp = UappFactory.createUapp(body)
         val doc = uappRepository.saveUapp(uapp)
         log.info("Create uapp success, id: ${doc.uappId}, type: ${doc.appType}")
@@ -30,17 +33,17 @@ class UappService (val uappRepository: UappRepository) {
      * 校验 userId 的用户是否有权限编辑 uappId 的 UAPP
      * 如果没有权限，则直接抛出异常
      */
-    fun checkEditPermission(uappId: String, userId: String, onlyMeta: Boolean = false): Uapp {
+    fun checkEditPermission(uappId: String, user: String, onlyMeta: Boolean = false): Uapp {
         val uapp = when (onlyMeta) {
             false -> uappRepository.findById(uappId)
             true -> uappRepository.findMetadataById(uappId)
         }
-        checkEditPermission(uapp, userId)
+        checkEditPermission(uapp, user)
         return uapp!!
     }
 
-    private fun checkEditPermission(uapp: Uapp?, userId: String) {
-        if (uapp == null || (uapp.owner != userId && !uapp.coEdit)) {
+    private fun checkEditPermission(uapp: Uapp?, user: String) {
+        if (uapp == null || (uapp.owner != user && !uapp.coEdit)) {
             throw UappPermissionException("Uapp 不存在或者没有编辑权限")
         }
     }
@@ -84,7 +87,9 @@ class UappService (val uappRepository: UappRepository) {
             updateTime = uapp.updateTime,
             iShare = uapp.iShare,
             coEdit = uapp.coEdit,
-            eShare = uapp.eShare
+            eShare = uapp.eShare,
+            tenantId = uapp.tenantId,
+            usableAvues = uapp.usableAvues,
         )
         return metadata
     }
@@ -98,8 +103,8 @@ class UappService (val uappRepository: UappRepository) {
         return uappRepository.updateUappMetadata(uappId, updateReq)
     }
 
-    fun listUapp(groupId: String, userId: String): PageInfo<UappMetadata> {
-        val query = uappRepository.oprOfQueryByGroupId(groupId, userId)
+    fun listUapp(groupId: String, user: String, tenantId: Int): PageInfo<UappMetadata> {
+        val query = uappRepository.oprOfQueryByGroupId(groupId, user, tenantId)
         val uappCnt = uappRepository.executeCount(query)
         val uappList = uappRepository.executeQuery(query)
         val metadataList = uappList.map { convertMetadata(it) }

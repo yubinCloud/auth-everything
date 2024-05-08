@@ -28,7 +28,7 @@ export default (app) => {
       res.json(resbody.getSuccessResult(data));
     }).catch(error => {
       res.json(resbody.getFailResult(error));
-    });;
+    });
   })
   app.get(url + '/detail', jsonParser, function (req, res) {
     const id = req.query.id;
@@ -77,19 +77,15 @@ export default (app) => {
   })
   app.post(url + '/submit', jsonParser, function (req, res) {
     const data = req.body;
+    data.tenantId = req.get("X-TenantId");
     if (data.id) {
       dbDao.update(data).then(data => {
         res.json(resbody.getSuccessResult(data));
       }).catch(error => {
         res.json(resbody.getFailResult(error));
       });
-    } else {
-      Object.defineProperty(data,"tenantId",{
-        value: req.get("X-TenantId"),
-        writable: true, // 是否可写
-        enumerable: true, // 是否可枚举
-        configurable: true
-      })
+    }
+    else {
       dbDao.save(data).then(data => {
         res.json(resbody.getSuccessResult(data));
       }).catch(error => {

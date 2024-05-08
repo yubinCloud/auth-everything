@@ -4,6 +4,7 @@ import cn.hutool.json.JSONUtil;
 import com.example.eusersso.converter.EuserConverter;
 import com.example.eusersso.dao.EuserDao;
 import com.example.eusersso.dao.param.EuserSelectCond;
+import com.example.eusersso.dto.request.EuserUappDto;
 import com.example.eusersso.dto.request.UpdateEuserDto;
 import com.example.eusersso.dto.response.EuserListItem;
 import com.example.eusersso.dto.response.PageResp;
@@ -25,10 +26,12 @@ import com.example.eusersso.util.TimestampUtil;
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.postgresql.util.PSQLException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.rmi.Remote;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 
@@ -59,12 +62,19 @@ public class EuserService {
     public int insertOne(EuserDao euserDao) {
         euserDao.setPassword(passwordEncoder.encode(euserDao.getPassword()));
         euserDao.setCreateTime(TimestampUtil.now());  // 获取自1970年1月1日以来的秒数
-        return euserMapper.insertOne(euserDao);
+        euserDao.setLastUpdatedIuser(euserDao.getCreatedBy());
+        euserDao.setLastUpdatedTime(TimestampUtil.now());
+
+        try{
+            return euserMapper.insertOne(euserDao);
+        }catch (DuplicateKeyException e){
+                return -100;
+        }
     }
 
     @Transactional
     public PageResp<EuserListItem> selectPageByCond(String username, String screenName, Integer roleId, Integer tenantId,
-                                                    String routePath, Integer pageNum, Integer pageSize,
+                                                    String routePath, Integer uappRole, Integer pageNum, Integer pageSize,
                                                     SubsystemEnum subsystem
     ) {
         //封装查询条件
@@ -77,6 +87,7 @@ public class EuserService {
         cond.setDbAccessLabel(subsystem.getDbAccessLabel());
         cond.setPageSize(pageSize);
         cond.setPageNum(pageNum);
+        cond.setUappRole(uappRole);
 
         var list = selectByCond(cond);
         PageResp<EuserListItem> page = new PageResp<>();
@@ -152,6 +163,17 @@ public class EuserService {
         }).toList();
     }
 
+    @Transactional
+    public int addUapp(EuserUappDto uappDto, String whoAmI, Integer tenantId) {
+        EuserDao euserDao = new EuserDao();
+        euserDao.setUsername(uappDto.getUsername());
+        euserDao.setUappId(uappDto.getUappId());
+        euserDao.setLastUpdatedIuser(whoAmI);
+        euserDao.setTenantId(tenantId);
+
+        return euserMapper.addUapp(euserDao);
+    }
+
     private String prepostParam(String selectParam) {
         if (StringUtils.isBlank(selectParam)) {
             selectParam = null;
@@ -160,4 +182,6 @@ public class EuserService {
         }
         return selectParam;
     }
+
+
 }

@@ -37,6 +37,10 @@ public class EuserDao implements Serializable {
 
     private Integer tenantId;
 
+    private Integer uappRole;
+
+    private String uappId;
+
     private Map<String, Object> labels;
 
     private String lastUpdatedIuser;

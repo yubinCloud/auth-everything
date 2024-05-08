@@ -9,7 +9,6 @@ function save (data) {
     let visual = data.visual;
     let config = data.config;
     let id;
-    console.log("VISUAL:"+JSON.stringify(visual))
     insert({
       table,
       column: toColumn(visualMode.id, visualMode.column),
@@ -92,7 +91,7 @@ export default {
       })
     })
   },
-  copy: (id) => {
+  copy: (id,req) => {
     return new Promise((resolve) => {
       let data = {
         visual: {},
@@ -103,6 +102,7 @@ export default {
         return list({ table: tableConfig, data: { visual_id: data.visual.id }, parent: true })
       }).then(res2 => {
         data.config = res2[0];
+        data.visual.tenantId = req.get("X-TenantId");
         return save(data)
       }).then(res3 => {
         resolve(res3)

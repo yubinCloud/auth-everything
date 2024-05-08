@@ -12,7 +12,6 @@ export default (app) => {
       size: req.query.size,
       tenantId: req.get("X-TenantId")
     };
-    console.log(JSON.stringify(query))
     categoryDao.list(query).then(data => {
       res.json(resbody.getSuccessResult(data));
     }).catch(error => {
@@ -37,12 +36,8 @@ export default (app) => {
   })
   app.post(url + '/save', jsonParser, function (req, res) {
     const data = req.body;
-    Object.defineProperty(data,"tenantId",{
-      value: req.get("X-TenantId"),
-      writable: true, // 是否可写
-      enumerable: true, // 是否可枚举
-      configurable: true
-    })
+    data.tenantId = req.get("X-TenantId");
+
     categoryDao.save(data).then(data => {
       res.json(resbody.getSuccessResult(data));
     }).catch(error => {
@@ -51,6 +46,7 @@ export default (app) => {
   })
   app.post(url + '/update', jsonParser, function (req, res) {
     const data = req.body;
+    data.tenantId = req.get("X-TenantId");
     categoryDao.update(data).then(data => {
       res.json(resbody.getSuccessResult(data));
     }).catch(error => {

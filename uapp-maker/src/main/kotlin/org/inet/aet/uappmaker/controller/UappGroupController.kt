@@ -3,6 +3,7 @@ package org.inet.aet.uappmaker.controller
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
+import org.inet.aet.uappmaker.constant.XReqHeader
 import org.inet.aet.uappmaker.dto.request.CreateUappGroupRequest
 import org.inet.aet.uappmaker.dto.request.UpdateUappGroupRequest
 import org.inet.aet.uappmaker.dto.response.PageInfo
@@ -22,8 +23,10 @@ class UappGroupController (private val uappGroupService: UappGroupService) {
 
     @PostMapping("/create")
     @Operation(summary = "创建一个 Uapp Group")
-    fun createUappGroup(@RequestBody @Valid createUappGroupRequest: CreateUappGroupRequest): R<UappGroup> {
-        val uappGroup = uappGroupService.createUappGroup(createUappGroupRequest)
+    fun createUappGroup(@RequestBody @Valid body: CreateUappGroupRequest,
+                        @RequestHeader(XReqHeader.IUSER_TENANTID) tenantId: Int): R<UappGroup> {
+        body.tenantId = tenantId
+        val uappGroup = uappGroupService.createUappGroup(body)
         return R_SUCCESS(uappGroup)
     }
 
@@ -49,8 +52,8 @@ class UappGroupController (private val uappGroupService: UappGroupService) {
 
     @GetMapping("/all")
     @Operation(summary = "获取全部 Uapp Group")
-    fun allUappGroups(): R<List<UappGroup>> {
-        val result = uappGroupService.allUappGroups()
+    fun allUappGroups(@RequestHeader(XReqHeader.IUSER_TENANTID) tenantId: Int): R<List<UappGroup>> {
+        val result = uappGroupService.allUappGroups(tenantId)
         return R_SUCCESS(result)
     }
 }
