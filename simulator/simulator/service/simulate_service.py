@@ -56,8 +56,6 @@ class SimulateService:
         :param visual_id: _description_
         :param components: _description_
         """
-        await page.goto(self.path_service.get_simulate_login_path(), wait_until="commit")
-        await self._load_localstorage(page, credits)
         for component_id in components:
             url = self.path_service.get_component_path(visual_id, component_id)
             logger.info(f'enter url: {url}')

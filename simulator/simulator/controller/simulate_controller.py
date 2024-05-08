@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, Body, BackgroundTasks
 from playwright.async_api import Browser
 from typing import List
+import json
 
 from dependencies import use_browser
 from schema.response import R
@@ -31,7 +32,14 @@ async def save_imgs_func(
     :param path_service: _description_
     :param simulate_service: _description_
     """
-    page = await browser.new_page()
+    context = await browser.new_context()
+    item = {
+        'key': 'creditTech-insights',
+        'value': credits
+    }
+    item_str = json.dumps(item)
+    await context.add_init_script("(item => localStorage.setItem(item.key, item.value))(" + item_str + ")")
+    page = await context.new_page()
     await simulate_service.save_images(page, visual_id, components, credits)
     await page.close()
     
