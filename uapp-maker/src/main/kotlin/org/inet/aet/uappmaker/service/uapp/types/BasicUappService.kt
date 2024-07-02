@@ -81,12 +81,13 @@ class BasicUappService (private val uappService: UappService,
             throw BaseBuzException("无法在 APP ${uapp.uappId} 中找到 tab $tabId")
         }
 
-        //检查 nav 是否在 uapp 的 usableAvues 中
-        val permission = checkUsableAvues(uapp.usableAvues, navInfo.path);
-        if (!permission){
-            log.info("Nav ${navInfo.path} not found in uapp ${uapp.uappId}")
-            throw BaseBuzException("无法在 APP ${uapp.uappId} 中找到 nav ${navInfo.path}")
-        }
+        // TODO 检查增加的 nav 是否在 usableAvues 中
+//        //检查 nav 是否在 uapp 的 usableAvues 中
+//        val permission = checkUsableAvues(uapp.usableAvues, navInfo.path);
+//        if (!permission){
+//            log.info("Nav ${navInfo.path} not found in uapp ${uapp.uappId}")
+//            throw BaseBuzException("无法在 APP ${uapp.uappId} 中找到 nav ${navInfo.path}")
+//        }
 
         val nav = UiBasicNav(
             id = UUID.randomUUID().toString().replace("-", ""),
@@ -109,12 +110,13 @@ class BasicUappService (private val uappService: UappService,
      * 为 nav 添加 child nav
      */
     fun addNavChild(navInfo: CreateNavInfo, uapp: Uapp, parentId: String): Boolean {
-        //检查 nav 是否在 uapp 的 usableAvues 中
-        val permission = checkUsableAvues(uapp.usableAvues, navInfo.path);
-        if (!permission){
-            log.info("Nav ${navInfo.path} not found in uapp ${uapp.uappId}")
-            throw BaseBuzException("无法在 APP ${uapp.uappId} 中找到 nav ${navInfo.path}")
-        }
+        // TODO 检查增加的 nav 是否在 usableAvues 中
+//        //检查 nav 是否在 uapp 的 usableAvues
+//        val permission = checkUsableAvues(uapp.usableAvues, navInfo.path);
+//        if (!permission){
+//            log.info("Nav ${navInfo.path} not found in uapp ${uapp.uappId}")
+//            throw BaseBuzException("无法在 APP ${uapp.uappId} 中找到 nav ${navInfo.path}")
+//        }
 
         val tabs = parseContent(uapp)
         val childNav = UiBasicNav(
