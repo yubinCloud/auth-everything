@@ -25,7 +25,7 @@ public class ExchangeClientConfig {
                 .filter(reactorLoadBalancerExchangeFilterFunction)
                 .baseUrl("lb://jupyter-service" + "/jupyter")
                 .build();
-        var factory = HttpServiceProxyFactory.builder(WebClientAdapter.forClient(client)).blockTimeout(Duration.ofSeconds(60)).build();
+        var factory = HttpServiceProxyFactory.builderFor(WebClientAdapter.create(client)).build();
         return factory.createClient(JupyterExchange.class);
     }
 }

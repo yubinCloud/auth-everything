@@ -39,3 +39,20 @@ def headers(
     return {
         "yes": "yes"
     }
+
+
+@app.post('/api/nl_sql')
+def nl2sql(request: Request):
+    print(request)
+    return {
+        'code': 200,
+        'msg': '',
+        'data': {
+            'sql': "SELECT * FROM mock",
+            'chart': 'bar',
+            'guess': [
+                '今年的销售收入较去年相比增长了多少？',
+                '有哪些产品或服务贡献了今年销售收入的主要增长？'
+            ]
+        }
+    }

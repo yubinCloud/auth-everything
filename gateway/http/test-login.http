@@ -34,3 +34,21 @@ GET http://10.245.142.233:10010/antv/
 
 ### GET request with parameter
 GET http://127.0.0.1:10010/hello/admin
+
+### Post Dataease
+POST http://127.0.0.1:10010/de-api/api/auth/userInfo
+
+
+### Post native Dataease
+POST http://127.0.0.1:9081/de-api/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "xxxx",
+  "loginType": 3
+}
+
+### Post Dataease
+POST http://127.0.0.1:9081/de-api/api/auth/userInfo
+Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3MTkwNDg2MDgsInVzZXJJZCI6MSwidXNlcm5hbWUiOiJhZG1pbiJ9.1FZykkY0A70fsLWkKCh_thpDTdhp2wgulyaaS0Nr0PE

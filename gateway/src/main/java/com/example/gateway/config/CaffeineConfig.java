@@ -40,4 +40,17 @@ public class CaffeineConfig {
                 .maximumSize(500)
                 .build();
     }
+
+    /**
+     * 缓存 dataease-backend 服务所需 token 的 cache
+     * @return
+     */
+    @Bean
+    public Cache<String, String> dataeaseTokenCache() {
+        return Caffeine.newBuilder()
+                .expireAfterWrite(5, TimeUnit.MINUTES)
+                .initialCapacity(30)
+                .maximumSize(500)
+                .build();
+    }
 }

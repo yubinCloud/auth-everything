@@ -24,9 +24,7 @@ import java.util.Objects;
 @RequestMapping("/exec")
 @RequiredArgsConstructor
 @Slf4j
-@Tag(
-        name = "执行 SQL 语句"
-)
+@Tag(name = "执行 SQL 的 API")
 public class ExecController {
 
     private final ExecuteService executeService;
@@ -35,7 +33,7 @@ public class ExecController {
     @Operation(summary = "执行 SQL 查询语句")
     public R<List<Map<String, Object>>> executeSelectSQL(
             @RequestBody @Valid ExecuteSQLRequest body
-    ) throws SQLException {
+    ) throws SQLException, ClassNotFoundException {
         List<Map<String, Object>> list;
         if (Objects.isNull(body.getSlots()) || body.getSlots().isEmpty()) {
             list = executeService.execQueryWithoutSlots(body);
@@ -66,5 +64,18 @@ public class ExecController {
     ) {
         ExecuteMultiSQLResponse resp = executeService.execMultiSQL(body);
         return R.ok(resp);
+    }
+
+    public static void main(String[] args) throws ClassNotFoundException, SQLException {
+        String SQL = "SELECT * FROM yubin";
+
+        Class.forName("com.dbcp.jdbc.Driver");
+        String url = "jdbc:dbcp://10.245.142.206:6688/dbs";
+        String username = "u01";
+        String password = "abc123";
+        Connection conn = DriverManager.getConnection(url, username, password);
+        Statement statement = conn.createStatement();
+        statement.execute(SQL);
+        conn.commit();
     }
 }

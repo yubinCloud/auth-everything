@@ -24,10 +24,9 @@ public class GlobalExceptionHandler {
      * @return
      */
     @ResponseBody
-    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
-    @ExceptionHandler({ SQLException.class, SQLExecuteException.class })
-    public R<String> handleSqlException(@NotNull Exception e) {
-        return R.badRequest("SQL 异常，请重新检查相关配置。错误：" + e.getMessage(), e.getMessage());
+    @ExceptionHandler({ SQLException.class})
+    public R<Object> handleSqlException(@NotNull SQLException e) {
+        return R.sqlExecError(e.getMessage());
     }
 
     /**

@@ -13,8 +13,9 @@ public class DriverClassListConfig {
             "org.postgresql.Driver",            // PG
             "oracle.jdbc.driver.OracleDriver",         // Oracle
             "com.mysql.cj.jdbc.Driver",         // MySQL
-            "org.apache.hive.jdbc.HiveDriver",  // Hive or Inceptor
-            "com.microsoft.sqlserver.jdbc.SQLServerDriver"  // SQL Server
+//            "org.apache.hive.jdbc.HiveDriver",  // Hive or Inceptor
+            "com.microsoft.sqlserver.jdbc.SQLServerDriver",  // SQL Server
+            "com.dbcp.jdbc.Driver"  // 航天云网 TyDB
     );
 
     @Bean

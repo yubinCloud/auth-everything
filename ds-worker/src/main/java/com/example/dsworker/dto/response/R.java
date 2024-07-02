@@ -20,6 +20,7 @@ public class R<T> implements Serializable {
     public static final int CODE_SUCCESS = 0;
     public static final int CODE_ERROR = -500;
     public static final int BAD_REQUEST = -400;
+    public static final int SQL_EXEC_ERROR = 1;    // 表示 SQL 执行出错
 
     @Getter
     @Setter
@@ -62,6 +63,10 @@ public class R<T> implements Serializable {
 
     public static R<String> badRequest(String msg, String data) {
         return new R<>(BAD_REQUEST, msg, data);
+    }
+
+    public static R<Object> sqlExecError(String msg) {
+        return new R<>(SQL_EXEC_ERROR, msg, null);
     }
 
     public String toString() {

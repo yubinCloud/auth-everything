@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.1.0</version>
+        <version>3.3.0</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.example</groupId>
@@ -15,7 +15,8 @@
     <description>ds-worker</description>
     <properties>
         <java.version>17</java.version>
-        <spring-cloud.version>2022.0.4</spring-cloud.version>
+        <spring-cloud.version>2023.0.2</spring-cloud.version>
+        <spring-cloud-alibaba.version>2023.0.1.0</spring-cloud-alibaba.version>
         <knife4j.version>4.1.0</knife4j.version>
         <hikaricp.version>5.0.1</hikaricp.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
@@ -64,12 +65,20 @@
             <scope>runtime</scope>
         </dependency>
         <!--- 星环 Inceptor 驱动 -->
+<!--        <dependency>-->
+<!--            <groupId>io.transwarp</groupId>-->
+<!--            <artifactId>jdbc</artifactId>-->
+<!--            <version>1.2</version>-->
+<!--            <scope>system</scope>-->
+<!--            <systemPath>${pom.basedir}/src/main/resources/libs/inceptor/inceptor-sdk-studio-1.2.jar</systemPath>-->
+<!--        </dependency>-->
+        <!--- 航天云网 TyDB 驱动 -->
         <dependency>
-            <groupId>io.transwarp</groupId>
-            <artifactId>jdbc</artifactId>
-            <version>1.2</version>
+            <groupId>com.dbcp.jdbc</groupId>
+            <artifactId>dbcp-jdbc</artifactId>
+            <version>2.0</version>
             <scope>system</scope>
-            <systemPath>${pom.basedir}/src/main/resources/libs/inceptor/inceptor-sdk-studio-1.2.jar</systemPath>
+            <systemPath>${pom.basedir}/src/main/resources/libs/tydb/tydb-jdbc-17.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -117,7 +126,7 @@
             <dependency>
                 <groupId>com.alibaba.cloud</groupId>
                 <artifactId>spring-cloud-alibaba-dependencies</artifactId>
-                <version>2022.0.0.0</version>
+                <version>${spring-cloud-alibaba.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

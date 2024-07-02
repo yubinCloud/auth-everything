@@ -4,7 +4,6 @@ import cn.dev33.satoken.stp.StpUtil;
 import com.example.ssoauth.entity.User;
 import com.example.ssoauth.service.JupyterService;
 import com.example.ssoauth.service.UserService;
-import com.example.ssoauth.util.LoginIdUtil;
 import com.example.ssoauth.util.PasswordEncoder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -30,8 +29,6 @@ public class InternalController {
 
     private final PasswordEncoder passwordEncoder;
 
-    private final LoginIdUtil loginIdUtil;
-
     //euser-sso和xxl-job中均有调用,勿动
     @GetMapping("/user/info/{username}")
     @Operation(summary = "查看用户信息")
@@ -56,11 +53,9 @@ public class InternalController {
     @GetMapping("/user/jupyter/ctx")
     @Operation(summary = "获取用户的 jupyter 登录信息的上下文")
     public String getJupyterToken(
-            @NotBlank @Parameter(description = "用户名", required = true) @RequestParam String username,
-            @RequestHeader("X-TenantId") Integer tenantId
+            @NotBlank @Parameter(description = "用户名", required = true) @RequestParam String username
     ) {
-        String loginId = loginIdUtil.appendLoginId(tenantId,username);
-        return jupyterService.findCtx(loginId);
+        return jupyterService.findCtx(username);
     }
 
     @GetMapping("/user/jupyter/ctxByToken")

@@ -24,20 +24,22 @@ public class ExecuteService {
 
     private static final Pattern SQL_SLOT_PATTERN = Pattern.compile("#\\{.+?}");
 
-    public List<Map<String, Object>> execQueryWithoutSlots(ExecuteSQLRequest body) throws SQLException {
+    public List<Map<String, Object>> execQueryWithoutSlots(ExecuteSQLRequest body) throws SQLException, ClassNotFoundException {
         List<Map<String, Object>> list;
+        Class.forName(body.getDataSourceConf().getDriverClass());
         try (
                 Connection conn = dataSourceService.getConnection(body.getDataSourceConf());
                 Statement statement = conn.createStatement();
                 ResultSet rs = statement.executeQuery(body.getSql())
         ) {
-            list = ResultSetConverter.toList(rs);
+            list = ResultSetConverter.toList(rs, body.getQueryLimit(), body.getQueryOffset());
 //            conn.commit();
         }
         return list;
     }
 
-    public List<Map<String, Object>> execQueryWithSlots(ExecuteSQLRequest body) throws SQLException {
+    public List<Map<String, Object>> execQueryWithSlots(ExecuteSQLRequest body) throws SQLException, ClassNotFoundException {
+        Class.forName(body.getDataSourceConf().getDriverClass());
         List<SQLSlot> slots = new ArrayList<>();
         String slottedSQL = fillSlots(body.getSql(), body.getSlots(), slots);
         System.out.println(slottedSQL);
@@ -47,7 +49,7 @@ public class ExecuteService {
                 PreparedStatement preparedStatement = createPreparedStatement(conn, slottedSQL, slots);
                 ResultSet rs = preparedStatement.executeQuery()
         ) {
-            list = ResultSetConverter.toList(rs);
+            list = ResultSetConverter.toList(rs, body.getQueryLimit(), body.getQueryOffset());
             conn.commit();
         }
         return list;

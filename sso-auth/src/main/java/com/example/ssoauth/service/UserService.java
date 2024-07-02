@@ -1,7 +1,6 @@
 package com.example.ssoauth.service;
 
 import cn.dev33.satoken.dao.SaTokenDaoRedisJackson;
-import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONUtil;
 import com.example.ssoauth.dao.param.DeleteUserPermissionParam;
 import com.example.ssoauth.dao.param.NewUserDao;
@@ -17,13 +16,11 @@ import com.example.ssoauth.exception.LoginException;
 import com.example.ssoauth.exception.PermissionException;
 import com.example.ssoauth.exception.UserAddException;
 import com.example.ssoauth.exchange.JupyterExchange;
-import com.example.ssoauth.exchange.request.JupyterUserUpdateRequest;
 import com.example.ssoauth.exchange.request.JupyterUsrCreateRequest;
 import com.example.ssoauth.exchange.response.JR;
 import com.example.ssoauth.mapper.UserMapper;
 import com.example.ssoauth.mapstruct.UserConverter;
 import com.example.ssoauth.mapstructutil.UserConverterUtil;
-import com.example.ssoauth.util.LoginIdUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import lombok.RequiredArgsConstructor;
@@ -50,8 +47,6 @@ public class UserService {
 
     private final SaTokenDaoRedisJackson redisJackson;
 
-    private final LoginIdUtil loginIdUtil;
-
     static private final String KEY_PREFIX_PERM = "aet:auth-perm:";
     static private final Integer DEFAULT_TENANT_ID = 1;
 
@@ -64,10 +59,8 @@ public class UserService {
             throw new PermissionException();
         }
 
-        //生成loginId
-        String loginId = loginIdUtil.appendLoginId(tenantId, whoAmI);
         //查询当前操作人的 jupyter token
-        String jupyterToken = findJupyterToken(loginId);
+        String jupyterToken = findJupyterToken(whoAmI);
         var jupyterReq = new JupyterUsrCreateRequest();
         jupyterReq.setAdmin(userDto.getJupyterhubAdmin());
         String username = userDto.getUsername();
@@ -109,10 +102,7 @@ public class UserService {
             throw new PermissionException();
         }
 
-        //redis 中 jupyter的token, key为loginId, 需要先拼接
-        String loginId = loginIdUtil.appendLoginId(myTenantId, whoAmI);
-        String jupyterToken = findJupyterToken(loginId);
-
+        String jupyterToken = findJupyterToken(whoAmI);
         String username = req.getUsername();
         // jupyter 根据 username 删除用户, token 为当前操作人的 token
         var jupyterResp = jupyterExchange.deleteUser(username, jupyterToken);
@@ -164,8 +154,7 @@ public class UserService {
         }
         var insertParam = new PermissionInsertParam(username, tenantId, jsonStr);
         userMapper.appendPermission(insertParam);
-        String loginId = loginIdUtil.appendLoginId(tenantId, username);
-        redisJackson.delete(KEY_PREFIX_PERM + loginId);
+        redisJackson.delete(KEY_PREFIX_PERM + username);
     }
 
     @Transactional
@@ -175,8 +164,7 @@ public class UserService {
         }
         var param = new DeleteUserPermissionParam(username, tenantId, permission);
         userMapper.deletePermission(param);
-        String loginId = loginIdUtil.appendLoginId(tenantId, username);
-        redisJackson.delete(KEY_PREFIX_PERM + loginId);
+        redisJackson.delete(KEY_PREFIX_PERM + username);
     }
 
     private String findJupyterToken(String loginId) {

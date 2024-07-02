@@ -1,0 +1,1 @@
+将 dataease v1.8 代码打包的 `backend-1.8.0.jar` 放到这个目录下的 target 目录下面，然后构建镜像

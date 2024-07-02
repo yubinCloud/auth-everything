@@ -1,23 +1,21 @@
 package com.example.dsworker.controller;
 
+import com.example.dsworker.dto.request.DBSchemaRequest;
 import com.example.dsworker.dto.request.DataSourceConf;
 import com.example.dsworker.dto.request.MetaFieldsRequest;
 import com.example.dsworker.dto.response.R;
+import com.example.dsworker.entity.DBSchema;
 import com.example.dsworker.service.DataSourceService;
+import com.example.dsworker.service.MetadataService;
 import com.example.dsworker.utils.ResultSetConverter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.List;
 import java.util.Map;
 
@@ -26,12 +24,12 @@ import java.util.Map;
 @RequestMapping("/meta")
 @RequiredArgsConstructor
 @Slf4j
-@Tag(
-        name = "数据库元数据的操作"
-)
+@Tag(name = "获取 DB 的元数据的 API")
 public class MetaController {
 
     private final DataSourceService dataSourceService;
+
+    private final MetadataService metadataService;
 
     @PostMapping("/tables")
     @Operation(summary = "获取数据库的所有 tables")
@@ -69,5 +67,29 @@ public class MetaController {
             }
         }
         return R.ok(list);
+    }
+
+    @PostMapping("/db-schema")
+    @Operation(summary = "获取一个 DB 的 schema 信息")
+    public R<DBSchema> getDBSchema(@RequestBody @Valid DBSchemaRequest body) throws SQLException {
+        DBSchema schema = metadataService.getDBSchema(body.getDataSourceConf());
+        return R.ok(schema);
+    }
+
+    public static void main(String[] args) throws ClassNotFoundException, SQLException {
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        String url = "jdbc:mysql://localhost:3306/sso_auth";
+        String user = "root";
+        String pwd = "root";
+        Connection conn = DriverManager.getConnection(url, user, pwd);
+        String catalog = conn.getCatalog();  // db name
+        var meta = conn.getMetaData();
+        var rs = meta.getTables(catalog, "%", "%", new String[]{"TABLE"});
+        System.out.println(ResultSetConverter.toList(rs));
+        var colRs = meta.getColumns(catalog, "%", "role", "%");
+        System.out.println(ResultSetConverter.toList(colRs));
+        System.out.println(meta.getDatabaseProductName());
+        System.out.println(meta.getDatabaseProductVersion());
+        System.out.println(meta.getDriverName());
     }
 }

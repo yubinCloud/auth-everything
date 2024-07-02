@@ -39,6 +39,23 @@ services:
     restart: ${DOCKER_RESTART_POLICY}
     networks:
       - platform-net
+  
+  dataease-mysql8:
+    container_name: aet-dataease-mysql8
+    hostname: dataease-mysql8
+    image: mysql:8.0.32
+    expose:
+      - "3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=dataease-wei
+    privileged: true
+    volumes:
+      - ./dataease/dataease-mysql8/conf:/etc/mysql/conf.d
+      - dataease-mysql8-data:/var/lib/mysql
+    restart: ${DOCKER_RESTART_POLICY}
+    networks:
+      - platform-net
 
   redis6:
     container_name: ${PROJECT_PREFIX}-${REDIS_HOST}
@@ -679,11 +696,61 @@ services:
   #     - AF_WORKER_ZOOKEEPER_HOSTS=af-zookeeper:2181
   #     - AF_WORKER_KAFKA_SERVERS=localhost:9092
   #   depends_on:
-  #     af-zookeeper:
+  #     af-zookeeper:vim d
   #       condition: service_healthy
   #   restart: ${DOCKER_RESTART_POLICY}
   #   networks:
   #     - platform-net
+
+  dataease-backend:
+    container_name: aet-dataease-backend
+    hostname: dataease-backend
+    image: aet-dataease-backend
+    expose:
+      - "9081"
+    env_file:
+      - ./.env
+    environment:
+      - DATAEASE_MYSQL_HOST=dataease-mysql8
+    depends_on:
+      af-leader:
+        condition: service_healthy
+      dataease-mysql8:
+        condition: service_started
+    restart: ${DOCKER_RESTART_POLICY}
+    networks:
+      - platform-net
+
+  chat-analysis:
+    image: aet-chat-analysis
+    container_name: aet-chat-analysis
+    hostname: chat-analysis
+    expose:
+      - 9719
+    env_file:
+      - ./.env
+    environment:
+      - CHAT_ANALYSIS_REDIS_HOST=${REDIS_HOST}
+      - CHAT_ANALYSIS_PG_HOST=euser-postgresql
+      - CHAT_ANALYSIS_PG_USER=${EUSER_POSTGRESQL_USER}
+      - CHAT_ANALYSIS_PG_PASSWORD=${EUSER_POSTGRESQL_PASSWORD}
+      - CHAT_ANALYSIS_AI_SRV_BACKEND=local-test
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f localhost:9719/chat-analysis/actuator/health | grep UP || exit 1; echo healthy"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 70s
+    depends_on:
+      euser-postgresql:
+        condition: service_healthy
+      redis6:
+        condition: service_started
+      gateway:
+        condition: service_healthy
+    restart: ${DOCKER_RESTART_POLICY}
+    networks:
+      - platform-net
 
   ##################################################################
   #################### Alibaba Sidecars ############################
@@ -918,6 +985,10 @@ volumes:
   mysql8-data:
     external: true
     name: aet-mysql8-data
+  
+  dataease-mysql8-data:
+    external: true
+    name: aet-dataease-mysql8-data
   
   es-data:
     external: true

@@ -35,6 +35,7 @@ class UappController (private val uappService: UappService) {
         return R_SUCCESS(uapp)
     }
 
+    // TODO 校验外部用户是否拥有权限来查看
     @GetMapping("/metadata/{uappId}")
     @Operation(summary = "查看 UAPP 的元信息", description = "注意权限要求，且返回数据不包含 content")
     fun getUappMetadata(@PathVariable uappId: String,

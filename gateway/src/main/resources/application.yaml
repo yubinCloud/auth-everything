@@ -178,6 +178,18 @@ spring:
           predicates:
             - Path=/public-api/**
 
+        - id: dataease-backend
+          uri: lb://dataease-backend
+          predicates:
+            - Path=/de-api/**
+          filters:
+            - DataeaseBackendAuthAdapter
+
+        - id: chat-analysis
+          uri: lb://chat-analysis
+          predicates:
+            - Path=/chat-analysis/**
+
       globalcors:
         cors-configurations:
           '[/**]':
@@ -220,3 +232,6 @@ management:
 
 jupyter:
   enable-subsystem: ${ENABLE_JUPYTER_SUBSYSTEM:true}
+
+dataease:
+  enable-subsystem: ${ENABLE_DATAEASE_SUBSYSTEM:true}

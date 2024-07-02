@@ -18,12 +18,12 @@ public class JupyterService {
 
     static private final String KEY_PREFIX_JUPYTER = "aet:j-ctx:";
 
-    public String findToken(String loginId) {
+    public String findToken(String username) {
         // 通过 Caffeine + Redis 双缓存来获取 user 的 jupyter token
-        String token = jupyterTokenCache.getIfPresent(loginId);
+        String token = jupyterTokenCache.getIfPresent(username);
         if (token == null) {
-            token = redisJackson.get(KEY_PREFIX_JUPYTER + loginId);
-            jupyterTokenCache.put(loginId, token);
+            token = redisJackson.get(KEY_PREFIX_JUPYTER + username);
+            jupyterTokenCache.put(username, token);
         }
         return token;
     }

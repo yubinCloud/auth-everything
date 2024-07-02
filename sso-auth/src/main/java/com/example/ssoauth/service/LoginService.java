@@ -1,19 +1,13 @@
 package com.example.ssoauth.service;
 
-import cn.dev33.satoken.stp.SaLoginConfig;
 import cn.dev33.satoken.stp.StpUtil;
 import com.example.ssoauth.config.JupyterConfig;
-import com.example.ssoauth.constant.SaLoginConfExtraKey;
 import com.example.ssoauth.dto.response.LoginResp;
 import com.example.ssoauth.exception.LoginException;
 import com.example.ssoauth.mapstruct.UserConverter;
-import com.example.ssoauth.mapstructutil.UserConverterUtil;
-import com.example.ssoauth.util.LoginIdUtil;
 import com.example.ssoauth.util.PasswordEncoder;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,8 +23,6 @@ public class LoginService {
     private final PasswordEncoder passwordEncoder;
 
     private final JupyterService jupyterService;
-
-    private final LoginIdUtil loginIdUtil;
 
     private final JupyterConfig jupyterConfig;
 
@@ -55,13 +47,13 @@ public class LoginService {
             throw new LoginException();  // 用户名或密码校验错误
         }
         // 2. 根据账号id，进行登录
-        String loginId = loginIdUtil.appendLoginId(tenantId, username);
+        String loginId = tenantId + "," + username;
         StpUtil.login(loginId, 2626560);
 
         //判断是否登录jupyter
         if (jupyterConfig.isEnableSubsystem()){
             // 3. 登录 jupyter
-            jupyterService.loginJupyter(loginId);
+            jupyterService.loginJupyter(username);
             log.info("jupyter已登录");
         }else{
             log.info("未开启jupyter登录");
