@@ -25,7 +25,7 @@ spring:
 
 ai-serv:
   # 配置 AI 服务的 backend，可选：`local-test`、`transn` 等，具体可见 `AIServBackendEnum` 类
-  backend: ${CHAT_ANALYSIS_AI_SRV_BACKEND:openai}
+  backend: ${CHAT_ANALYSIS_AI_SRV_BACKEND:transn}
   transn-backend:
     base-url: ${TRANSN_BACKEND_BASEURL:https://zx.poc.iol8.com}
   openai:

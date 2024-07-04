@@ -7,8 +7,16 @@ import java.math.BigDecimal
  * bar 类型的 chart 所需要的数据
  */
 data class BarEchartsFormat (
-    val xAxis: List<String>,
-    val yAxis: List<Number>
+    val x: List<String>,
+    val y: List<Number>
+)
+
+/**
+ * Line chart 所需要的数据
+ */
+data class LineEchartsFormat (
+    var x: List<String>,
+    val y: List<Number>
 )
 
 

@@ -14,12 +14,6 @@ data class Chat2ChartResponse (
     @Schema(description = "SQL")
     var sql: String,
 
-    @Schema(description = "本次对话是否成功")
-    val success: Boolean,
-
-    @Schema(description = "失败的 reason")
-    val errorReason: String,
-
     @Schema(description = "chart content，当 success 为 true 时，一定不为 null")
     var chartContent: Any?,
 

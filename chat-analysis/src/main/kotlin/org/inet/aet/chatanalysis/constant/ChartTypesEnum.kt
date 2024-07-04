@@ -9,4 +9,5 @@ enum class ChartTypesEnum (var nm: String) {
     BAR("bar"),    // 柱状图
     PIE("pie"),    // 饼状图
     RAW_TABLE("raw"),  // 原生 table
+    NOT_SUPPORTED("not supported"),  // 暂未支持的 chart type
 }

@@ -24,18 +24,15 @@ class ChatService (
         val analysisResult = aiBackendService.nl2chart(chatGenReq)
         val sql = analysisResult.sql
         // 检查是否需要执行 SQL
-        if (analysisResult.sqlQueryExecResult == null && analysisResult.success) {
+        if (analysisResult.sqlQueryExecResult == null) {
             analysisResult.sqlQueryExecResult = datasourceService.execQuery(chatGenReq.dataSourceConf, sql)
         }
         // 根据 nl2chart 结果，组装本次 request 的 resp
-        val chartContent = if (analysisResult.success) chartDataFormatProcessService.processRelationalResultSet(analysisResult.chartConf.chartType, analysisResult.sqlQueryExecResult!!.resultSet) else null
-        val errorReason = if (!analysisResult.success) analysisResult.errorMsg else analysisResult.sqlQueryExecResult!!.errorReason
+        val chartContent = chartDataFormatProcessService.processRelationalResultSet(analysisResult.chartConf.chartType, analysisResult.sqlQueryExecResult!!.resultSet)
         return Chat2ChartResponse(
             outputText = "",
             chartType = analysisResult.chartConf.chartType.nm,
             sql = sql,
-            success = analysisResult.success && analysisResult.sqlQueryExecResult!!.success,
-            errorReason = errorReason,
             chartContent = chartContent,
             nextMaybe = analysisResult.nextMaybe
         )

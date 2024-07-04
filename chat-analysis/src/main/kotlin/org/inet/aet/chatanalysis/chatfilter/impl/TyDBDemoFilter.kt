@@ -4,11 +4,12 @@ import org.inet.aet.chatanalysis.chatfilter.itfce.Chat2ChartFilter
 import org.inet.aet.chatanalysis.constant.ChartTypesEnum
 import org.inet.aet.chatanalysis.dto.request.Chat2ChartRequest
 import org.inet.aet.chatanalysis.dto.response.Chat2ChartResponse
+import org.inet.aet.chatanalysis.exception.Err
+import org.inet.aet.chatanalysis.exception.LogicalException
 import org.inet.aet.chatanalysis.service.impl.ChartDataFormatProcessService
 import org.inet.aet.chatanalysis.service.impl.DatasourceService
 import org.inet.aet.chatanalysis.typealiases.RelationalResultSet
 import org.springframework.stereotype.Component
-import kotlin.streams.toList
 
 /**
  * TyDB 数据库作为 Demo 的 filter
@@ -19,6 +20,9 @@ class TyDBDemoFilter(private val datasourceService: DatasourceService, private v
 
     private fun makeResp(req: Chat2ChartRequest, sql: String, chartType: ChartTypesEnum): Chat2ChartResponse {
         val (success, reason, records) = datasourceService.execQuery(req.dataSourceConf, sql)
+        if (!success) {
+            throw LogicalException(Err.SQL_EXEC_ERROR, reason)
+        }
         var rs: RelationalResultSet = records.stream().map { it.toMutableMap() }.toList()
         val row = records[0]
         if (row.containsKey("SALES_TYPE")) {
@@ -30,8 +34,6 @@ class TyDBDemoFilter(private val datasourceService: DatasourceService, private v
             outputText = "",
             chartType = chartType.nm,
             sql = sql,
-            sqlSuccess = success,
-            sqlErrorReason = reason,
             chartContent = chartDataFormatProcessService.processRelationalResultSet(chartType, rs),
             nextMaybe = emptyList()
         )

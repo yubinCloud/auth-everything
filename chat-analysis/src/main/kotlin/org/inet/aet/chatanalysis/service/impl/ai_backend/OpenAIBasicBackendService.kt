@@ -8,10 +8,9 @@ import org.inet.aet.chatanalysis.config.AIServProperty
 import org.inet.aet.chatanalysis.constant.AIServBackendFuncEnum
 import org.inet.aet.chatanalysis.constant.ChartTypesEnum
 import org.inet.aet.chatanalysis.dto.request.Chat2ChartRequest
-import org.inet.aet.chatanalysis.entity.ChartConf
-import org.inet.aet.chatanalysis.entity.Chat2SQLResult
-import org.inet.aet.chatanalysis.entity.ChatAnalysisResult
-import org.inet.aet.chatanalysis.entity.ChatAnalysisResultFactory
+import org.inet.aet.chatanalysis.entity.*
+import org.inet.aet.chatanalysis.exception.Err
+import org.inet.aet.chatanalysis.exception.LogicalException
 import org.inet.aet.chatanalysis.service.impl.DatasourceService
 import org.inet.aet.chatanalysis.service.itfce.AIBackendService
 import org.inet.aet.chatanalysis.util.CommonDBSchemaSerializer
@@ -137,19 +136,10 @@ class OpenAIBasicBackendService (aiServProperty: AIServProperty, private val dat
         val sql = extractSQLFromLLMAnswer(answer)
         logger.info(mapOf("Q" to chatReq.input, "LLM ans" to answer, "SQL" to sql).toString())
         if (sql == null) {
-            return ChatAnalysisResultFactory.fail("SQL 抽取失败")
+            throw LogicalException.create(Err.LLM_RESP_PARSE_ERROR, "SQL 抽取失败")
         }
         // TODO: 然后进行 chart type classify
-        return ChatAnalysisResultFactory.success(
-            ChartConf(ChartTypesEnum.RAW_TABLE),
-            sql,
-            null,
-            listOf()
-        )
-    }
-
-    override fun nl2sql(chatReq: Chat2ChartRequest): Chat2SQLResult {
-        TODO("Not yet implemented")
+        return ChatAnalysisResult.create(ChartTypesEnum.RAW_TABLE, sql, null, emptyList())
     }
 
     /**
