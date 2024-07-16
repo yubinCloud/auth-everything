@@ -63,5 +63,4 @@ class Chat2ChartController(
         return R_SUCCESS(chatResp)
     }
 
-}.
-        0
+}

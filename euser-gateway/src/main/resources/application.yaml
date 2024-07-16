@@ -58,6 +58,13 @@ spring:
           predicates:
             - Path=/uapp-maker/**
 
+        - id: dataease-backend
+          uri: lb://dataease-backend
+          predicates:
+            - Path=/de-api/**
+          filters:
+            - DataeaseBackendAuthAdapter
+
       globalcors:
         cors-configurations:
           '[/**]':
@@ -81,3 +88,7 @@ management:
   endpoint:
     health:
       enabled: true
+
+
+dataease:
+  enable-subsystem: ${ENABLE_DATAEASE_SUBSYSTEM:true}

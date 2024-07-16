@@ -1,15 +1,15 @@
 package org.inet.aet.chatanalysis.constant
 
+import org.inet.aet.chatanalysis.service.itfce.AIBackendService
+
 
 /**
  * 枚举各种 AI Service 的 backend
  */
-class AIServBackendEnum {
+enum class AIServBackendEnum (val backendId: String, val zhName: String) {
 
-    companion object {
-        const val LOCAL_TEST = "local-test"  // 本地 mock 的接口来测试
-        const val TRANSN = "transn"   // 航天云网项目中，传神（Transn）的 AI 后端
-        const val OPENAI = "openai"   // OpenAI 后端
-    }
+    LOCAL_TEST("local-test", "本地 mock"),
+    TRANSN("transn", "Transn"),
+    OPENAI("openai", "OpenAI"),
 
 }

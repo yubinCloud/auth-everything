@@ -1,7 +1,7 @@
 package com.example.eusergateway.service;
 
-import com.example.eusergateway.exchange.response.AvuePermission;
-import com.example.eusergateway.exchange.response.PublicApiPermission;
+import com.example.eusergateway.exchange.response.eusersso.AvuePermission;
+import com.example.eusergateway.exchange.response.eusersso.PublicApiPermission;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

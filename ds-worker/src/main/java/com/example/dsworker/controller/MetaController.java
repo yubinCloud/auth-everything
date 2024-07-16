@@ -44,7 +44,7 @@ public class MetaController {
             try (
                     ResultSet rs = conn.getMetaData().getTables(catalog, null, null, new String[]{"TABLE"})
             ) {
-                list = ResultSetConverter.toList(rs);
+                list = ResultSetConverter.toMapList(rs);
             }
         }
         return R.ok(list);
@@ -63,7 +63,7 @@ public class MetaController {
             try (
                     ResultSet rs = conn.getMetaData().getColumns(catalog, "%", body.getTableName(), "%")
             ) {
-                list = ResultSetConverter.toList(rs);
+                list = ResultSetConverter.toMapList(rs);
             }
         }
         return R.ok(list);
@@ -85,9 +85,9 @@ public class MetaController {
         String catalog = conn.getCatalog();  // db name
         var meta = conn.getMetaData();
         var rs = meta.getTables(catalog, "%", "%", new String[]{"TABLE"});
-        System.out.println(ResultSetConverter.toList(rs));
+        System.out.println(ResultSetConverter.toMapList(rs));
         var colRs = meta.getColumns(catalog, "%", "role", "%");
-        System.out.println(ResultSetConverter.toList(colRs));
+        System.out.println(ResultSetConverter.toMapList(colRs));
         System.out.println(meta.getDatabaseProductName());
         System.out.println(meta.getDatabaseProductVersion());
         System.out.println(meta.getDriverName());

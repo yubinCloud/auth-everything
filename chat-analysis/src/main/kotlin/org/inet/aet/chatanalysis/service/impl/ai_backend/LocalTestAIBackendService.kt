@@ -5,7 +5,11 @@ import org.inet.aet.chatanalysis.constant.ChartTypesEnum
 import org.inet.aet.chatanalysis.dto.request.Chat2ChartRequest
 import org.inet.aet.chatanalysis.entity.ChatAnalysisResult
 import org.inet.aet.chatanalysis.service.itfce.AIBackendService
+import org.springframework.context.annotation.Lazy
+import org.springframework.stereotype.Service
 
+@Service
+@Lazy
 class LocalTestAIBackendService: AIBackendService {
 
     override fun supportFunctions(): Set<AIServBackendFuncEnum> {

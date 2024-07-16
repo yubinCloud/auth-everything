@@ -26,7 +26,7 @@ public class MetadataService {
             schema.setDbName(catalog);
             var metadata = conn.getMetaData();
             var tablesRs = metadata.getTables(catalog, "%", "%", new String[]{"TABLE"});
-            var tables = ResultSetConverter.toList(tablesRs);
+            var tables = ResultSetConverter.toMapList(tablesRs);
             for (Map<String, Object> tableMap : tables) {
                 String tableName = (String) tableMap.get("TABLE_NAME");
                 String remark = (String) tableMap.get("REMARKS");
@@ -35,7 +35,7 @@ public class MetadataService {
                 table.setRemark(remark);
                 table.setPrimaryKeys(Collections.emptyList());
                 var columnRs = metadata.getColumns(catalog, "%", tableName, "%");
-                var columns = ResultSetConverter.toList(columnRs)
+                var columns = ResultSetConverter.toMapList(columnRs)
                         .stream()
                         .map(colMap -> {
                             var col = new DBSchema.DBColumn();

@@ -11,6 +11,8 @@ import org.inet.aet.chatanalysis.service.impl.DatasourceService
 import org.inet.aet.chatanalysis.service.itfce.AIBackendService
 import org.inet.aet.chatanalysis.typealiases.RelationalResultSet
 import org.slf4j.LoggerFactory
+import org.springframework.context.annotation.Lazy
+import org.springframework.stereotype.Service
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClientException
@@ -68,6 +70,8 @@ interface TransnAIBackendExchange {
 /**
  * 传神的 AI 后端
  */
+@Service
+@Lazy
 class TransnAIBackendService (aiServProperty: AIServProperty, private val datasourceService: DatasourceService): AIBackendService {
 
     companion object {
@@ -78,15 +82,12 @@ class TransnAIBackendService (aiServProperty: AIServProperty, private val dataso
     }
 
     // 与 transn 服务进行交互的 client，其初始化在 init() 中
-    private val transnClient: TransnAIBackendExchange
-
-    init {
-        // 初始化 transnClient
+    private val transnClient: TransnAIBackendExchange = run {
         val restClient = RestClient.builder()
             .baseUrl(aiServProperty.transnBackend.baseUrl)
             .build()
         val factory = HttpServiceProxyFactory.builderFor(RestClientAdapter.create(restClient)).build()
-        transnClient = factory.createClient(TransnAIBackendExchange::class.java)
+        factory.createClient(TransnAIBackendExchange::class.java)
     }
 
     override fun supportFunctions(): Set<AIServBackendFuncEnum> {

@@ -5,6 +5,7 @@ import com.example.dsworker.dto.request.ExecuteSQLRequest;
 import com.example.dsworker.dto.request.SQLSlot;
 import com.example.dsworker.dto.response.ExecuteMultiSQLResponse;
 import com.example.dsworker.dto.response.ExecuteSQLResult;
+import com.example.dsworker.dto.response.adapter.dataease.DataAndFieldSet;
 import com.example.dsworker.exception.InputSlotException;
 import com.example.dsworker.exception.SQLExecuteException;
 import com.example.dsworker.utils.ResultSetConverter;
@@ -32,7 +33,7 @@ public class ExecuteService {
                 Statement statement = conn.createStatement();
                 ResultSet rs = statement.executeQuery(body.getSql())
         ) {
-            list = ResultSetConverter.toList(rs, body.getQueryLimit(), body.getQueryOffset());
+            list = ResultSetConverter.toMapList(rs, body.getQueryLimit(), body.getQueryOffset());
 //            conn.commit();
         }
         return list;
@@ -49,10 +50,45 @@ public class ExecuteService {
                 PreparedStatement preparedStatement = createPreparedStatement(conn, slottedSQL, slots);
                 ResultSet rs = preparedStatement.executeQuery()
         ) {
-            list = ResultSetConverter.toList(rs, body.getQueryLimit(), body.getQueryOffset());
+            list = ResultSetConverter.toMapList(rs, body.getQueryLimit(), body.getQueryOffset());
             conn.commit();
         }
         return list;
+    }
+
+    public List<String[]> execQueryOfArrayFormat(ExecuteSQLRequest body) throws SQLException, ClassNotFoundException {
+        Class.forName(body.getDataSourceConf().getDriverClass());
+        List<SQLSlot> slots = new ArrayList<>();
+        String slottedSQL = fillSlots(body.getSql(), body.getSlots(), slots);
+        List<String[]> list = null;
+        try (
+                Connection conn = dataSourceService.getConnection(body.getDataSourceConf());
+                PreparedStatement preparedStatement = createPreparedStatement(conn, slottedSQL, slots);
+                ResultSet rs = preparedStatement.executeQuery()
+        ) {
+            list = ResultSetConverter.toArrayList(rs, body.getQueryLimit(), body.getQueryOffset());
+            conn.commit();
+        }
+        return list;
+    }
+
+    public DataAndFieldSet execQueryOfFieldFormat(ExecuteSQLRequest body) throws SQLException, ClassNotFoundException {
+        Class.forName(body.getDataSourceConf().getDriverClass());
+        List<SQLSlot> slots = new ArrayList<>();
+        String slottedSQL = fillSlots(body.getSql(), body.getSlots(), slots);
+        DataAndFieldSet result = new DataAndFieldSet();
+        try (
+                Connection conn = dataSourceService.getConnection(body.getDataSourceConf());
+                PreparedStatement preparedStatement = createPreparedStatement(conn, slottedSQL, slots);
+                ResultSet rs = preparedStatement.executeQuery()
+        ) {
+            var dataList = ResultSetConverter.toArrayList(rs, body.getQueryLimit(), body.getQueryOffset());
+            var fieldList = ResultSetConverter.toFieldList(rs);
+            result.setDataList(dataList);
+            result.setFieldList(fieldList);
+            conn.commit();
+        }
+        return result;
     }
 
     public int execUpdateWithoutSlots(ExecuteSQLRequest body) throws SQLException {
@@ -98,7 +134,7 @@ public class ExecuteService {
             boolean isQuery = statement.execute();
             if (isQuery) {
                 execResult.setQuery(true);
-                execResult.setRows(ResultSetConverter.toList(statement.getResultSet()));
+                execResult.setRows(ResultSetConverter.toMapList(statement.getResultSet()));
             } else {
                 execResult.setQuery(false);
                 execResult.setCount(statement.getUpdateCount());
@@ -127,6 +163,9 @@ public class ExecuteService {
 
 
     private String fillSlots(String sql, Map<String, SQLSlot> slots, List<SQLSlot> outSlots) {
+        if (slots == null) {
+            slots = new HashMap<>();
+        }
         StringBuilder sb = new StringBuilder();
         Matcher m = SQL_SLOT_PATTERN.matcher(sql);
         while (m.find()) {

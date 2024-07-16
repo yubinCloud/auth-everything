@@ -25,7 +25,7 @@ data class AddUiBasicTabRequest (
 
 data class CreateNavInfo (
 
-    @Schema(description = "1 代表 avue 大屏 nav（默认），2 代表外链 nav")
+    @Schema(description = "1 代表 avue 大屏 nav（默认），2 代表外链 nav，3 代表 dataease panel id")
     var navType: Int?,
 
     var name: String,
@@ -34,7 +34,7 @@ data class CreateNavInfo (
 
     var color: String?,
 
-    var path: String,  //avue大屏 ID
+    var path: String,  //avue 大屏 ID
 )
 
 

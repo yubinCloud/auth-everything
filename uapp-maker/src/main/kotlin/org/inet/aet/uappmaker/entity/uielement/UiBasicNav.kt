@@ -4,6 +4,7 @@ package org.inet.aet.uappmaker.entity.uielement
 enum class UiBasicNavType(val no: Int) {
     AUE_NAV(1),
     EXTERNAL_LINK_NAV(2),
+    DE_PANEL(3),
 }
 
 data class UiBasicNav(
@@ -12,8 +13,8 @@ data class UiBasicNav(
     var name: String,
     var icon: String?,
     var color: String?,
-    var path: String,
-    var avid: String?,  // `Avue Visual ID` 或者外链地址
+    var path: String,       // `Avue Visual ID`  or 外链地址 or `DataEase-panel id`
+    var avid: String?,      // 暂时没有用到
     var children: MutableList<UiBasicNav>?
 ): UiElement("basic-nav")
 
@@ -24,6 +25,6 @@ data class UiBasicNavMetadata (
     var name: String?,
     var icon: String?,
     var color: String?,
-    var path: String?,
-    var avid: String?,  // Avue Visual ID 或者外链地址
+    var path: String?,  // Avue Visual ID or 外链地址 or DataEase-panel id
+    var avid: String?,
 )

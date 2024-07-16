@@ -1,12 +1,11 @@
 package com.example.eusergateway.service;
 
 import com.example.eusergateway.exchange.EuserSSOExchange;
-import com.example.eusergateway.exchange.response.PersonalPermissionInfo;
+import com.example.eusergateway.exchange.response.eusersso.PersonalPermissionInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.example.eusergateway.dto.response.R;
 
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

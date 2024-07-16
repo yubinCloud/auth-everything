@@ -1,5 +1,6 @@
 package com.example.eusergateway.config;
 
+import com.example.eusergateway.exchange.DataeaseBackendExchange;
 import com.example.eusergateway.exchange.EuserSSOExchange;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
@@ -29,6 +30,17 @@ public class ExchangeClientConfig {
                 .build();
         HttpServiceProxyFactory factory = HttpServiceProxyFactory.builder(WebClientAdapter.forClient(client)).build();
         return factory.createClient(EuserSSOExchange.class);
+    }
+
+    @Bean
+    @LoadBalanced
+    DataeaseBackendExchange dataeaseBackendExchange() {
+        WebClient client = WebClient.builder()
+                .filter(reactorLoadBalancerExchangeFilterFunction)
+                .baseUrl("lb://dataease-backend/de-api")
+                .build();
+        var factory = HttpServiceProxyFactory.builder(WebClientAdapter.forClient(client)).build();
+        return factory.createClient(DataeaseBackendExchange.class);
     }
 
 }

@@ -61,9 +61,13 @@ class UappService (val uappRepository: UappRepository) {
     }
 
     private fun checkInternalViewPermission(uapp: Uapp?, userId: String) {
-        if (uapp == null || (uapp.owner != userId && !uapp.iShare)) {
-            throw UappPermissionException("Uapp 不存在或者没有查看权限")
+//        if (uapp == null || (uapp.owner != userId && !uapp.iShare)) {
+//            throw UappPermissionException("Uapp 不存在或者没有查看权限")
+//        }
+        if (uapp == null) {
+            throw UappPermissionException("Uapp 不存在")
         }
+        log.info(uapp.toString())
     }
 
     fun checkUappType(actual: Int, expected: Int) {

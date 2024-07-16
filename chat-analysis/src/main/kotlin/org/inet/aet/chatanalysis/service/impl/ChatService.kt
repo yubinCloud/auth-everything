@@ -3,25 +3,24 @@ package org.inet.aet.chatanalysis.service.impl
 
 import org.inet.aet.chatanalysis.dto.request.Chat2ChartRequest
 import org.inet.aet.chatanalysis.dto.response.Chat2ChartResponse
-import org.inet.aet.chatanalysis.service.itfce.AIBackendService
 import org.springframework.stereotype.Service
 
 @Service
 class ChatService (
-    private val aiBackendService: AIBackendService,
+    private val aiBackend: AIBackendProxy,
     private val datasourceService: DatasourceService,
     private val chartDataFormatProcessService: ChartDataFormatProcessService
 ) {
 
     fun supportFunctions(): List<String> {
-        return aiBackendService.supportFunctions().stream().map { it.nm }.toList()
+        return aiBackend.supportFunctions().stream().map { it.nm }.toList()
     }
 
     /**
      * 通过对话生成 chart
      */
     fun chat2chart(chatGenReq: Chat2ChartRequest): Chat2ChartResponse {
-        val analysisResult = aiBackendService.nl2chart(chatGenReq)
+        val analysisResult = aiBackend.nl2chart(chatGenReq)
         val sql = analysisResult.sql
         // 检查是否需要执行 SQL
         if (analysisResult.sqlQueryExecResult == null) {

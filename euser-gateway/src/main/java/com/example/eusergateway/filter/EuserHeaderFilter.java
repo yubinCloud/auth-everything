@@ -2,6 +2,7 @@ package com.example.eusergateway.filter;
 
 import cn.dev33.satoken.stp.StpUtil;
 import com.alibaba.cloud.commons.lang.StringUtils;
+import com.example.eusergateway.constant.RequestHeaderConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -31,7 +32,7 @@ public class EuserHeaderFilter implements WebFilter {
         if (Objects.isNull(loginId)) {
             return chain.filter(exchange);
         }
-        request = request.mutate().header("X-Euser", loginId).build();
+        request = request.mutate().header(RequestHeaderConstant.EUSER_HEADER, loginId).build();
         return chain.filter(exchange.mutate().request(request).build());
     }
 }

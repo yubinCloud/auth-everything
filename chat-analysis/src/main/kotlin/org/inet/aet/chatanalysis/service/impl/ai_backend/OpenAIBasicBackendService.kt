@@ -16,6 +16,8 @@ import org.inet.aet.chatanalysis.service.itfce.AIBackendService
 import org.inet.aet.chatanalysis.util.CommonDBSchemaSerializer
 import org.inet.aet.chatanalysis.util.DBSchemaSerializer
 import org.slf4j.LoggerFactory
+import org.springframework.context.annotation.Lazy
+import org.springframework.stereotype.Service
 import java.util.regex.Pattern
 
 
@@ -81,26 +83,12 @@ FROM
  *
  * 需要在配置信息中填写 openai 相关字段
  */
+@Service
+@Lazy
 class OpenAIBasicBackendService (aiServProperty: AIServProperty, private val datasourceService: DatasourceService): AIBackendService {
 
-    private var assistant: OpenaiAssistant  // 基于 OpenAI LM 的对话助手
-
-    private var dbSchemaSerializer: DBSchemaSerializer = CommonDBSchemaSerializer()   // 用于序列化 db schema
-
-    companion object {
-        // 用于 NL2SQL 的 prompt template
-        private val NL2SQL_PROMPT_TEMPLATE: PromptTemplate = PromptTemplate.from(NL2SQL_PROMPT_TEMPLATE_STRING)
-
-        // 从 markdown 文件中提取 SQL block 的 regex pattern
-        private val MARKDOWN_SQL_EXTRACT_PATTERN: Pattern = Pattern.compile("```(?i)sql\\s*\\n([\\s\\S]*?)```")
-
-        private val logger = LoggerFactory.getLogger(this::class.java)
-    }
-
-    init {
-        /**
-         * 初始化 assistant
-         */
+    // 基于 OpenAI LM 的对话助手
+    private var assistant: OpenaiAssistant = run {
         val prop = aiServProperty.openai
         val openaiBuilder = OpenAiChatModel.builder()
         if (prop.modelName != null) {
@@ -117,7 +105,20 @@ class OpenAIBasicBackendService (aiServProperty: AIServProperty, private val dat
             openaiBuilder.baseUrl(prop.baseUrl)
         }
         val chatLM: ChatLanguageModel = openaiBuilder.build()
-        assistant = AiServices.create(OpenaiAssistant::class.java, chatLM)
+        AiServices.create(OpenaiAssistant::class.java, chatLM)
+    }
+
+    // 用于序列化 db schema
+    private var dbSchemaSerializer: DBSchemaSerializer = CommonDBSchemaSerializer()
+
+    companion object {
+        // 用于 NL2SQL 的 prompt template
+        private val NL2SQL_PROMPT_TEMPLATE: PromptTemplate = PromptTemplate.from(NL2SQL_PROMPT_TEMPLATE_STRING)
+
+        // 从 markdown 文件中提取 SQL block 的 regex pattern
+        private val MARKDOWN_SQL_EXTRACT_PATTERN: Pattern = Pattern.compile("```(?i)sql\\s*\\n([\\s\\S]*?)```")
+
+        private val logger = LoggerFactory.getLogger(this::class.java)
     }
 
     override fun supportFunctions(): Set<AIServBackendFuncEnum> {

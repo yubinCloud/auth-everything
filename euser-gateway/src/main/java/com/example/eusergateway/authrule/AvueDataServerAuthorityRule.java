@@ -23,12 +23,13 @@ public class AvueDataServerAuthorityRule implements AuthorityRule {
     public SaRouterStaff authInfo() {
         return SaRouter.match("/avue/**").free(r -> {
             // 大屏页面，检查用户是否具有该大屏 view-id 的权限
-            SaRouter.match("/avue/visual/detail", rq -> {
-                String visualId = SaHolder.getRequest().getParam("id", null);
-                if (visualId != null) {
-                    StpUtil.checkPermission(permissionFactory.createVisualIdPermission(Long.parseLong(visualId)));
-                }
-            });
+            // TODO 这里暂时放开了
+//            SaRouter.match("/avue/visual/detail", rq -> {
+//                String visualId = SaHolder.getRequest().getParam("id", null);
+//                if (visualId != null) {
+//                    StpUtil.checkPermission(permissionFactory.createVisualIdPermission(Long.parseLong(visualId)));
+//                }
+//            });
         });
     }
 }
