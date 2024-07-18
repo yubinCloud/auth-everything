@@ -5,6 +5,7 @@ import com.example.avuehelper.dto.response.R;
 import com.example.avuehelper.service.dscoordinator.DatasourceMangeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -25,7 +26,7 @@ public class DatasourceManageController {
 
     @PostMapping("/check-conn")
     @Operation(summary = "检查数据源是否可以连接")
-    public R<Boolean> checkConnection(@RequestBody @Validated CheckConnRequest body) {
+    public R<Boolean> checkConnection(@RequestBody @Valid CheckConnRequest body) {
         boolean success = dsMangeService.checkConnection(body.getDataSourceConf());
         return R.ok(success);
     }
