@@ -1,6 +1,7 @@
 package com.example.avuehelper.config;
 
 import com.example.avuehelper.exchange.api.DsWorkerExchange;
+import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.client.loadbalancer.reactive.ReactorLoadBalancerExchangeFilterFunction;
@@ -11,10 +12,10 @@ import org.springframework.web.reactive.function.client.support.WebClientAdapter
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
 @Configuration
-@RequiredArgsConstructor
 public class HttpExchangeConfig {
 
-    private final ReactorLoadBalancerExchangeFilterFunction reactorLoadBalancerExchangeFilterFunction;
+    @Resource
+    private ReactorLoadBalancerExchangeFilterFunction reactorLoadBalancerExchangeFilterFunction;
 
     @Bean
     @LoadBalanced

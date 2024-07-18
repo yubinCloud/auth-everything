@@ -6,6 +6,6 @@ import lombok.Data;
 @Data
 public class CheckConnRequest {
 
-    private DataSourceConf dsConf;
+    private DataSourceConf dataSourceConf;
 
 }

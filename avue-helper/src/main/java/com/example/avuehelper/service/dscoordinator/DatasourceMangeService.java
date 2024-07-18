@@ -5,8 +5,6 @@ import com.example.avuehelper.service.rpc.DsWorkerRpcService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.sql.SQLException;
-
 @Service
 @RequiredArgsConstructor
 public class DatasourceMangeService {
