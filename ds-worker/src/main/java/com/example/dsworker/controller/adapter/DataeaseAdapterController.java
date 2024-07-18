@@ -1,5 +1,6 @@
 package com.example.dsworker.controller.adapter;
 
+import com.example.dsworker.dto.request.DataSourceConf;
 import com.example.dsworker.dto.request.ExecuteSQLRequest;
 import com.example.dsworker.dto.request.MetaFieldsRequest;
 import com.example.dsworker.dto.response.R;
@@ -7,6 +8,7 @@ import com.example.dsworker.dto.response.adapter.dataease.DataAndFieldSet;
 import com.example.dsworker.dto.response.adapter.dataease.TableField;
 import com.example.dsworker.service.ExecuteService;
 import com.example.dsworker.service.MetadataService;
+import com.example.dsworker.service.adapter.dataease.DataeaseAdapterService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -30,6 +32,8 @@ public class DataeaseAdapterController {
     private final ExecuteService executeService;
 
     private final MetadataService metadataService;
+
+    private final DataeaseAdapterService dataeaseAdapterService;
 
     @PostMapping("/exec-select")
     @Operation(summary = "执行 SQL 查询语句")
@@ -56,6 +60,15 @@ public class DataeaseAdapterController {
     public R<List<TableField>> getTableFields(@RequestBody @Valid MetaFieldsRequest body) throws SQLException, ClassNotFoundException {
         var result = metadataService.getTableFields(body.getDataSourceConf(), body.getTableName());
         return R.ok(result);
+    }
+
+    @PostMapping("/get-schema")
+    @Operation(summary = "获取 db 的 schema")
+    public R<List<String>> getSchema(@RequestBody @Valid ExecuteSQLRequest body) throws SQLException, ClassNotFoundException {
+        DataSourceConf dsConf = body.getDataSourceConf();
+        String schemaSQL = body.getSql();
+        List<String> schemas = dataeaseAdapterService.getSchema(dsConf, schemaSQL);
+        return R.ok(schemas);
     }
 
 }
