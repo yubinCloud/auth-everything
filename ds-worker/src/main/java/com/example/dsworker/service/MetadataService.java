@@ -5,9 +5,11 @@ import com.example.dsworker.dto.response.adapter.dataease.TableField;
 import com.example.dsworker.entity.DBSchema;
 import com.example.dsworker.utils.ResultSetConverter;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -66,10 +68,34 @@ public class MetadataService {
             while (resultSet.next()) {
                 String tableName = resultSet.getString("TABLE_NAME");
                 String databaseName = resultSet.getString("TABLE_CAT");
-                System.out.println(tableName);
-                System.out.println(databaseName);
+                if (tableName.equalsIgnoreCase(targetTable)) {
+                    TableField tableField = extractTableField(resultSet, dsConf);
+                    tableFields.add(tableField);
+                }
             }
+            resultSet.close();
         }
         return tableFields;
+    }
+
+    private TableField extractTableField(ResultSet resultSet, DataSourceConf dsConf) throws SQLException {
+        TableField tableField = new TableField();
+        String colName = resultSet.getString("COLUMN_NAME");
+        tableField.setFieldName(colName);
+        String remarks = resultSet.getString("REMARKS");
+        if (StringUtils.isAllBlank(remarks)) {
+            remarks = colName;
+        }
+        tableField.setRemarks(remarks);
+        String fieldType = resultSet.getString("TYPE_NAME").toUpperCase();
+        tableField.setFieldType(fieldType);
+        // 识别 fieldType 的 size（这里的识别有待改善）
+        String fieldSizeString = resultSet.getString("COLUMN_SIZE");
+        if (fieldSizeString == null) {
+            tableField.setFieldSize(1);
+        } else {
+            tableField.setFieldSize(Integer.parseInt(fieldSizeString));
+        }
+        return tableField;
     }
 }

@@ -6,6 +6,7 @@ import com.example.dsworker.dto.request.SQLSlot;
 import com.example.dsworker.dto.response.ExecuteMultiSQLResponse;
 import com.example.dsworker.dto.response.ExecuteSQLResult;
 import com.example.dsworker.dto.response.adapter.dataease.DataAndFieldSet;
+import com.example.dsworker.dto.response.adapter.dataease.TableField;
 import com.example.dsworker.exception.InputSlotException;
 import com.example.dsworker.exception.SQLExecuteException;
 import com.example.dsworker.utils.ResultSetConverter;
@@ -72,7 +73,7 @@ public class ExecuteService {
         return list;
     }
 
-    public DataAndFieldSet execQueryOfFieldFormat(ExecuteSQLRequest body) throws SQLException, ClassNotFoundException {
+    public DataAndFieldSet execQueryOfDataAndFieldFormat(ExecuteSQLRequest body) throws SQLException, ClassNotFoundException {
         Class.forName(body.getDataSourceConf().getDriverClass());
         List<SQLSlot> slots = new ArrayList<>();
         String slottedSQL = fillSlots(body.getSql(), body.getSlots(), slots);
@@ -89,6 +90,22 @@ public class ExecuteService {
             conn.commit();
         }
         return result;
+    }
+
+    public List<TableField> execQueryOfFieldFormat(ExecuteSQLRequest body) throws SQLException, ClassNotFoundException {
+        Class.forName(body.getDataSourceConf().getDriverClass());
+        List<SQLSlot> slots = new ArrayList<>();
+        String slottedSQL = fillSlots(body.getSql(), body.getSlots(), slots);
+        List<TableField> fieldList;
+        try (
+                Connection conn = dataSourceService.getConnection(body.getDataSourceConf());
+                PreparedStatement preparedStatement = createPreparedStatement(conn, slottedSQL, slots);
+                ResultSet rs = preparedStatement.executeQuery()
+        ) {
+            fieldList = ResultSetConverter.toFieldList(rs);
+            conn.commit();
+        }
+        return fieldList;
     }
 
     public int execUpdateWithoutSlots(ExecuteSQLRequest body) throws SQLException {

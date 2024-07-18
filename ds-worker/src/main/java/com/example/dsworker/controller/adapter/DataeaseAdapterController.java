@@ -1,6 +1,5 @@
 package com.example.dsworker.controller.adapter;
 
-import com.example.dsworker.dto.request.DataSourceConf;
 import com.example.dsworker.dto.request.ExecuteSQLRequest;
 import com.example.dsworker.dto.request.MetaFieldsRequest;
 import com.example.dsworker.dto.response.R;
@@ -42,6 +41,12 @@ public class DataeaseAdapterController {
     @PostMapping("/fetch-result-and-field")
     @Operation(summary = "执行 SQL 查询，获取 resultSet 以及相应 field 描述")
     public R<DataAndFieldSet> fetchResultAndField(@RequestBody @Valid ExecuteSQLRequest body) throws SQLException, ClassNotFoundException {
+        var result = executeService.execQueryOfDataAndFieldFormat(body);
+        return R.ok(result);
+    }
+
+    @PostMapping("/fetch-result-field")
+    public R<List<TableField>> fetchResultField(@RequestBody @Valid ExecuteSQLRequest body) throws SQLException, ClassNotFoundException {
         var result = executeService.execQueryOfFieldFormat(body);
         return R.ok(result);
     }
