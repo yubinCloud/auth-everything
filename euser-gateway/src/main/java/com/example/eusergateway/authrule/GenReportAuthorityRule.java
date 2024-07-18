@@ -17,7 +17,7 @@ public class GenReportAuthorityRule implements AuthorityRule {
     @Override
     public SaRouterStaff authInfo() {
         return SaRouter.match("/genreports/**")
-                .notMatch("/genreports/tplconfig", "/genreports/hasreport", "/genreports/editapi", "/genreports/genreport")
+                .notMatch("/genreports/tplconfig", "/genreports/hasreport", "/genreports/editapi", "/genreports/genreport", "/genreports/download")
                 .check(rq -> StpUtil.checkRole("it:FORBIDDEN"));
     }
 }

@@ -208,57 +208,57 @@ services:
     networks:
       - platform-net
   
-  # nacos:
-  #   container_name: ${PROJECT_PREFIX}-${NACOS_HOST}
-  #   hostname: ${NACOS_HOST}
-  #   image: aet-nacos
-  #   env_file:
-  #     - ./nacos/nacos.env
-  #   environment:
-  #     - MYSQL_SERVICE_HOST=${MYSQL_HOST}
-  #     - MYSQL_SERVICE_PORT=3306
-  #     - MYSQL_SERVICE_USER=root
-  #     - MYSQL_SERVICE_PASSWORD=${MYSQL_PWD}
-  #     - MYSQL_SERVICE_DB_NAME=nacos
-  #   expose:
-  #     - "8848"
-  #     - "9848"
-  #     - "9849"
-  #   ports:
-  #     - 8848:8848
-  #     # - 9848:9848
-  #     # - 9849:9849
-  #   healthcheck:
-  #     test: ["CMD-SHELL", "curl -sS 'http://localhost:8848/nacos' || exit 1; echo healthy"]
-  #     interval: 5s
-  #     timeout: 10s
-  #     retries: 3
-  #     start_period: 60s
-  #   depends_on:
-  #     sentinel-dashboard:
-  #       condition: service_healthy
-  #   restart: ${DOCKER_RESTART_POLICY}
-  #   networks:
-  #     - platform-net
-
   nacos:
-    container_name: aet-nacos
-    hostname: nacos
-    image: qingpan/rnacos:stable
-    privileged: true
+    container_name: ${PROJECT_PREFIX}-${NACOS_HOST}
+    hostname: ${NACOS_HOST}
+    image: aet-nacos
+    env_file:
+      - ./nacos/nacos.env
+    environment:
+      - MYSQL_SERVICE_HOST=${MYSQL_HOST}
+      - MYSQL_SERVICE_PORT=3306
+      - MYSQL_SERVICE_USER=root
+      - MYSQL_SERVICE_PASSWORD=${MYSQL_PWD}
+      - MYSQL_SERVICE_DB_NAME=nacos
     expose:
-      - 8848
-      - 9848
-      - 9849
+      - "8848"
+      - "9848"
+      - "9849"
     ports:
-      - 10848:10848
       - 8848:8848
+      # - 9848:9848
+      # - 9849:9849
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sS 'http://localhost:8848/nacos' || exit 1; echo healthy"]
+      interval: 5s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
     depends_on:
       sentinel-dashboard:
         condition: service_healthy
     restart: ${DOCKER_RESTART_POLICY}
     networks:
       - platform-net
+
+  # nacos:
+  #   container_name: aet-nacos
+  #   hostname: nacos
+  #   image: qingpan/rnacos:stable
+  #   privileged: true
+  #   expose:
+  #     - 8848
+  #     - 9848
+  #     - 9849
+  #   ports:
+  #     - 10848:10848
+  #     - 8848:8848
+  #   depends_on:
+  #     sentinel-dashboard:
+  #       condition: service_healthy
+  #   restart: ${DOCKER_RESTART_POLICY}
+  #   networks:
+  #     - platform-net
   
   ##################################################################
   ######################### Biz Services ###########################
@@ -267,11 +267,11 @@ services:
   gateway:
     build:
       context: ./gateway
-    container_name: ${PROJECT_PREFIX}-${GATEWAY_HOST}
-    hostname: ${GATEWAY_HOST}
+    container_name: aet-gateway
+    hostname: gateway
     image: aet-gateway
     ports:
-      - 10010:${GATEWAY_PORT}
+      - 10010:10010
     env_file:
       - ./.env
     healthcheck:
@@ -282,7 +282,7 @@ services:
       start_period: 300s
     depends_on:
       nacos:
-        condition: service_started
+        condition: service_healthy
       redis6:
         condition: service_started
     restart: ${DOCKER_RESTART_POLICY}
@@ -835,8 +835,6 @@ services:
       - platform-net
     
   sidecar-ds-coordinator:
-    build:
-      context: ./alibaba-sidecars/nacos-sidecar
     container_name: aet-sidecar-ds-coordinator
     hostname: sidecar-ds-coordinator
     image: aet-nacos-sidecar
@@ -864,8 +862,6 @@ services:
       - platform-net
     
   sidecar-simulator:
-    build:
-      context: ./alibaba-sidecars/nacos-sidecar
     container_name: aet-sidecar-simulator
     hostname: sidecar-simulator
     image: aet-nacos-sidecar
@@ -893,8 +889,6 @@ services:
       - platform-net
   
   sidecar-genreports:
-    build:
-      context: ./alibaba-sidecars/nacos-sidecar
     container_name: aet-sidecar-genreports
     hostname: sidecar-genreports
     image: aet-nacos-sidecar

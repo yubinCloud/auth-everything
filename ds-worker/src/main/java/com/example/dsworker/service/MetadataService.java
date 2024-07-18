@@ -1,6 +1,7 @@
 package com.example.dsworker.service;
 
 import com.example.dsworker.dto.request.DataSourceConf;
+import com.example.dsworker.dto.response.adapter.dataease.TableField;
 import com.example.dsworker.entity.DBSchema;
 import com.example.dsworker.utils.ResultSetConverter;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -54,5 +56,20 @@ public class MetadataService {
             schema.setDbDriverName(metadata.getDriverName());
         }
         return schema;
+    }
+
+    public List<TableField> getTableFields(DataSourceConf dsConf, String targetTable) throws SQLException {
+        List<TableField> tableFields = new ArrayList<>();
+        try (Connection conn = dataSourceService.getConnection(dsConf)) {
+            var metadata = conn.getMetaData();
+            var resultSet = metadata.getColumns(null, "%", targetTable, "%");
+            while (resultSet.next()) {
+                String tableName = resultSet.getString("TABLE_NAME");
+                String databaseName = resultSet.getString("TABLE_CAT");
+                System.out.println(tableName);
+                System.out.println(databaseName);
+            }
+        }
+        return tableFields;
     }
 }

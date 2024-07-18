@@ -76,7 +76,7 @@ export default (app) => {
     
 
     // TODO: 这个接口临时放开所有组件权限，之后需要删除掉
-    app.get(url + '/detail-temp', resbody.asyncHandler(async (req, res, next) => {
+    app.get(url + '/detail-temp', jsonParser, resbody.asyncHandler(async (req, res, next) => {
         const id = req.query.id;
         const visualDetail = await visualDao.detail(id);
         res.json(resbody.getSuccessResult(visualDetail));

@@ -17,5 +17,5 @@ public class LoginResp {
 
     private String token;
 
-
+    private String uappId;
 }

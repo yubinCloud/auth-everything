@@ -1,6 +1,6 @@
 package com.example.dsworker.utils;
 
-import com.example.dsworker.dto.response.adapter.dataease.DataAndFieldSet;
+import com.example.dsworker.dto.response.adapter.dataease.TableField;
 import org.apache.commons.lang3.StringUtils;
 
 import java.sql.ResultSet;
@@ -32,15 +32,21 @@ public class ResultSetConverter {
         return toRowList(rs, limit, offset, ROW_FORMAT_ARRAY).stream().map(row -> (String[]) row).toList();
     }
 
-    static public List<DataAndFieldSet.TableField> toFieldList(ResultSet rs) throws SQLException {
-        List<DataAndFieldSet.TableField> fieldList = new ArrayList<>();
+    /**
+     * 将 ResultSet 的 metadata 转为 `List<TableField>`
+     * @param rs
+     * @return
+     * @throws SQLException
+     */
+    static public List<TableField> toFieldList(ResultSet rs) throws SQLException {
+        List<TableField> fieldList = new ArrayList<>();
         ResultSetMetaData metaData = rs.getMetaData();
         int columnCount = metaData.getColumnCount();
         for (int j = 0; j < columnCount; j++) {
             String colName = metaData.getColumnName(j + 1);
             String colLabel = StringUtils.isNotEmpty(metaData.getColumnLabel(j + 1)) ? metaData.getColumnLabel(j + 1): colName;
             String colType = metaData.getColumnTypeName(j + 1);
-            var field = new DataAndFieldSet.TableField();
+            var field = new TableField();
             field.setFieldName(colLabel);
             field.setRemarks(colLabel);
             field.setFieldType(colType);
