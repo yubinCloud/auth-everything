@@ -24,6 +24,9 @@ public class DsWorkerRpcService {
 
     /**
      * 通过远程调用 ds-worker 来执行 SQL
+     *
+     * 当无法连接 ds-worker 或者连接出现错误时，会抛出 BzException
+     * 当 ds-worker 返回 code 不为 0 时，会抛出 SQLException，调用者需要根据业务需求来处理 SQLException，比如捕获 SQLException 并重新抛出 BzException(code=SQL_EXEC_ERROR)
      * @param dsConf
      * @param sql
      * @param slots
