@@ -5,6 +5,8 @@ import com.example.avuehelper.service.rpc.DsWorkerRpcService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.sql.SQLException;
+
 @Service
 @RequiredArgsConstructor
 public class DatasourceMangeService {
@@ -15,7 +17,7 @@ public class DatasourceMangeService {
         String checkSQL = "SELECT 1 FROM DUAL";
         try {
             dsWorkerService.execSelectSQL(dsConf, checkSQL);
-        } catch (Exception e) {
+        } catch (SQLException e) {
             return false;
         }
         return true;

@@ -47,4 +47,11 @@ public class GlobalExceptionHandler {
     public R<Object> handleInputSlotException(@NotNull Exception e) {
         return R.badRequest("输入的 SQL 参数与 SQL 不匹配，请检查");
     }
+
+    @ResponseBody
+    @ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler( {Exception.class })
+    public R<Object> handleUnknownException(@NotNull Exception e) {
+        return R.badRequest("发生未知异常，请检查 ds-worker 服务");
+    }
 }

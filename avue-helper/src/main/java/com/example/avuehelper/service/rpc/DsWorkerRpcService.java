@@ -1,11 +1,15 @@
 package com.example.avuehelper.service.rpc;
 
+import com.example.avuehelper.constant.BzExceptionEnum;
 import com.example.avuehelper.entity.DataSourceConf;
 import com.example.avuehelper.entity.SQLSlot;
+import com.example.avuehelper.exception.BzExceptionFactory;
 import com.example.avuehelper.exchange.api.DsWorkerExchange;
 import com.example.avuehelper.exchange.request.ExecSelectSQLRequest;
+import com.example.avuehelper.exchange.response.DsWorkerRespJSON;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.sql.SQLException;
 import java.util.Collections;
@@ -37,7 +41,14 @@ public class DsWorkerRpcService {
         requestBody.setQueryLimit(queryLimit);
         requestBody.setQueryOffset(queryOffset);
         // 发起远程调用
-        var dsWorkerResp = dsWorkerExchange.execSelectSQL(requestBody);
+        DsWorkerRespJSON<List<Map<String, Object>>> dsWorkerResp;
+        try {
+            dsWorkerResp = dsWorkerExchange.execSelectSQL(requestBody);
+        } catch (WebClientResponseException.ServiceUnavailable e) {
+            throw BzExceptionFactory.make(BzExceptionEnum.DS_WORKER_ERROR, "ds-worker 无法连接");
+        } catch (WebClientResponseException e) {
+            throw BzExceptionFactory.make(BzExceptionEnum.DS_WORKER_ERROR, "ds-worker 出现错误：" + e.getLocalizedMessage());
+        }
         // 获取 resp
         if (dsWorkerResp.getCode() != 0) {
             throw new SQLException(dsWorkerResp.getMsg());
