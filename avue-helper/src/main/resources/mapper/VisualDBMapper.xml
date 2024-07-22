@@ -11,10 +11,11 @@
         <result property="url" column="url" jdbcType="VARCHAR"/>
         <result property="username" column="username" jdbcType="VARCHAR"/>
         <result property="password" column="password" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
     </resultMap>
 
     <sql id="VisualDBEntityColums">
-        id, name, driver_class, url, username, password
+        id, name, driver_class, url, username, password, remark
     </sql>
     <insert id="insertOne" parameterType="com.example.avuehelper.dto.request.NewVisualDBDto">
         INSERT INTO blade_visual_db
@@ -26,5 +27,19 @@
         SELECT <include refid="VisualDBEntityColums"/>
         FROM blade_visual_db
         WHERE id = #{id,jdbcType=BIGINT}
+    </select>
+
+    <select id="selectPage" resultMap="VisualDBMapping">
+        SELECT <include refid="VisualDBEntityColums"/>
+        FROM blade_visual_db
+        WHERE tenant_id = #{tenantId,jdbcType=INTEGER}
+        ORDER BY id
+        OFFSET #{offset,jdbcType=INTEGER} LIMIT #{limit,jdbcType=INTEGER}
+    </select>
+
+    <select id="countAll" resultType="long">
+        SELECT COUNT(*)
+        FROM blade_visual_db
+        WHERE tenant_id = #{tenantId,jdbcType=INTEGER}
     </select>
 </mapper>

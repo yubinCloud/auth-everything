@@ -10,6 +10,7 @@ import lombok.Data;
 @Schema(description = "创建新数据源")
 public class NewVisualDBDto {
 
+    @Schema(description = "不需要前端传递，由后端自动生成")
     private Long id;
 
     @NotBlank

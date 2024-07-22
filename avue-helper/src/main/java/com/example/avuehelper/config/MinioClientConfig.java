@@ -35,10 +35,10 @@ public class MinioClientConfig {
         // 检查 bucket 是否存在
         boolean found = client.bucketExists(BucketExistsArgs.builder().bucket(minioProperties.getBucket()).build());
         if (!found) {
-            log.info("MinIO bucket `" + minioProperties.getBucket() + "` not found, prepare to create it.");
+            log.info("MinIO bucket `{}` not found, prepare to create it.", minioProperties.getBucket());
             client.makeBucket(MakeBucketArgs.builder().bucket(minioProperties.getBucket()).build());
         } else {
-            log.info("MinIO bucket `" + minioProperties.getBucket() + "` already exists.");
+            log.info("MinIO bucket `{}` already exists.", minioProperties.getBucket());
         }
         // 将 bucket 的策略设置为 public
         Resource bucketPolicyFile = resourceLoader.getResource("classpath:minio-bucket-policy.json");

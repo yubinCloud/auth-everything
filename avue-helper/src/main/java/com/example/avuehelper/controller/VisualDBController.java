@@ -1,5 +1,6 @@
 package com.example.avuehelper.controller;
 
+import com.example.avuehelper.constant.XRequestHeader;
 import com.example.avuehelper.dto.request.NewVisualDBDto;
 import com.example.avuehelper.dto.response.R;
 import com.example.avuehelper.entity.VisualDB;
@@ -26,8 +27,7 @@ public class VisualDBController {
     }
 
     @PostMapping("/add")
-    public R saveDB(@RequestBody NewVisualDBDto db,
-                    @RequestHeader("X-TenantId") Integer tenantId) {
+    public R saveDB(@RequestBody NewVisualDBDto db, @RequestHeader(XRequestHeader.X_TENANT_ID) Integer tenantId) {
         db.setTenantId(tenantId);
         visualDBService.insertOne(db);
         return R.ok();
